@@ -1,0 +1,77 @@
+{
+  "notes": "Column names are best guesses from docs. Data Steward: run \\d on each table and correct before freezing.",
+  "in_sample_end": null,
+  "tables": {
+    "sas_candidates": "SELECT * FROM super_agent_select_candidates_daily WHERE trading_date <= :as_of",
+    "sas_runs": "SELECT * FROM super_agent_select_runs WHERE trading_date <= :as_of",
+    "sas_excursion": "SELECT * FROM sas_selection_excursion WHERE trading_date <= :as_of",
+    "conviction_monitor": "SELECT * FROM conviction_monitor_daily WHERE trading_date <= :as_of",
+    "market_regime": "SELECT * FROM market_regime_daily WHERE trading_date <= :as_of",
+    "uoa_symbol": "SELECT * FROM uoa_symbol_daily WHERE trading_date <= :as_of",
+    "gex_symbol": "SELECT * FROM gex_symbol_daily WHERE trading_date <= :as_of",
+    "whale_ledger": "SELECT * FROM whale_watch_ledger WHERE trading_date <= :as_of",
+    "projection_bull": "SELECT * FROM projection_pick_bullish_daily WHERE trading_date <= :as_of",
+    "projection_bear_v2": "SELECT * FROM projection_pick_bearish_daily_v2 WHERE trading_date <= :as_of",
+    "outcome_corrections": "SELECT * FROM outcome_correction_ledger"
+  },
+  "availability": {
+    "sas_candidates": {
+      "available_time_et": "16:05",
+      "lag_sessions": 0,
+      "note": "written live at decision time; point-in-time by construction"
+    },
+    "sas_runs": {
+      "available_time_et": "16:05",
+      "lag_sessions": 0
+    },
+    "sas_excursion": {
+      "available_time_et": "post-hoc",
+      "lag_sessions": 1,
+      "note": "OUTCOME table \u2014 never a feature"
+    },
+    "conviction_monitor": {
+      "available_time_et": "16:02",
+      "lag_sessions": 1,
+      "note": "next-session signal; feature only for t+1 decisions"
+    },
+    "market_regime": {
+      "available_time_et": "16:05",
+      "lag_sessions": 0,
+      "note": "use the label written that night; validators V3 blocks revised columns"
+    },
+    "uoa_symbol": {
+      "available_time_et": "16:05",
+      "lag_sessions": 0,
+      "note": "OI confirmation columns are NEXT-MORNING data: lag_sessions=1 for any *_oi_* column"
+    },
+    "gex_symbol": {
+      "available_time_et": "16:05",
+      "lag_sessions": 0
+    },
+    "whale_ledger": {
+      "available_time_et": "post-hoc",
+      "lag_sessions": 1,
+      "note": "OUTCOME table"
+    },
+    "projection_bull": {
+      "available_time_et": "16:05",
+      "lag_sessions": 0
+    },
+    "projection_bear_v2": {
+      "available_time_et": "16:05",
+      "lag_sessions": 0
+    },
+    "outcome_corrections": {
+      "available_time_et": "post-hoc",
+      "lag_sessions": 1,
+      "note": "never a feature"
+    }
+  },
+  "lineage_required": [
+    "code_git_sha",
+    "scoring_versions_present",
+    "engine_versions_present",
+    "universe_membership_note"
+  ],
+  "universe_membership_note": "Candidate universe is generated live nightly from engines; no reconstructed universe. If any table is backfilled, record universe_membership_asof here."
+}

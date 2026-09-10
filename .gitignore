@@ -1,0 +1,6 @@
+# --- research desk ---
+.env
+.env.*
+research/data/*.parquet
+research/reports/hook_audit.log
+logs/

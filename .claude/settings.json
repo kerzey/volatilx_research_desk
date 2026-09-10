@@ -1,0 +1,86 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat research/*)",
+      "Bash(git -C $CODEBASE_DIR blame*)",
+      "Bash(git -C $CODEBASE_DIR log*)",
+      "Bash(git -C $CODEBASE_DIR ls-files*)",
+      "Bash(git -C $CODEBASE_DIR rev-parse*)",
+      "Bash(git -C $CODEBASE_DIR show*)",
+      "Bash(git add research/*)",
+      "Bash(git commit*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git push origin main*)",
+      "Bash(git status*)",
+      "Bash(ls*)",
+      "Bash(psql $RESEARCH_DB_URL*)",
+      "Bash(python research/*)",
+      "Bash(python research/lib/controller.py*)",
+      "Bash(python research/lib/db.py*)",
+      "Bash(python research/lib/status.py*)",
+      "Bash(python research/lib/validators.py*)",
+      "Bash(python scripts/second_opinion.py*)",
+      "Bash(sha256sum*)",
+      "Bash(wc*)",
+      "Glob",
+      "Grep",
+      "Read"
+    ],
+    "deny": [
+      "Bash(az storage blob delete*)",
+      "Bash(az storage blob upload*)",
+      "Bash(az storage container delete*)",
+      "Bash(curl*)",
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(git push origin +*)",
+      "Bash(rm -rf*)",
+      "Bash(sudo*)",
+      "Bash(wget*)",
+      "Edit(../volatilx/**)",
+      "Edit(.claude/**)",
+      "Edit(.claude/hooks/**)",
+      "Edit(//c/Users/sahin/Projects/volatilx/**)",
+      "Edit(research/lib/controller.py)",
+      "Edit(research/lib/eval_utils.py)",
+      "Edit(research/lib/freeze_dataset.py)",
+      "Edit(research/lib/validators.py)",
+      "Read(**/*.pem)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(**/secrets/**)",
+      "Read(.env)",
+      "Read(.env.*)",
+      "Write(../volatilx/**)",
+      "Write(.claude/**)",
+      "Write(.claude/hooks/**)",
+      "Write(//c/Users/sahin/Projects/volatilx/**)"
+    ],
+    "additionalDirectories": [
+      "C:/Users/sahin/Projects/volatilx"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/guard_bash.py"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/guard_write.py"
+          }
+        ]
+      }
+    ]
+  }
+}
