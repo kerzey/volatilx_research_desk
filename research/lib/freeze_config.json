@@ -1,6 +1,7 @@
 {
-  "notes": "Column names are best guesses from docs. Data Steward: run \\d on each table and correct before freezing.",
-  "in_sample_end": null,
+  "notes": "Data Steward verified 2026-09-10: all 11 tables use `trading_date` as the date column (guessed names were correct); no column-name fixes were needed. Two schema hazards found and documented below: (1) market_regime_daily carries THREE regime_version rows per trading_date for 2026-01-02..2026-06-08 (v1/v1.1/v1.2), all written by a same-day backfill on 2026-06-02/2026-06-08 \u2014 there is NO point-in-time regime label on record for any night before 2026-06-09; only v1.2 rows from 2026-06-09 onward are same-night live writes. SELECT * intentionally keeps all versions for lineage; consumers must NOT treat pre-2026-06-09 rows as point-in-time. (2) sas_selection_excursion.computed_at shows recomputation weeks/months after trading_date (not a fixed 1-session lag) \u2014 confirmed OUTCOME-only, never a feature, consistent with existing note.",
+  "in_sample_end": "2026-05-29",
+  "in_sample_end_rationale": "Last trading date of May 2026 (per super_agent_select_runs). CLAUDE.md records April-May 2026 as a strong tape and June-August as materially weaker; splitting at the April/May-June boundary keeps the strong tape entirely in-sample and puts the weaker, larger June-Sep10 stretch out-of-sample \u2014 the conservative direction for an OOS test per Q001 PREREG \u00a76/\u00a78. Set by data-steward per protocol; Q001's PREREG is not yet locked and this value is provisional until Haci locks it.",
   "tables": {
     "sas_candidates": "SELECT * FROM super_agent_select_candidates_daily WHERE trading_date <= :as_of",
     "sas_runs": "SELECT * FROM super_agent_select_runs WHERE trading_date <= :as_of",
@@ -12,13 +13,13 @@
     "whale_ledger": "SELECT * FROM whale_watch_ledger WHERE trading_date <= :as_of",
     "projection_bull": "SELECT * FROM projection_pick_bullish_daily WHERE trading_date <= :as_of",
     "projection_bear_v2": "SELECT * FROM projection_pick_bearish_daily_v2 WHERE trading_date <= :as_of",
-    "outcome_corrections": "SELECT * FROM outcome_correction_ledger"
+    "outcome_corrections": "SELECT * FROM outcome_correction_ledger WHERE trading_date <= :as_of"
   },
   "availability": {
     "sas_candidates": {
       "available_time_et": "16:05",
       "lag_sessions": 0,
-      "note": "written live at decision time; point-in-time by construction"
+      "note": "written live at decision time; point-in-time by construction. Verified: sampled created_at/updated_at cluster same trading_date evening."
     },
     "sas_runs": {
       "available_time_et": "16:05",
@@ -27,22 +28,22 @@
     "sas_excursion": {
       "available_time_et": "post-hoc",
       "lag_sessions": 1,
-      "note": "OUTCOME table \u2014 never a feature"
+      "note": "OUTCOME table \u2014 never a feature. CORRECTION 2026-09-10: computed_at sampling shows the true lag is NOT a fixed 1 session \u2014 rows are recomputed repeatedly over weeks/months as the excursion window matures (e.g. trading_date 2026-04-21 recomputed at 2026-07-05 and again later). \"lag_sessions: 1\" understates this; treat as variable/never-a-feature, not next-day-available."
     },
     "conviction_monitor": {
       "available_time_et": "16:02",
       "lag_sessions": 1,
-      "note": "next-session signal; feature only for t+1 decisions"
+      "note": "next-session signal; feature only for t+1 decisions. Verified: created_at is same trading_date ~16:02 ET for a 20-row random sample, no exceptions."
     },
     "market_regime": {
       "available_time_et": "16:05",
       "lag_sessions": 0,
-      "note": "use the label written that night; validators V3 blocks revised columns"
+      "note": "CORRECTED 2026-09-10: this is only true for regime_version='v1.2' rows with trading_date >= 2026-06-09 (created_at same-day ~16:05 ET, verified on a random sample, one late-write exception on 2026-07-06 posted 2026-07-07 14:23 UTC). For trading_date <= 2026-06-08 there is NO point-in-time row at all \u2014 all v1/v1.1/v1.2 rows for that period were written by a backfill on 2026-06-02/2026-06-08. Do not use market_regime_daily as a knowledge-time-compliant feature before 2026-06-09; validator V3's revised-column block does not protect against this because the hazard is a wholesale missing-then-backfilled history, not a same-day revision."
     },
     "uoa_symbol": {
       "available_time_et": "16:05",
       "lag_sessions": 0,
-      "note": "OI confirmation columns are NEXT-MORNING data: lag_sessions=1 for any *_oi_* column"
+      "note": "OI confirmation columns are NEXT-MORNING data: lag_sessions=1 for any *_oi_* column. Verified: in a 15-row sample, oi_confirm_* fields always postdate created_at (updated_at ranges from next-day to several weeks later for older backfilled rows) \u2014 never same-day, so no leak, but \"next-morning\" understates how late some historical rows were finalized."
     },
     "gex_symbol": {
       "available_time_et": "16:05",
@@ -51,7 +52,7 @@
     "whale_ledger": {
       "available_time_et": "post-hoc",
       "lag_sessions": 1,
-      "note": "OUTCOME table"
+      "note": "OUTCOME table. Verified 2026-09-10: table is EMPTY (0 rows) \u2014 confirms CLAUDE.md's known finding \"whale ledger empty.\""
     },
     "projection_bull": {
       "available_time_et": "16:05",
@@ -64,7 +65,7 @@
     "outcome_corrections": {
       "available_time_et": "post-hoc",
       "lag_sessions": 1,
-      "note": "never a feature"
+      "note": "never a feature. SQL corrected 2026-09-10 to add the trading_date <= :as_of filter (was previously pulling the full table unscoped); 0 of 795 rows have a null trading_date so the filter is safe."
     }
   },
   "lineage_required": [
@@ -73,5 +74,5 @@
     "engine_versions_present",
     "universe_membership_note"
   ],
-  "universe_membership_note": "Candidate universe is generated live nightly from engines; no reconstructed universe. If any table is backfilled, record universe_membership_asof here."
+  "universe_membership_note": "Candidate universe is generated live nightly from engines; no reconstructed universe. If any table is backfilled, record universe_membership_asof here. FLAG: market_regime_daily trading_date <= 2026-06-08 is entirely backfilled (see availability.market_regime note) \u2014 universe_membership_asof for that slice = 2026-06-02 (v1) / 2026-06-08 (v1.1, v1.2)."
 }

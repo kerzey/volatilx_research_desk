@@ -1,4 +1,7 @@
 {
+  "env": {
+    "CODEBASE_DIR": "C:/Users/sahin/Projects/volatilx"
+  },
   "permissions": {
     "allow": [
       "Bash(cat research/*)",
@@ -40,7 +43,6 @@
       "Bash(wget*)",
       "Edit(../volatilx/**)",
       "Edit(.claude/**)",
-      "Edit(.claude/hooks/**)",
       "Edit(//c/Users/sahin/Projects/volatilx/**)",
       "Edit(research/lib/controller.py)",
       "Edit(research/lib/eval_utils.py)",
@@ -51,11 +53,7 @@
       "Read(**/.env.*)",
       "Read(**/secrets/**)",
       "Read(.env)",
-      "Read(.env.*)",
-      "Write(../volatilx/**)",
-      "Write(.claude/**)",
-      "Write(.claude/hooks/**)",
-      "Write(//c/Users/sahin/Projects/volatilx/**)"
+      "Read(.env.*)"
     ],
     "additionalDirectories": [
       "C:/Users/sahin/Projects/volatilx"

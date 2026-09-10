@@ -3,7 +3,7 @@
 set -euo pipefail
 MODE="${1:-daily}"
 cd "$(dirname "$0")/.."
-set -a; [ -f .env ] && . ./.env; set +a
+set -a; [ -f .env.research ] && . ./.env.research; set +a
 mkdir -p research/reports/daily research/reports/weekly logs
 
 TOOLS='Read,Grep,Glob,Bash(python research/*),Bash(psql $RESEARCH_DB_URL*),Bash(ls*),Bash(cat research/*),Write'
