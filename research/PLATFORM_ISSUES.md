@@ -22,16 +22,16 @@ Statuses: `OPEN` · `HACI_DECIDED:<fix|research|accept>` · `BRIEF_WRITTEN` · `
 
 | ID | Severity | Status | Issue |
 |---|---|---|---|
-| PI-001 | high | FIX | `uoa_symbol_daily.fwd_return_*` still ~95% degraded; 30d relapsed to 0% from 07-27 |
-| PI-002 | high | FIX | No coverage watchdog fires on PI-001 (none found in the codebase by that name) |
-| PI-003 | med | FIX | `atr_pct` corrupted around splits (ATR computed on raw bars) |
-| PI-004 | med | FIX | Manual re-runs indistinguishable from nightly runs in `super_agent_select_runs` |
-| PI-005 | med | accept | `market_regime_daily` not point-in-time before 06-09 (backfilled) |
-| PI-006 | low | FIX | 16 published picks have no target ladder |
-| PI-007 | low | FIX | `industry` populated for only 12% of candidates |
-| PI-008 | low | accept | Smart-money layer weight forced to 0; CLAUDE.md weights text says 5 |
-| PI-009 | research | research | L1/L2 targets sit inside one day's range (median 0.31 / 0.55 ATR) — targets are not ATR-scaled |
-| PI-010 | research | research | Elite (90+) count falling: Apr 8 · May 13 · Jun 12 · Jul 8 · Aug 3 · Sep 2 |
+| PI-001 | high | HACI_DECIDED:fix | `uoa_symbol_daily.fwd_return_*` still ~95% degraded; 30d relapsed to 0% from 07-27 |
+| PI-002 | high | HACI_DECIDED:fix | No coverage watchdog fires on PI-001 (none found in the codebase by that name) |
+| PI-003 | med | HACI_DECIDED:fix | `atr_pct` corrupted around splits (ATR computed on raw bars) |
+| PI-004 | med | HACI_DECIDED:fix | Manual re-runs indistinguishable from nightly runs in `super_agent_select_runs` |
+| PI-005 | med | HACI_DECIDED:accept | `market_regime_daily` not point-in-time before 06-09 (backfilled) |
+| PI-006 | low | HACI_DECIDED:fix | 16 published picks have no target ladder |
+| PI-007 | low | HACI_DECIDED:fix | `industry` populated for only 12% of candidates |
+| PI-008 | low | HACI_DECIDED:accept | Smart-money layer weight forced to 0; CLAUDE.md weights text says 5 |
+| PI-009 | research | HACI_DECIDED:research | L1/L2 targets sit inside one day's range (median 0.31 / 0.55 ATR) — targets are not ATR-scaled |
+| PI-010 | research | HACI_DECIDED:research | Elite (90+) count falling: Apr 8 · May 13 · Jun 12 · Jul 8 · Aug 3 · Sep 2 |
 
 ## Detail
 
