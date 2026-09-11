@@ -32,14 +32,23 @@ def v1_prereg_locked(qdir):
     return bool(committed) and not dirty, "PREREG committed and unchanged"
 
 
+def prereg_manifests(d):
+    """Every manifest named in a PREREG header line "**Manifest…:** <path> …".
+    Accepts "**Manifest:**" and qualified forms such as "**Manifest (selections):**"."""
+    import re
+    pat = re.compile(r"^\*\*Manifest[^*]*:\*\*\s*(\S+)")
+    return [m.group(1) for line in (d / "PREREG.md").read_text(encoding="utf-8").splitlines()
+            if (m := pat.match(line))]
+
+
 def v2_manifest_verified(qdir):
-    # manifest path is parsed from PREREG header line "**Manifest:** research/data/manifest_vNNN.json"
-    for line in (qdir / "PREREG.md").read_text().splitlines():
-        if line.startswith("**Manifest:**"):
-            path = line.split("**Manifest:**")[1].split()[0]
-            r = subprocess.run([sys.executable, "research/lib/freeze_dataset.py", "--verify", path])
-            return r.returncode == 0, f"manifest {path} checksums"
-    return False, "manifest line missing in PREREG"
+    # every manifest named in a PREREG header line "**Manifest…:** research/data/<file>.json"
+    paths = prereg_manifests(qdir)
+    if not paths:
+        return False, "manifest line missing in PREREG"
+    bad = [p for p in paths
+           if subprocess.run([sys.executable, "research/lib/freeze_dataset.py", "--verify", p]).returncode != 0]
+    return not bad, (f"checksum verify failed: {bad}" if bad else f"checksums OK: {paths}")
 
 
 def v3_no_revised_labels(qdir):
@@ -99,12 +108,18 @@ def v8_reproducible(qdir):
 
 
 def v9_lineage_present(qdir):
-    for line in (qdir / "PREREG.md").read_text().splitlines():
-        if line.startswith("**Manifest:**"):
-            m = json.loads(Path(line.split("**Manifest:**")[1].split()[0]).read_text())
-            missing = [k for k in ("code_git_sha", "scoring_versions_present") if k not in m]
-            return not missing, f"manifest lineage missing: {missing}" if missing else "lineage present"
-    return False, "no manifest"
+    paths = prereg_manifests(qdir)
+    if not paths:
+        return False, "no manifest"
+    missing = {}
+    for p in paths:
+        m = json.loads(Path(p).read_text())
+        # a price manifest (freeze_prices.py) is keyed to a base SAS manifest instead of scoring versions
+        need = ("code_git_sha", "base_manifest_sha256") if "base_manifest" in m else ("code_git_sha", "scoring_versions_present")
+        gap = [k for k in need if k not in m]
+        if gap:
+            missing[p] = gap
+    return not missing, (f"manifest lineage missing: {missing}" if missing else f"lineage present in {len(paths)} manifest(s)")
 
 
 CHECKS = [v1_prereg_locked, v2_manifest_verified, v3_no_revised_labels, v4_knowledge_time,

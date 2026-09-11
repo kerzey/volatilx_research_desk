@@ -61,19 +61,32 @@ def pre_PREREG_LOCKED(d, st, args):
     return None
 
 
+def prereg_manifests(d):
+    """Every manifest named in a PREREG header line "**Manifest…:** <path> …".
+    Accepts "**Manifest:**" and qualified forms such as "**Manifest (selections):**"."""
+    import re
+    pat = re.compile(r"^\*\*Manifest[^*]*:\*\*\s*(\S+)")
+    return [m.group(1) for line in (d / "PREREG.md").read_text(encoding="utf-8").splitlines()
+            if (m := pat.match(line))]
+
+
 def pre_DATASET_PINNED(d, st, args):
-    for line in (d / "PREREG.md").read_text().splitlines():
-        if line.startswith("**Manifest:**"):
-            m = Path(line.split("**Manifest:**")[1].split()[0])
-            if not m.exists():
-                return f"manifest {m} not found"
-            r = subprocess.run([sys.executable, "research/lib/freeze_dataset.py", "--verify", str(m)], capture_output=True)
-            if r.returncode != 0:
-                return "manifest checksum verify failed"
-            st["manifest"] = str(m)
-            st["manifest_sha256"] = sha(m)
-            return None
-    return "no manifest line in PREREG"
+    paths = prereg_manifests(d)
+    if not paths:
+        return "no manifest line in PREREG"
+    pinned = {}
+    for p in paths:
+        m = Path(p)
+        if not m.exists():
+            return f"manifest {m} not found"
+        r = subprocess.run([sys.executable, "research/lib/freeze_dataset.py", "--verify", str(m)], capture_output=True)
+        if r.returncode != 0:
+            return f"manifest checksum verify failed: {m}"
+        pinned[p] = sha(m)
+    st["manifest"] = paths[0]                 # kept for older tooling
+    st["manifest_sha256"] = pinned[paths[0]]
+    st["manifests"] = pinned                  # every manifest the PREREG names
+    return None
 
 
 def pre_EVALUATED(d, st, args):
