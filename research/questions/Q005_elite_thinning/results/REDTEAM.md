@@ -159,4 +159,178 @@ Verdict under alternative readings (using only numbers eval.py already produced;
 4. Caveat Gate 0 for streakiness (F3) and the mixed P0 baseline (F5).
 5. Any successor question that re-specifies the 3a rule is post hoc with respect to manifest_v001 and must say so.
 
+## Addendum 2026-09-11 — second opinion (checklist item 10, run after sign-off)
+
+**Decision (plain English, for Haci): the second opinion does NOT change the verdict. It stays INCONCLUSIVE.**
+The second model reached INCONCLUSIVE on its own, for the same main reason as F1: the config changes line up with the fall in time, but nothing shows they caused it. Its closing line, "SECOND OPINION: DISAGREE", is aimed at eval.py's mechanical HISTORICALLY_CONFIRMED in SUMMARY.md, the only verdict it was shown. It did not see this review. One of its points (look-ahead in the candidate snapshot) led me to a new defect, A1: on four nights the frozen candidates come from a re-run made 19-51 hours after the 16:05 decision. A1 strengthens F1 and leaves Gate 0 intact, so the verdict does not move. It needs a Data Steward fix.
+
+Run facts:
+- Command: `python scripts/second_opinion.py --question Q005` from the desk root, 2026-09-11. First attempt, exit 0. Output: results/SECOND_OPINION.md.
+- Model: **gpt-5.6-sol** (OPENAI_REVIEW_MODEL in the desk settings file's env block; also the SECOND_OPINION.md header).
+- Inputs sent: PREREG.md (sha256 8347b498...cd7bc, the same file eval.py ran against per run_summary.prereg_sha256), eval.py, results/SUMMARY.md. Nothing else. The model did not see the result CSVs, run_summary.json, git history or this review.
+- Credential basis: CLAUDE.md rule 1 as amended in 29a449f lists OPENAI_API_KEY. Checked on disk before running.
+- Script encoding defect (not fixed; scripts/ is outside the desk's write area). scripts/second_opinion.py:39 reads with `read_text()` and :49 writes with `write_text()`, neither with an encoding. On this Windows host (cp1252 locale) the model therefore received UTF-8 files decoded as cp1252, so characters like ≥, §, → and — arrived garbled. SECOND_OPINION.md is also saved as cp1252. The garbling did not stop the model reading the code. The critique below is decoded from cp1252, with CRLF normalised, and is otherwise verbatim. Fix for Haci: add `encoding="utf-8"` on both lines.
+- The model's eval.py line citations are approximate, often 10-20 lines off. Correct lines are given in my responses.
+
+### Second model's critique (verbatim, gpt-5.6-sol)
+
+````text
+## Adversarial review
+
+### 1. The “configuration” verdict establishes timing, not causation
+
+The decisive flaw is the definition of `brackets_the_fall`. A change is deemed causal whenever:
+
+1. any changed key is classified as “behavioural,”
+2. there are at least 20 nights before and after,
+3. the post-change elite rate is lower, and
+4. an unadjusted permutation p-value is at most 0.05.
+
+That logic appears in `classify()` and the breakpoint loop (eval.py lines 543–637). It never recomputes historical scores under the old versus new configuration, isolates the changed key, or even verifies that the key can affect `overall_score`. In particular, `classify()` treats essentially every numeric parameter as behavioural and every Boolean change other than adding `False` as behavioural (lines 559–575).
+
+The four “confirmed” dates are nested breakpoints only one to seven sessions apart. Their before/after samples substantially overlap, so all four are largely detecting the same July–September decline. They are not four independent replications. A general time trend, market shift, upstream model change, or unrelated scoring change would make every sufficiently late breakpoint appear to “bracket” the fall.
+
+Worse, the final verdict short-circuits to configuration whenever any breakpoint fires (eval.py lines 1030–1040), even though the registered distributional analysis is explicitly INCONCLUSIVE and the greedy and marginal component rankings disagree. At most, the analysis confirms temporal coincidence between configuration hashes and a decline.
+
+The supplied summary also omits the key-level diff table, so a reviewer cannot determine whether the June 29–July 8 changes were capable of moving a score through 90.
+
+### 2. Look-ahead and post-selection risks
+
+There is no obvious use of forward returns, but several weaker forms of look-ahead remain:
+
+- The candidate table is loaded from a September snapshot without checking row creation/update timestamps or reconstructing what was actually visible on each night (eval.py lines 116–166). Carrying a historical `trading_date` or embedded JSON does not prove the row was never backfilled or overwritten.
+- Channel 4’s price and dollar-volume tercile cutoffs are calculated from **all P0 and P1 rows together** (lines 642–692). Consequently, the P0 universe definition depends on the later P1 distribution. P0-derived cutoffs should have been frozen and applied to P1.
+- The as-of price join permits a bar dated on the signal night rather than requiring the previous completed session (lines 657–668). A 16:05 ET diagnostic can know the official close shortly afterward, but a retail trader could not execute at that same closing price after receiving a 16:05 signal.
+- The greedy component order is selected from the observed marginal effects and then held fixed in the bootstrap (lines 850–890). The intervals therefore do not include uncertainty from selecting the order.
+- More fundamentally, the preregistration says `Status: DRAFT`, while the monthly decline was already known and explicitly motivated the dates and hypothesis. Without proof that the cited commit was locked before implementation choices and before inspecting component/config results, researcher-degree-of-freedom look-ahead cannot be ruled out.
+
+### 3. Denominator, missing-night, and survivorship problems
+
+The population is only nights with an existing `sas_run`; `NIGHTS` is constructed from observed run dates rather than from every expected market session (eval.py lines 116–143). Sessions without a run are merely listed. A zero-candidate or failed-run night is therefore not necessarily represented as zero output. The subsequent assertion that every retained night has at least one candidate (lines 274–282) prevents such nights from entering the rate denominator.
+
+That creates operational survivorship risk: if engine failures or zero-output nights were more common in either period, elite picks per calendar/trading night would be biased. The script also does not validate the preregistration’s assertion that `sas_candidates` contains every unpublished candidate; it can only analyze rows surviving in the frozen table.
+
+Repeated symbols and multiple source memberships also mean candidate rows are not a stable universe denominator. Night-level resampling handles within-night dependence for uncertainty, but it does not repair changes in deduplication, upstream eligibility, or persistence of candidate records.
+
+Channel 1 uses:
+
+`P0 mean candidate count × sum of P1 nightly elite fractions`
+
+rather than replaying a well-defined candidate-generation intervention (eval.py lines 776–814). This is sensitive to the nightly correlation between candidate volume and elite rate. It is not a unique causal decomposition. The negative Channel 1 share and 128% Channel 2 share demonstrate that the channels are not an additive accounting identity in the implemented counterfactual.
+
+### 4. Baseline mismatch
+
+The registered main baseline is P0 versus P1, but configuration “causality” uses a different baseline: every breakpoint compares **all nights before that date** with **all nights after it** (eval.py lines 585–625). Thus the June 29, July 2, July 7, and July 8 tests have different baselines and repeatedly include almost the same low-rate August/September observations.
+
+This is especially problematic because a gradual trend will mechanically produce significant late breakpoints even if no discrete change caused it. No interrupted-time-series model estimates a level or slope change at the configuration date, and no contemporaneous control series is used.
+
+The pre-registered shortfall is based on elite count per night, whereas Channel 2 quantile-maps pooled candidate rows (lines 706–814). Nights with more candidates therefore receive more weight in the score-distribution counterfactual than nights with fewer candidates, despite the declared night-level unit of inference.
+
+### 5. Regime confounding is described but not controlled
+
+The configuration dates coincide with calendar time, and the available regime composition is highly imbalanced: only eight P0 nights are shown as strongly bullish versus 42 P1 nights. Most within-period regime cells are suppressed. The code creates descriptive strata (eval.py lines 485–525), but neither Gate 0 nor the configuration-break tests adjust for regime, SPY trend/volatility, candidate mix, or seasonality.
+
+The SPY stratification is only a binary up/down classification based on trailing return. It does not control continuously for volatility or distinguish whether the July/August score decline reflects market inputs functioning as designed. Permuting elite counts across all dates in the breakpoint tests assumes exchangeability despite the very trend and regime structure under investigation.
+
+Therefore configuration, time, and market regime are almost perfectly confounded.
+
+### 6. Multiple-testing inflation
+
+The reported BH adjustment is effectively no adjustment: `BH_Q_GATE` is calculated from a one-element list and declares `m = 1` (eval.py lines 408–426), even though the preregistration identifies a four-item F2 family. The script also takes the minimum of the trend and rate p-values as `p_gate`; the separate within-gate BH values are merely informational and do not control the verdict.
+
+More seriously, approximately ten configuration breakpoints are tested at 0.05 with no family-wise or false-discovery correction (eval.py lines 576–637). The first reported “fire,” June 29, has p=0.0499 and would not survive even a modest multiplicity adjustment. The later p-values are stronger, but they are nested tests sharing nearly all observations and should not be interpreted as independent confirmation.
+
+There are also 14 component counterfactuals, two Channel 4 variants, a June-only catalyst sensitivity, month panels, and alternate cut analyses. Printing every result reduces selective reporting but does not correct selection bias in identifying the largest component or greedy order.
+
+### 7. Effect size versus slippage
+
+This study measures a product-label frequency change, not a trading effect. Its estimated effect is approximately 0.255 fewer elite labels per night, and the score’s 99th percentile declined by about 2.4 points. Neither quantity can be compared with spread, commissions, market impact, option slippage, or expected return.
+
+No outcome, entry price, trade direction payoff, holding period, or capacity analysis is read by the script; the candidate columns are explicitly restricted accordingly (eval.py lines 136–151). Thus `HISTORICALLY_CONFIRMED` must not be interpreted as confirmation of a tradable edge or economically material deterioration. A two-point score movement could have zero economic value even if it materially changes how often an arbitrary 90 threshold is crossed.
+
+### 8. Retail executability of the exit rule
+
+There is no exit rule at all. The preregistration expressly says no forward bars, outcomes, excursions, or returns are used, and `eval.py` defines neither an entry nor an exit. Retail executability, gap risk, option liquidity, bid–ask spread, and whether an exit can be placed contemporaneously therefore cannot be assessed.
+
+If the 16:05 ET score were later treated as a trading signal, a retail trader could only act in after-hours trading or at the next session’s open, not at the same-day regular-session close used by the trailing-price join. Any trading claim would require a separately preregistered next-executable-price entry and an explicit order-based exit.
+
+### Bottom line
+
+The decline in elite-candidate counts itself has reasonable evidence in this sample: both the trend and P0/P1 tests are near or below 0.05. What is not established is the stronger verdict that configuration caused it. The implementation labels unrelated or merely coincident configuration changes as causal, repeatedly tests overlapping breakpoints without correction, uses a baseline different from the registered P0/P1 comparison, and does not adjust for regime or time trends.
+
+The verdict should be INCONCLUSIVE pending old-config replay or a key-specific score counterfactual showing that the June 29–July 8 changes actually moved enough rows below 90.
+
+SECOND OPINION: DISAGREE
+````
+
+### Point-by-point response
+
+**Point 1: "the configuration verdict establishes timing, not causation". AGREE. This is F1, reached independently.**
+- `classify()` is eval.py:560-572. Line 571 counts every key as behavioural unless it was added with the value False. The global before/after split is eval.py:589-601. The short-circuit to the configuration verdict is eval.py:1014-1018 (the model cites 1030-1040). All confirmed.
+- Nested, overlapping breakpoints: confirmed. F1 counts the overlap: the four firing tests share 46 of their 46-51 "after" nights.
+- "The summary omits the key-level diff table": true of what the model was shown (SUMMARY.md:67 only points to the CSV). In F1 I read channel3a_config_diffs.csv. The firing keys are publication gates (bear_publish_threshold, bear_max_output_cap, publication_floor) plus a three-flag toggle and its revert.
+- The model asks for an old-config replay or a key-specific score counterfactual before any causal claim. eval.py's own outputs already settle this for the keys that fired:
+  - The scoring arithmetic `score_arr` (eval.py:232-251) has no term for any of them, yet it reproduces 6194 of 6211 overall_scores, including every P1 row.
+  - published_conversion.csv shows 29/29 and 12/12 elite candidates published.
+  - So these keys cannot have pushed a score across 90. Apart from them, the scoring configuration was constant from 06-03 to 09-10 (F1e).
+- New corroboration, A1 below: the 07-02 configuration was never in force at a 16:05 decision.
+
+**Point 2: look-ahead.**
+- **2a. Candidate snapshot, no created/updated-time check. AGREE IN PART. This led to new finding A1.** eval.py never reads `created_at` (USE_COLS, eval.py:89-95). The manifest availability note for sas_candidates says "point-in-time by construction", based on sampling. My checks on the frozen table (manifest_v001, the 107 included nights):
+  - Completeness is fine. Rows per night equal `sas_runs.stats_json.universe_count` on all 107 nights.
+  - **A1 (new, MEDIUM, knowledge time):** on 4 nights the whole candidate set was written by a re-run after the decision. In each case `sas_runs.created_at` is on the pick night, `started_at`/`finished_at` were reset to the re-run time, and every candidate row carries the re-run's `created_at`:
+
+    | night | run row created (UTC) | re-run started (UTC) | hours after 16:05 ET | rows | elite | config hash |
+    |---|---|---|---|---|---|---|
+    | 2026-04-02 | 04-02 20:28 | 04-04 22:13 | 50 | 67 | 1 | 6d5c0496833b |
+    | 2026-04-24 | 04-24 23:01 | 04-26 16:53 | 45 | 50 | 0 | 6d5c0496833b |
+    | 2026-05-15 | 05-15 20:38 | 05-17 23:25 | 51 | 53 | 0 | f7c5a4cb49be |
+    | 2026-07-02 | 07-02 22:23 | 07-03 14:58 | 19 | 61 | 1 | 0fea1355bf26 |
+
+    No trading session fell between any pick night and its re-run (Good Friday 04-03, two weekends, the 07-03 holiday), so closing prices are the same. The flow feeds, LLM-agent outputs and config, though, are those at re-run time, not at 16:05. Validators v1-v9 did not catch this.
+  - Effect on Gate 0. I dropped the 4 nights and recomputed by hand from nightly.csv with the same statistics as eval.py:392-430; run on all 107 nights, my code reproduces eval.py's values exactly. Result: P0 28/55 = 0.509 vs P1 11/48 = 0.229; Poisson Wald trend p 0.035 (was 0.039); permutation rate p 0.010 (was 0.018); exact rate p 0.024 (was 0.041). The fall stands and is slightly stronger.
+  - Effect on Channel 3a. Config 0fea1355bf26 (enrichment, multi-agent and synthesis flags set false) exists only in the 07-03 holiday re-run. The excluded 07-06 manual run and 07-07 both use 03fa47e1c436, the config from 06-29 (channel3a_config_timeline.csv). So the 07-02 "change" and the 07-07 "revert", two of the four firing dates, record how one re-run was configured, not a change to the engine's 16:05 configuration. This strengthens F1. Separately, the 05-15 weight/ATR change may really date from 05-18, because the frozen 05-15 rows come from the 05-17 re-run. That test did not fire either way (p = 0.062).
+  - Action: Data Steward. Add these 4 nights to the knowledge-time notes / exclusions next to 06-26 (F7), and correct the sas_candidates availability note: re-run nights overwrite the 16:05 set.
+  - Checked and benign: on 6 P1 nights (07-08, 07-16, 07-17, 07-27, 07-28, 07-31) `stats_json.top_score` is below the night's highest overall_score. The reason is that top_score reports the top bullish pick, and bearish picks are ranked separately (the higher rows are bearish, marked selected or selected_dark). None of those rows is 90 or above.
+  - Residual risk, low: 2807 rows were updated more than 10 minutes after creation, on nearly every night and up to 156 days later. That fits outcome grading writing to the same rows. The frozen table cannot prove the score columns were never touched. But score_details_json reproduces overall_score on every row except 06-26 (F7), and the stats_json universe counts match.
+- **2b. Channel 4 tercile cutoffs pooled over P0 and P1 (eval.py:641). AGREE it is a choice. DISAGREE that it is look-ahead or that it matters.** It uses no outcome and no future-dated field, and PREREG §4 does not say which period the terciles come from. It cannot change the verdict. At most, channel4_universe_joint would move from CONTRIBUTES to EXPLAINS. Even then, eval.py:976-979 would still return INCONCLUSIVE, because the marginal-vs-greedy disagreement (projection vs flow, eval.py:971-972) is computed from Channel 3 alone.
+- **2c. The as-of price join allows a bar dated on the pick night (eval.py:635-637). DISAGREE that this is a defect.** The 16:00 close is known by the 16:05 decision, as the model itself concedes. Its retail-execution argument does not apply because this question measures no trade and no return. The one real piece of hindsight in these bars is split adjustment (F11), and it affects Channel 4 only.
+- **2d. Greedy order chosen from point estimates, then held fixed in the bootstrap (eval.py:837-839, 849). AGREE, LOW.** The cumulative CIs are conditional on that order. The comparison that decides the verdict (marginal top vs greedy top, eval.py:971-972) uses point estimates only, so the bootstrap never enters it.
+- **2e. PREREG says "Status: DRAFT", and the decline was known when the hypothesis was written. DISAGREE on the lock. AGREE on selection, as a caveat.**
+  - The lock is fine. PREREG.md:3 is stale text. `git log --follow` shows PREREG.md committed once (c52fa16) and never changed; its sha256 matches run_summary.prereg_sha256; state.json records PREREG_LOCKED by haci before eval.py was committed (8242ccf).
+  - The selection point is right and I had not stated it. The question exists because the monthly series looked like a decline. Gate 0 tests essentially that same series, since every elite candidate was published (29/29, 12/12). So Gate 0's p-value is a post-selection p-value and overstates the evidence. This adds to F3.
+  - It does not make the verdict NULL. PREREG §8 gives NULL only if Gate 0 fails, and the registered test passes. The report should add it to the "fall is statistically marginal" caveat.
+
+**Point 3: denominator.**
+- **3a. Nights built from runs only, and "zero-output nights cannot enter". DISAGREE for this run.** run_summary.spy_sessions_without_run is empty: every SPY session from 04-01 to 09-10 has a run. Also, eval.py:293 is an assert, not a filter. A zero-candidate night would stop the script, not drop out quietly. The script ran, so there are none.
+- **3b. Nothing checks that sas_candidates is complete.** Checked now: rows equal universe_count on all 107 nights (2a).
+- **3c. The Channel 1 formula (eval.py:768) is not a unique decomposition, and the channels do not add up. AGREE.** Channel 1 is -10.8% and Channel 2 is 128.0%, so the PREREG §4 statement that "Channels 1 and 2 are exhaustive by construction" does not hold in the counterfactual as implemented. This supports INCONCLUSIVE. F4 already notes that Channel 2's EXPLAINS label is close to automatic here.
+
+**Point 4: baseline.**
+- **4a. The 3a tests use a different baseline from P0/P1. AGREE** (F1, F10).
+- **4b. A gradual trend makes late breakpoints significant, and there is no interrupted-time-series check. AGREE.** My local step test in F1 (20 nights either side of each date) fires for none of them; the closest is 07-08 at p = 0.059.
+- **4c. Channel 2 pools candidate rows (eval.py:778-780). AGREE, LOW.** This matches the spec: PREREG §4 defines Channel 2 on P1's row-level overall_score distribution. The bootstrap still resamples nights (eval.py:846-849), and candidates per night moved only modestly (54.1 to 62.7), so the row weighting shifts little.
+
+**Point 5: regime confounding. AGREE. Nothing new.** This matches checklist item 5 (PARTIAL) and F5. The model's figures are correct: 8 strongly_bullish P0 nights vs 42 in P1 (SUMMARY.md:117-119). Its point that permutation tests assume nights are exchangeable, which a trend or streaks would break, is F3.
+
+**Point 6: multiple testing.**
+- **6a. BH with m = 1 is "no adjustment". DISAGREE.** PREREG §7 (PREREG.md:177-179) says the F2 family has 4 items but only 1 registered question, and BH covers "any formal test that F2 questions report". Q005 is the only registered F2 question (F10), so m = 1 is correct.
+- **6b. p_gate = min(p_trend, p_rate) (eval.py:429). AGREE on the technical point; it does not matter here.** PREREG §8 passes the gate if either test is significant. eval.py's own BH over the two gives q = 0.0183 for each (run_summary.bh.within_gate_bh_trend_rate_informational), still at or below 0.05.
+- **6c. About ten uncorrected breakpoint tests (eval.py:578-612; there are 11), with 06-29 at p = 0.0499. AGREE** (F10, F8).
+- **6d. 14 component counterfactuals plus variants. AGREE. The PREREG already handles this.** The full table is printed, and the decision rule applies to whichever component tops it (PREREG §7). No effect on the verdict.
+
+**Point 7: effect size vs slippage. AGREE; N/A.** This is a NON_QUOTABLE diagnostic with no MPE (PREREG.md:5-6, 213-214). The model rightly warns that no verdict here is a trading claim.
+
+**Point 8: exit rule. AGREE; N/A** (checklist item 8).
+
+**The model's bottom line: INCONCLUSIVE pending an old-config replay. AGREE on the verdict. DISAGREE on the remedy.** A replay cannot help for the keys that fired, because they are not in the score arithmetic, and apart from them the scoring config did not change from 06-03 to 09-10. Separating the layers needs a successor question, which would be post hoc with respect to manifest_v001 (required note 5).
+
+### Net effect on this sign-off
+- Verdict unchanged: **INCONCLUSIVE**. No change is proposed to the controller, LEDGER.md or REPORT.md.
+- Checklist item 10 is now **DONE**; the entry above records why it was not run at sign-off.
+- New notes for the report / ledger. These are for Haci to place; I have not edited REPORT.md or LEDGER.md.
+  6. Four included nights (04-02, 04-24, 05-15, 07-02) hold re-run candidate sets written 19-51 hours after 16:05 ET. The 07-02 config existed only in that re-run. Gate 0 holds with them dropped (rate p 0.010, trend p 0.035). Refer to the Data Steward along with 06-26 (F7).
+  7. Gate 0 is a post-selection test, because the question was asked after the decline was seen. Read the fall as real but statistically marginal (F3 + 2e).
+  8. scripts/second_opinion.py needs `encoding="utf-8"` at lines 39 and 49. This is a Haci-side fix, outside the desk's write scope.
+
 SIGN-OFF: INCONCLUSIVE
