@@ -1,6 +1,6 @@
 {
   "id": "Q005",
-  "state": "DATASET_PINNED",
+  "state": "LEDGERED",
   "history": [
     {
       "state": "IDEA",
@@ -24,6 +24,30 @@
       "at": "2026-09-11T04:49:09.936672+00:00",
       "by": "data-steward",
       "note": "pinned after patch4; both manifests verified"
+    },
+    {
+      "state": "EVALUATED",
+      "at": "2026-09-11T05:24:29.974836+00:00",
+      "by": "researcher",
+      "note": "single run 2026-09-11T05:19:36Z; eval verdict HISTORICALLY_CONFIRMED (configuration, Ch3a) -- see results/NOTES.md F1 for red-team"
+    },
+    {
+      "state": "VALIDATED",
+      "at": "2026-09-11T05:27:03.505517+00:00",
+      "by": "agent",
+      "note": ""
+    },
+    {
+      "state": "REDTEAM_SIGNED",
+      "at": "2026-09-11T05:45:57.924335+00:00",
+      "by": "red-team",
+      "note": "Red team endorses INCONCLUSIVE (verdict change from eval HISTORICALLY_CONFIRMED-configuration). Channel 3a fired only via an unregistered global before/after split, on publication-only gates and a one-night flag toggle plus its revert; scoring config constant 06-03..09-10; 100 pct of elite candidates published in both periods. Faithful reading falls through to the distributional branch: marginal top projection_score != greedy top flow_strength_score (interaction +50.9 pct). Gate 0 passes as registered. Second opinion not run (credential rule). See results/REDTEAM.md."
+    },
+    {
+      "state": "LEDGERED",
+      "at": "2026-09-11T13:07:47.134027+00:00",
+      "by": "reporter",
+      "note": "Run by main session on reporter's behalf: reporter reviewed and accepted LEDGER row + REPORT.md but has no shell tool to run the controller. REPORT.md placed by main session after harness blocked subagent report writes. approved_by corrected from haci to n/a."
     }
   ],
   "prereg_commit": "c52fa1611a43ad6060b05669854dd3d33d6a3758",
@@ -33,5 +57,8 @@
   "manifests": {
     "research/data/manifest_v001.json": "b03f355a68373aadd0f2dc56c9154158929642291bf6caacb2f5a9bf15bef374",
     "research/data/manifest_prices_v001.json": "73d2a895da7db724a236ea051d81944799135f0fb5fb3f1d022659f2b0c3b655"
-  }
+  },
+  "eval_sha256": "8e1d460000d7d733ae4a62a630fee26481976c0973206b9e2c774aeea77a1141",
+  "summary_sha256": "bd9b13d6234be6423977c4ae27290f68d199a307596c3d9e034f6282267fed80",
+  "historical_verdict": "INCONCLUSIVE"
 }

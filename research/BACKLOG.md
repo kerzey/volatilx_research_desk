@@ -13,6 +13,7 @@ only after the Registrar drafts a PREREG and Haci commits it.
 - [ ] H-010 Score-band monotonicity under fixed exit rule — baseline: adjacent band — mechanism: score should order expected return
 - [ ] H-011 Confidence label (high/medium/low) vs realized return — baseline: label shuffled
 - [ ] H-012 Conflict penalty validity: penalized candidates vs unpenalized at same base score
+- [ ] H-014 (F2, successor to Q005 §8 Channel 3a) — Re-specify the "configuration change brackets the fall" rule so it can only fire on changes that can mechanically move `overall_score` (weights, timeframe multipliers, ATR block/cap, projection cap, scoring enable-flags held ≥ 20 nights) and requires a step at the change date (local before/after), not a global before/after split that any mid-sample date passes when the series declines. Publication-only gates (`publication_floor`, `bear_publish_threshold`, `bear_max_output_cap`) and single-night flag toggles that revert would be excluded. Also fix, in advance, the +5 GEX-offset firing definition (recorded offset vs "null gex_alignment_score"; they diverge 0.5% vs 31% in Apr–Jun because the offset code postdates April). Source: Q005 run 2026-09-11 (results/NOTES.md Part B, flags F1/F2). Raised by the Researcher AFTER seeing Q005's output, so any successor is post-hoc with respect to manifest_v001 and must say so (or wait for a later freeze); Q005 stands as run.
 
 ## F3 — Unused signals
 - [ ] H-020 GEX alignment (weight 0) vs day-lane outcome — baseline: GEX-missing picks

@@ -1,0 +1,89 @@
+# Platform commits 2026-04-01..2026-09-10 touching services/super_agent_select*.py or ai_agents/ (read-only git log at pinned platform SHA fa70688bc252d14f8d67e371afafc194731c324e)
+# Context for PREREG §10.4. Prompt/model changes in ai_agents/ are causes the Q005 decomposition cannot see.
+# format: short-sha | date | files touched (scoring / service / agents) | subject
+79cd0ce | 2026-07-09 | ai_agents/omega_agent.py | GPT 5.6 reasoning effort none-2
+6e1edb0 | 2026-07-09 | ai_agents/omega_agent.py | GPT 5.6 reasoning effort none
+83b571d | 2026-07-09 | ai_agents/omega_agent.py ai_agents/principal_agent.py ai_agents/super_agent_select_agent.py | upgrading agents to gpt 5.6
+ca7628d | 2026-07-09 | ai_agents/omega_agent.py | E2-2026-07-09: edge citation with mandatory pairing (agent + rubric + policy)
+a6ea998 | 2026-07-09 | ai_agents/omega_agent.py | Item 3: guide-as-tool — get_exit_ladder_guide (v1.2 sidecar, policy-rails)
+1765a6f | 2026-07-07 | super_agent_select_models.py super_agent_select_scoring.py | SAS conviction card + 80 publication floor
+f718b34 | 2026-07-06 | super_agent_select_service.py | X4: unresolvable ladders feed the G3 degraded-batch assertion
+5fa3db4 | 2026-07-06 | super_agent_select_service.py | W3: publication-time cross-lane ladder monotonicity (H4 family)
+85a435a | 2026-07-05 | ai_agents/omega_agent.py | Phase 1 closeout N1-N5: ladder de-split + CIs + rubric + baseline isolation
+b72c177 | 2026-07-05 | ai_agents/omega_agent.py | Phase 1 kickoff: eval harness + grounding tools v1 (P1-A/B/C)
+3f36900 | 2026-07-05 | super_agent_select_service.py | Phase 0.5h: ladder invalidation + grader void rule (G1-2026-07-06 executed)
+a3e6674 | 2026-07-05 | super_agent_select_service.py | Phase 0.5g: ladder integrity audit + operational guards (pre-merge)
+d3d49bc | 2026-07-05 | super_agent_select_service.py | Phase 0.5f: cluster integrity check + F3 guard behavior (push-ready)
+f94e347 | 2026-07-05 | super_agent_select_service.py | Phase 0.5e: wrong-side-target exclusion + final reconciliation (HELD, final gate)
+9be2a14 | 2026-07-03 | super_agent_select_scoring.py | Bear Phase 1 Step 1 amendment: stamp the gate-in-effect on graded sub-threshold rows
+31d6418 | 2026-07-03 | super_agent_select_scoring.py super_agent_select_service.py | Bear Phase 1 Step 1: dark-grade the sub-80 v2 bearish cohort
+d2788b8 | 2026-07-02 | super_agent_select_scoring.py | Bear Phase 1 dark-lane: fix cart_tag width overflow + verification checks (HELD)
+aa4108f | 2026-07-02 | super_agent_select_scoring.py super_agent_select_service.py | Bear Phase 1: instrument-only dark lane for v1-only bears (Option B, HELD)
+49e050a | 2026-07-02 | super_agent_select_service.py | Bear Phase 1: wire V1 into SAS bear candidate universe (dual-source, HELD)
+a9234b8 | 2026-06-28 | super_agent_select_models.py super_agent_select_scoring.py super_agent_select_service.py | Bear SAS cart: horizon-aware MTF bear technical + bull/bear/both routing
+cd68573 | 2026-06-02 | super_agent_select_models.py super_agent_select_service.py | Step 2: gates ship OFF by default + env-flippable kill-switches
+5f94594 | 2026-06-02 | super_agent_select_models.py super_agent_select_scoring.py super_agent_select_service.py | Phase 5 Step 2: LIVE secular gates — catalyst BULL_BULLISH + §D bear-release
+56d86a3 | 2026-06-02 | super_agent_select_service.py | Market Regime Stack v1: secular layer + inert consumer wiring (Phase 5 Step 1b)
+69ef05f | 2026-06-01 | ai_agents/fmp_client.py ai_agents/projection_expert.py super_agent_select_models.py super_agent_select_scoring.py super_agent_select_service.py | Earnings catalyst: fix resolver + direction-aware windowed scoring
+330f0b7 | 2026-05-20 | super_agent_select_scoring.py | Wave 2 finalization: SAS direction-vote prefix match + tech direction fix
+9f27157 | 2026-05-19 | ai_agents/bear_distribution_matcher.py | Diagnose bear library blob-sync silent failure
+90ca083 | 2026-05-18 | ai_agents/bear_distribution_matcher.py ai_agents/projection_expert.py | Bear engine: blob storage fetch for matcher libraries + ATR log cleanup
+916df1c | 2026-05-17 | ai_agents/bear_distribution_matcher.py | Bear distribution engine - phase 1 matcher + scoring extensions
+e6cc992 | 2026-05-17 | super_agent_select_models.py super_agent_select_scoring.py super_agent_select_service.py | Disable polarization approach
+4bc3f24 | 2026-05-16 | super_agent_select_models.py super_agent_select_scoring.py super_agent_select_service.py | Removing backtest
+28444b6 | 2026-05-16 | super_agent_select_models.py super_agent_select_scoring.py super_agent_select_service.py | SAS stale gate setup. 10 point penatly for 5 day sas stocks increased 10 percent
+014bc39 | 2026-05-16 | super_agent_select_models.py super_agent_select_scoring.py super_agent_select_service.py | Developing polarity vote in option flow vs dir ratio
+eaf9e08 | 2026-05-15 | super_agent_select_scoring.py | Adding GEX analysis to all SAS stocks
+f162061 | 2026-05-15 | super_agent_select_models.py super_agent_select_scoring.py super_agent_select_service.py | New sas scroing and calibration based on historical data 05-15-26
+634fc2e | 2026-05-14 | super_agent_select_models.py super_agent_select_scoring.py super_agent_select_service.py | Adding ATR quarantine not to populate stocks i sas from ATR
+66cb63d | 2026-05-14 | super_agent_select_models.py super_agent_select_public.py super_agent_select_scoring.py super_agent_select_service.py | removing industry roation call bonus from sas selections
+fbe5080 | 2026-05-14 | ai_agents/projection_expert.py | starting to enhance bear selection 1- bug fixes confidence weight fix
+2e7166c | 2026-05-07 | ai_agents/omega_agent.py | Enhance the Super agent report analysis by picking the latest report SAS or user
+0feb62d | 2026-05-02 | ai_agents/fade/qualification_gate.py | fix: use bar.timestamp attribute instead of nonexistent get_timestamp() method
+8f822df | 2026-05-02 | ai_agents/jobs/market_data_ingest.py | feat: morning fade indicator complete - integration tests and documentation
+9220705 | 2026-05-02 | ai_agents/fade/api.py | fix: enforce spec requirements for user_id type and symbol uppercase
+bf16822 | 2026-05-02 | ai_agents/fade/api.py | feat: add /api/fade/{symbol} endpoint with authentication
+85d3434 | 2026-05-02 | ai_agents/jobs/morning_fade_closeout.py | fix: correct distinct() query and move TriggerResults import to module level
+ad10683 | 2026-05-02 | ai_agents/jobs/scheduler.py | fix: correct APScheduler API usage in fade job registration
+6c5ffaa | 2026-05-02 | ai_agents/jobs/__init__.py ai_agents/jobs/market_data_ingest.py ai_agents/jobs/morning_fade_closeout.py ai_agents/jobs/morning_fade_monitor.py ai_agents/jobs/scheduler.py | feat: add three fade indicator background jobs (ingest, monitor, closeout)
+ab0d837 | 2026-05-02 | ai_agents/fade/watch_list.py | feat: add watch list configuration and builder
+3ee0ce4 | 2026-05-02 | ai_agents/fade/state_machine.py | feat: add state machine with 7 tests
+4f05d58 | 2026-05-02 | ai_agents/fade/trigger_evaluator.py | feat: add trigger evaluator with 8 tests and 12-min rolling window
+1eaee63 | 2026-05-02 | ai_agents/fade/__init__.py ai_agents/fade/qualification_gate.py | feat: add qualification gate with 6 tests
+88f4b4a | 2026-05-02 | super_agent_select_models.py | seperated the score as original and bonus for industry-2
+b0cba91 | 2026-05-02 | super_agent_select_models.py super_agent_select_public.py super_agent_select_scoring.py | seperated the score as original and bonus for industry
+eec4a98 | 2026-05-02 | super_agent_select_models.py super_agent_select_public.py super_agent_select_scoring.py super_agent_select_service.py | sector is updated with industry
+9854da1 | 2026-05-02 | super_agent_select_scoring.py super_agent_select_service.py | fix(sas): persist bonus_reason in score_details and guard against double-application
+755a713 | 2026-05-02 | super_agent_select_public.py super_agent_select_service.py | feat(sas): wire sector breadth bonus into pipeline and surface in DB row and public payload
+139f87d | 2026-05-02 | super_agent_select_scoring.py | feat(sas): implement apply_sector_breadth_bonus with 3/5/7pt sector cluster bonuses
+d09f504 | 2026-05-01 | super_agent_select_models.py | feat(sas): add sector and sector_rotation fields to SymbolContextPacket and CandidateScorecard
+5f6f669 | 2026-04-29 | ai_agents/projection_expert.py | bug firx for hourly and weekly projection engine
+cfddec9 | 2026-04-28 | ai_agents/omega_agent.py | Enhancement bearish pick
+76186de | 2026-04-27 | ai_agents/omega_agent.py | Bug fix of super agent  gpt 5.5 upgrade-2
+8c301ac | 2026-04-27 | ai_agents/omega_agent.py | Bug fix of sas performance table-3
+e8fd8d3 | 2026-04-25 | ai_agents/omega_agent.py ai_agents/super_agent_select_agent.py | upgrade the super agent to 5.5 and earnings catalyst development
+3758ca2 | 2026-04-17 | ai_agents/super_agent_select_agent.py | SAS backfill window increased to 14 days from 7 for short time targets-diagnose script
+dbea154 | 2026-04-17 | super_agent_select_public.py | SAS backfill window increased to 14 days from 7 for short time targets
+927aa9c | 2026-04-16 | ai_agents/earnings_agent.py | Bug fix for earnings date fetch function
+f63a5b4 | 2026-04-14 | ai_agents/omega_agent.py | Tool developed for Super Agent to recognize SAS stocks and reports
+58c86ac | 2026-04-11 | ai_agents/omega_agent.py | map company names with ticker in super agent
+6f87361 | 2026-04-04 | super_agent_select_service.py | Super agent select report update adding multi ai report targets-2
+4ea512f | 2026-04-04 | ai_agents/super_agent_select_agent.py super_agent_select_public.py super_agent_select_service.py | Super agent select report update adding multi ai report targets
+8c2cb3b | 2026-04-04 | ai_agents/principal_agent.py super_agent_select_service.py | Bug fix for super agent pick script-2
+281cee2 | 2026-04-04 | ai_agents/expert_agent.py ai_agents/price_action.py | Bug fix for super agent pick script
+0844f49 | 2026-04-04 | super_agent_select_models.py super_agent_select_report_service.py super_agent_select_service.py | Adding the multi ai analysis to super agent select
+c65a462 | 2026-04-02 | ai_agents/omega_agent.py | adding tool for super agent pick
+497b907 | 2026-04-02 | ai_agents/omega_agent.py | Adding price action analysis in super agent tool for analyze the stock question
+43054b7 | 2026-04-02 | ai_agents/expert_agent.py ai_agents/price_action.py ai_agents/principal_agent.py | Adding kalman filter in technical and price action. Principal agent looks a this from expert agent reports
+2ffe880 | 2026-04-02 | ai_agents/omega_agent.py | Super agent selection feature. Phase 2 super agent llm run and publish the table-2 smarter llm.Simple ready prompt adn one tool for it-2
+a542c46 | 2026-04-02 | ai_agents/omega_agent.py | Super agent selection feature. Phase 2 super agent llm run and publish the table-2 smarter llm.Simple ready prompt adn one tool for it
+c77578f | 2026-04-01 | ai_agents/super_agent_select_agent.py super_agent_select_public.py super_agent_select_service.py | Super agent selection feature. Phase 2 super agent llm run and publish the table-2 smarter llm-2
+a41c66e | 2026-04-01 | ai_agents/super_agent_select_agent.py super_agent_select_public.py | Super agent selection feature. Phase 2 super agent llm run and publish the table-2 smarter llm
+cd006c9 | 2026-04-01 | ai_agents/super_agent_select_agent.py super_agent_select_models.py super_agent_select_public.py super_agent_select_service.py | Super agent selection feature. Phase 2 super agent llm run and publish the table-1
+500e8a0 | 2026-04-01 | super_agent_select_models.py super_agent_select_scoring.py | Super agent selection feature. Phase 1 sript and backend job-3
+5d1e39d | 2026-04-01 | super_agent_select_models.py super_agent_select_scoring.py | Super agent selection feature. Phase 1 sript and backend job-2
+a92f454 | 2026-04-01 | super_agent_select_models.py super_agent_select_scoring.py super_agent_select_service.py | Super agent selection feature. Phase 1 sript and backend job
+0ff2c35 | 2026-04-01 | ai_agents/omega_agent.py | super agent pathc for investment company call
+6f1b0e9 | 2026-04-01 | ai_agents/omega_agent.py | super agent pathc for senate3
+338df08 | 2026-04-01 | ai_agents/omega_agent.py | super agent pathc for senate2
+837e014 | 2026-04-01 | ai_agents/omega_agent.py | super agent pathc for senate

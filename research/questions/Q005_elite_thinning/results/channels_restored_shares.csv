@@ -1,0 +1,20 @@
+item,family,cf_elite_P1,observed_elite_P1,restored_share,ci_lo,ci_hi,label,uninformative,status,months_holding,months_holding_list,month_rule_met,cut_share,cut_rule_met,label_for_verdict
+channel1_candidate_count,channel1,10.65428,12,-0.107658,-0.588455,-0.034154,NOT_A_DRIVER,False,ok,0,[],False,0.10434,False,NOT_A_DRIVER
+channel2_score_distribution,channel2,28.0,12,1.28,1.188601,1.951923,EXPLAINS,False,ok,2,"['Jul', 'Aug']",True,1.225166,True,EXPLAINS
+channel4_universe_joint,channel4,16.751338,12,0.380107,0.126499,1.960267,CONTRIBUTES,False,ok,1,['Jul'],False,0.185743,False,CONTRIBUTES
+channel4_universe_ipf_margins,channel4_secondary,15.106813,12,0.248545,0.07601,1.392332,CONTRIBUTES,False,ok,1,['Jul'],False,-0.134828,False,CONTRIBUTES
+projection_score,channel3,19.0,12,0.56,0.175089,2.641964,CONTRIBUTES,False,ok,2,"['Jul', 'Aug']",True,1.592715,True,CONTRIBUTES
+technical_structure_score,channel3,13.72,12,0.1376,0.0,0.97886,NOT_A_DRIVER,False,ok,1,['Jul'],False,0.357748,True,NOT_A_DRIVER
+flow_strength_score,channel3,13.0,12,0.08,0.0,0.542024,NOT_A_DRIVER,False,ok,1,['Jul'],False,0.122517,False,NOT_A_DRIVER
+catalyst_event_score,channel3,13.0,12,0.08,0.0,0.425846,NOT_A_DRIVER,False,ok,0,[],False,0.122517,False,NOT_A_DRIVER
+fundamental_quality_score,channel3,12.8,12,0.064,0.0,0.417487,NOT_A_DRIVER,False,ok,0,[],False,0.122517,False,NOT_A_DRIVER
+gex_alignment_score,channel3,12.0,12,0.0,0.0,0.0,NOT_A_DRIVER,False,ok,0,[],False,0.0,False,NOT_A_DRIVER
+smart_money_confirmation_score,channel3,12.0,12,0.0,0.0,0.0,NOT_A_DRIVER,False,no_data,0,[],False,0.0,False,NOT_A_DRIVER
+cross_layer_bonus,channel3,11.96,12,-0.0032,-0.189542,0.185884,NOT_A_DRIVER,False,ok,0,[],False,0.127417,False,NOT_A_DRIVER
+conflict_penalty,channel3,12.0,12,0.0,0.0,0.0,NOT_A_DRIVER,False,ok,0,[],False,0.0,False,NOT_A_DRIVER
+missing_data_penalty,channel3,12.0,12,0.0,0.0,0.0,NOT_A_DRIVER,False,ok,0,[],False,0.0,False,NOT_A_DRIVER
+gex_missing_offset,channel3,11.4,12,-0.048,-0.39543,0.0,NOT_A_DRIVER,False,ok,0,[],False,-0.107815,False,NOT_A_DRIVER
+completeness_score,channel3,12.0,12,0.0,0.0,0.0,NOT_A_DRIVER,False,not_in_arithmetic,0,[],False,0.0,False,NOT_A_DRIVER
+best_timeframe_mix,channel3,12.0,12,0.0,0.0,0.076379,NOT_A_DRIVER,False,ok,0,[],False,-0.004901,False,NOT_A_DRIVER
+atr_elite_cap,channel3,12.0,12,0.0,0.0,0.0,NOT_A_DRIVER,False,ok,0,[],False,0.0,False,NOT_A_DRIVER
+catalyst_event_score__P0_June_only,channel3_catalyst_postfix_P0,13.0,12,0.08,0.0,0.425846,NOT_A_DRIVER,False,ok,0,[],False,,False,NOT_A_DRIVER

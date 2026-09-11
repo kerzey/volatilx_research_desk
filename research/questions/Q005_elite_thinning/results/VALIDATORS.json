@@ -1,0 +1,47 @@
+[
+  {
+    "check": "v1_prereg_locked",
+    "status": "PASS",
+    "detail": "PREREG committed and unchanged"
+  },
+  {
+    "check": "v2_manifest_verified",
+    "status": "PASS",
+    "detail": "checksums OK: ['research/data/manifest_v001.json', 'research/data/manifest_prices_v001.json']"
+  },
+  {
+    "check": "v3_no_revised_labels",
+    "status": "PASS",
+    "detail": "no revised labels referenced"
+  },
+  {
+    "check": "v4_knowledge_time",
+    "status": "PASS",
+    "detail": "declared for ['sas_candidates', 'sas_runs', 'market_regime']"
+  },
+  {
+    "check": "v5_no_duplicate_observations",
+    "status": "PASS",
+    "detail": "0 duplicate nights"
+  },
+  {
+    "check": "v6_counts_reconcile",
+    "status": "PASS",
+    "detail": "summary n_nights=107 csv=107 excluded=6"
+  },
+  {
+    "check": "v7_mc_not_counted_as_n",
+    "status": "PASS",
+    "detail": "n_nights=107 (a value in the thousands means MC draws were counted as observations)"
+  },
+  {
+    "check": "v8_reproducible",
+    "status": "PASS",
+    "detail": "byte-identical on re-run"
+  },
+  {
+    "check": "v9_lineage_present",
+    "status": "PASS",
+    "detail": "lineage present in 2 manifest(s)"
+  }
+]

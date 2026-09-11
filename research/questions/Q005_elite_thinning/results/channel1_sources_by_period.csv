@@ -1,0 +1,15 @@
+source,period,n_nights,per_night,ci_lo,ci_hi
+projection_bearish,P0,58,7.5,5.689655,9.310345
+projection_bearish,P1,49,14.693878,14.081633,15.0
+projection_bearish_v2,P0,58,7.5,5.689655,9.310345
+projection_bearish_v2,P1,49,15.0,15.0,15.0
+projection_bullish,P0,58,15.0,15.0,15.0
+projection_bullish,P1,49,15.0,15.0,15.0
+uoa_day,P0,58,10.0,10.0,10.0
+uoa_day,P1,49,10.0,10.0,10.0
+uoa_long,P0,58,5.0,5.0,5.0
+uoa_long,P1,49,5.0,5.0,5.0
+uoa_swing,P0,58,10.0,10.0,10.0
+uoa_swing,P1,49,10.0,10.0,10.0
+whale_watch,P0,58,4.137931,2.413793,6.206897
+whale_watch,P1,49,0.0,0.0,0.0
