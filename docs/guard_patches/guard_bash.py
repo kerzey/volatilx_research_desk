@@ -7,6 +7,7 @@ Blocks:
   - writes/deletes to Azure blob containers other than `research`
   - force pushes, history rewrites
   - rm -rf, sudo, curl|sh style installs
+  - Alpaca trading endpoints (market data only) — absolute, no DESK_ADMIN escape
   - modification of enforcement code (unless DESK_ADMIN=1)
 Logs every decision to research/reports/hook_audit.log (stderr only on block).
 
@@ -39,6 +40,10 @@ GIT_DANGER = re.compile(r"git\s+push.*(--force|-f\b|\+)|git\s+(reset\s+--hard|fi
 GIT_PUSH = re.compile(r"git\s+push\b", re.I)
 GIT_PUSH_FEATURE = re.compile(r"git\s+push\s+(--set-upstream\s+|-u\s+)?origin\s+feature/Q\d{3}-[\w.-]+\s*$", re.I)
 DESTRUCTIVE = re.compile(r"(\brm\s+-[a-z]*r[a-z]*f|\bsudo\b|curl[^|]*\|\s*(ba)?sh|wget[^|]*\|\s*(ba)?sh|\bmkfs\b|\bdd\s+if=)", re.I)
+# Alpaca API keys are NOT read-only: the pair that reads prices can also place orders on the
+# account it belongs to. The desk may use market DATA only (data.alpaca.markets). The trading
+# hosts, the trading SDK client and the order/position/account routes are blocked outright.
+ALPACA_TRADING = re.compile(r"((paper-)?api\.alpaca\.markets|TradingClient|submit_order|replace_order|cancel_order|close_position|/v2/(orders|positions|account))", re.I)
 
 ADMIN = os.environ.get("DESK_ADMIN", "").strip().lower() in {"1", "true", "yes"}
 DESK_AGENTS = {"data-steward", "registrar", "explorer", "researcher", "red-team", "brief-writer", "reporter"}
@@ -105,6 +110,9 @@ def main() -> None:
         block(cmd, "force pushes are blocked", agent)
     if BLOB_WRITE.search(cmd) and re.search(r"(delete|container\s+delete)", cmd, re.I) and not BLOB_RESEARCH.search(cmd):
         block(cmd, "blob deletes outside the `research` container are blocked", agent)
+    # Absolute — DESK_ADMIN does not lift it. There is no maintenance reason to trade.
+    if ALPACA_TRADING.search(cmd):
+        block(cmd, "Alpaca trading endpoints are blocked; the desk uses market data only (data.alpaca.markets)", agent)
 
     # The platform codebase is READ-ONLY for everyone. CODEBASE_DIR now comes from
     # .claude/settings.json `env`, so this holds however Claude Code was launched.
@@ -115,7 +123,7 @@ def main() -> None:
 
     # --- everything below was previously unreachable (agent identity never resolved) ---
     if FORBIDDEN_CREDS.search(cmd):
-        block(cmd, "references a non-research credential; only RESEARCH_DB_URL / PROD_BLOB_SAS / RESEARCH_BLOB_SAS are allowed", agent)
+        block(cmd, "references a non-research credential; only RESEARCH_DB_URL / PROD_SAS_TOKEN / RESEARCH_SAS_TOKEN / ALPACA_* (market data) are allowed", agent)
     if DB_CONTEXT.search(cmd) and DML.search(cmd):
         block(cmd, "SQL write/DDL against a database is never allowed from the research desk", agent)
     if BLOB_WRITE.search(cmd) and not BLOB_RESEARCH.search(cmd):

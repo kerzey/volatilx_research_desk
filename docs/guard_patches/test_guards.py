@@ -34,8 +34,8 @@ def bash(cmd, agent=None):
     return d
 
 
-def write(path, agent=None):
-    d = {"tool_name": "Write", "tool_input": {"file_path": path}}
+def write(path, agent=None, content=""):
+    d = {"tool_name": "Write", "tool_input": {"file_path": path, "content": content}}
     if agent:
         d["agent_type"] = agent
     return d
@@ -64,6 +64,12 @@ BASH_CASES = [
     ("edit controller via sed -i", bash("sed -i s/a/b/ research/lib/controller.py"), True, False),
     ("normal freeze command", bash("python research/lib/freeze_dataset.py --verify research/data/manifest_v001.json"), False, False),
     ("normal controller advance", bash("python research/lib/controller.py advance Q001 DATASET_PINNED"), False, False),
+    ("daily check script", bash("python research/lib/daily_check.py --date 2026-09-10"), False, False),
+    ("alpaca market data (allowed)", bash("python research/lib/fetch_prices.py https://data.alpaca.markets/v2/stocks/bars"), False, False),
+    ("alpaca live trading host", bash("python -c \"import urllib.request; urllib.request.urlopen('https://api.alpaca.markets/v2/orders')\""), True, False),
+    ("alpaca paper trading host", bash("python x.py https://paper-api.alpaca.markets/v2/account"), True, False),
+    ("alpaca trading SDK", bash("python -c \"from alpaca.trading.client import TradingClient\""), True, False),
+    ("alpaca trading, even as admin", bash("python x.py https://api.alpaca.markets/v2/orders"), True, True),
 ]
 
 WRITE_CASES = [
@@ -79,6 +85,11 @@ WRITE_CASES = [
     ("playbook/ write", write("playbook/PB-001_x.md"), False, False),
     ("research/data as data-steward", write("research/data/manifest_v002.json", "data-steward"), False, False),
     ("research/data as researcher", write("research/data/manifest_v002.json", "researcher"), True, False),
+    ("script fetching alpaca market data", write("research/lib/fetch_prices.py", content="URL='https://data.alpaca.markets/v2/stocks/bars'"), False, False),
+    ("script with alpaca trading call", write("research/lib/x.py", content="from alpaca.trading.client import TradingClient"), True, False),
+    ("script with alpaca order route", write("research/lib/x.py", content="u='https://api.alpaca.markets/v2/orders'"), True, False),
+    ("prose mentioning the endpoint (.md)", write("docs/notes.md", content="never call api.alpaca.markets/v2/orders"), False, False),
+    ("guard source as admin", write(".claude/hooks/guard_bash.py", content="TradingClient"), False, True),
 ]
 
 
