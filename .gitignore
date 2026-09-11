@@ -7,3 +7,4 @@ logs/
 *.bak
 __pycache__/
 *.pyc
+research/reports/explore/work/
