@@ -1,0 +1,80 @@
+{
+  "version": "prices_001",
+  "as_of": "2026-09-10",
+  "base_manifest": "research/data/manifest_v001.json",
+  "base_manifest_sha256": "b03f355a68373aadd0f2dc56c9154158929642291bf6caacb2f5a9bf15bef374",
+  "code_git_sha": "3f7bc2fb63b754b7409c750459d7a86944178145",
+  "platform_git_sha": "fa70688bc252d14f8d67e371afafc194731c324e",
+  "source": "Alpaca market data API, feed=sip",
+  "frozen_at": "2026-09-11T02:04:59.368579+00:00",
+  "tables": [
+    {
+      "name": "prices_daily_raw",
+      "file": "research/data/p001_daily_raw.parquet",
+      "rows": 66500,
+      "columns": [
+        "symbol",
+        "date",
+        "o",
+        "h",
+        "l",
+        "c",
+        "v",
+        "n",
+        "vw"
+      ],
+      "sha256": "5690eaab3a19da7ea208dd12b62502b84990227ca75145880b66fce9dab21093",
+      "sql": "alpaca https://data.alpaca.markets/v2/stocks/bars timeframe=1Day adjustment=raw feed=sip start=2026-01-31T00:00:00Z end=2026-09-10T23:59:59Z symbols=436"
+    },
+    {
+      "name": "prices_daily_split",
+      "file": "research/data/p001_daily_split.parquet",
+      "rows": 66500,
+      "columns": [
+        "symbol",
+        "date",
+        "o",
+        "h",
+        "l",
+        "c",
+        "v",
+        "n",
+        "vw"
+      ],
+      "sha256": "7270c61304c7d4ba3e6708f48fe47f21bbfbffe8a91ebf667c97b495651ff175",
+      "sql": "alpaca https://data.alpaca.markets/v2/stocks/bars timeframe=1Day adjustment=split feed=sip start=2026-01-31T00:00:00Z end=2026-09-10T23:59:59Z symbols=436"
+    },
+    {
+      "name": "prices_hourly_raw",
+      "file": "research/data/p001_hourly_raw.parquet",
+      "rows": 451231,
+      "columns": [
+        "symbol",
+        "t",
+        "o",
+        "h",
+        "l",
+        "c",
+        "v",
+        "n",
+        "vw"
+      ],
+      "sha256": "dac17fc2fed87469bf1b32e4ae887527b97803967ca5e53d90630bc2c20d6035",
+      "sql": "alpaca https://data.alpaca.markets/v2/stocks/bars timeframe=1Hour adjustment=raw feed=sip start=2026-01-31T00:00:00Z end=2026-09-10T23:59:59Z symbols=227"
+    }
+  ],
+  "symbols_requested": 436,
+  "symbols_without_bars": [],
+  "in_sample_end": "2026-05-29",
+  "availability": {
+    "prices_daily_raw": {
+      "note": "bar dated <= pick night = feature; later bars = outcome"
+    },
+    "prices_daily_split": {
+      "note": "split-adjusted twin of daily_raw; raw/split on a date = cumulative split factor"
+    },
+    "prices_hourly_raw": {
+      "note": "UTC stamps, includes pre/post-market; SAS publishes ~21:0x UTC on the pick night"
+    }
+  }
+}
