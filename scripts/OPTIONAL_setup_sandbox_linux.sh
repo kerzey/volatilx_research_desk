@@ -42,7 +42,7 @@ setfacl -R -m u:$USER_NAME:rX "$REPO/.git"
 [ -f "$REPO/.env" ] && setfacl -m u:$USER_NAME:--- "$REPO/.env" || true
 # The desk gets its own env with only the research credentials:
 install -m 600 -o $USER_NAME -g $GROUP_NAME /dev/null /home/$USER_NAME/.research.env
-echo "# fill: RESEARCH_DB_URL, PROD_BLOB_SAS, RESEARCH_BLOB_SAS, OPENAI_API_KEY" > /home/$USER_NAME/.research.env
+echo "# fill: RESEARCH_DB_URL, PROD_SAS_TOKEN, RESEARCH_SAS_TOKEN, OPENAI_API_KEY" > /home/$USER_NAME/.research.env
 
 echo "sandbox user $USER_NAME configured. Verify:"
 echo "  sudo -u $USER_NAME touch $REPO/services/_probe   # must fail"

@@ -5,3 +5,5 @@ research/data/*.parquet
 research/reports/hook_audit.log
 logs/
 *.bak
+__pycache__/
+*.pyc

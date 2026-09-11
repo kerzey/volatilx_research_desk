@@ -14,7 +14,7 @@
       "Bash(git commit*)",
       "Bash(git diff*)",
       "Bash(git log*)",
-      "Bash(git push origin main*)",
+      "Bash(git push origin master*)",
       "Bash(git status*)",
       "Bash(ls*)",
       "Bash(psql $RESEARCH_DB_URL*)",

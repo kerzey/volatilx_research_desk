@@ -115,7 +115,7 @@ def main() -> None:
 
     # --- everything below was previously unreachable (agent identity never resolved) ---
     if FORBIDDEN_CREDS.search(cmd):
-        block(cmd, "references a non-research credential; only RESEARCH_DB_URL / PROD_BLOB_SAS / RESEARCH_BLOB_SAS are allowed", agent)
+        block(cmd, "references a non-research credential; only RESEARCH_DB_URL / PROD_SAS_TOKEN / RESEARCH_SAS_TOKEN are allowed", agent)
     if DB_CONTEXT.search(cmd) and DML.search(cmd):
         block(cmd, "SQL write/DDL against a database is never allowed from the research desk", agent)
     if BLOB_WRITE.search(cmd) and not BLOB_RESEARCH.search(cmd):

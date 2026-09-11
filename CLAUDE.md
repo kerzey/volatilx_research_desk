@@ -20,7 +20,7 @@ platform repo.
 ## Non-negotiables
 
 1. **Production is read-only.** Use `$RESEARCH_DB_URL` (read-only role) and
-   `$PROD_BLOB_SAS` (read/list only). Never look for, request, or use any other credential.
+   `$PROD_SAS_TOKEN` (read/list only). Never look for, request, or use any other credential.
 2. **Write only under `research/`, `docs/`, `playbook/`.** The platform codebase is never edited
    from here; the Brief Writer produces a prompt, Haci executes it in the platform repo.
 3. **Pre-register before unsealing.** A question runs only if its `PREREG.md` is committed
@@ -68,7 +68,13 @@ platform repo.
   whale ledger empty; regime A/B found no bonus-day edge; 88–90 band underperforms 90+;
   re-qualification after a large favorable move is continuation; short DTE underperforms.
 - Known data issues: null-ladder denominator (a subset of picks lack ladder rows);
-  May–June 2026 silent fwd_return freeze (fixed; coverage watchdog exists).
+  May–June 2026 silent fwd_return freeze in `uoa_symbol_daily` — NOT fixed as of
+  manifest_v001 (2026-09-10): coverage recovered to only ~5% of baseline and
+  `fwd_return_30d_pct` relapsed to 0% for trading_date ≥ 2026-07-27. The coverage
+  watchdog is not catching it. See research/reports/FREEZE_v001.md §5.
+- `market_regime_daily` has no point-in-time label before 2026-06-09 — the whole
+  2026-01-02..2026-06-08 range was backfilled on 2026-06-02/06-08. Rule 7 stratification
+  is only knowledge-time-legal from 2026-06-09 onward. See FREEZE_v001.md §7.
 
 ## Where things live
 
