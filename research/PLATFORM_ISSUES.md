@@ -22,16 +22,16 @@ Statuses: `OPEN` · `HACI_DECIDED:<fix|research|accept>` · `BRIEF_WRITTEN` · `
 
 | ID | Severity | Status | Issue |
 |---|---|---|---|
-| PI-001 | high | OPEN | `uoa_symbol_daily.fwd_return_*` still ~95% degraded; 30d relapsed to 0% from 07-27 |
-| PI-002 | high | OPEN | No coverage watchdog fires on PI-001 (none found in the codebase by that name) |
-| PI-003 | med | OPEN | `atr_pct` corrupted around splits (ATR computed on raw bars) |
-| PI-004 | med | OPEN | Manual re-runs indistinguishable from nightly runs in `super_agent_select_runs` |
-| PI-005 | med | OPEN | `market_regime_daily` not point-in-time before 06-09 (backfilled) |
-| PI-006 | low | OPEN | 16 published picks have no target ladder |
-| PI-007 | low | OPEN | `industry` populated for only 12% of candidates |
-| PI-008 | low | OPEN | Smart-money layer weight forced to 0; CLAUDE.md weights text says 5 |
-| PI-009 | research | OPEN | L1/L2 targets sit inside one day's range (median 0.31 / 0.55 ATR) — targets are not ATR-scaled |
-| PI-010 | research | OPEN | Elite (90+) count falling: Apr 8 · May 13 · Jun 12 · Jul 8 · Aug 3 · Sep 2 |
+| PI-001 | high | FIX | `uoa_symbol_daily.fwd_return_*` still ~95% degraded; 30d relapsed to 0% from 07-27 |
+| PI-002 | high | FIX | No coverage watchdog fires on PI-001 (none found in the codebase by that name) |
+| PI-003 | med | FIX | `atr_pct` corrupted around splits (ATR computed on raw bars) |
+| PI-004 | med | FIX | Manual re-runs indistinguishable from nightly runs in `super_agent_select_runs` |
+| PI-005 | med | accept | `market_regime_daily` not point-in-time before 06-09 (backfilled) |
+| PI-006 | low | FIX | 16 published picks have no target ladder |
+| PI-007 | low | FIX | `industry` populated for only 12% of candidates |
+| PI-008 | low | accept | Smart-money layer weight forced to 0; CLAUDE.md weights text says 5 |
+| PI-009 | research | research | L1/L2 targets sit inside one day's range (median 0.31 / 0.55 ATR) — targets are not ATR-scaled |
+| PI-010 | research | research | Elite (90+) count falling: Apr 8 · May 13 · Jun 12 · Jul 8 · Aug 3 · Sep 2 |
 
 ## Detail
 
@@ -91,6 +91,11 @@ EXPLORE_001: L1/L2 median 0.31 / 0.55 ATR from the close. The strategist prompt 
 targets per lane with no volatility scaling (`ai_agents/principal_agent.py:530-575`). If the
 sealed period confirms H-053, the change is ATR-scaled target placement — a scoring/plan
 behaviour change, so: PREREG → verdict → HUMAN_APPROVED → full brief with a shadow ladder.
+**Haci's view (2026-09-10):** near targets being reachable by other stocks is expected; the
+differentiator is *how fast* SAS picks reach them. Product direction if that holds: quick
+L1/L2 exits and capital recycling on sub-elite picks, deeper holds on elite picks, and
+strategies built on speed. Registered as H-065 / H-066; the research question tests speed
+against a distance-matched control, unconditionally, before any target redesign.
 
 ### PI-010 — elite is thinning *(research first)*
 Published 90+ picks per month fell from 12–13 (May–Jun) to 3 (Aug) and 2 (Sep to the 10th);

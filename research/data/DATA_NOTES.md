@@ -21,6 +21,17 @@ opened**, which is the criterion that matters.
 session's open. The resulting list is in `exclusions_v001.json` under `manual_runs`; `eval.py`
 reads it rather than hard-coding dates, and reports the excluded count.
 
+## A run on a market holiday (registrar, R1)
+
+`super_agent_select_runs` has a row for **2026-04-03 (Good Friday, NYSE closed)** — no SPY
+bar exists for that date, 0 picks were published, and the run finished on 04-04. Excluded under
+`non_session_runs`. **Rule for studies:** derive trading nights from the price freeze's SPY
+bars, never from `sas_runs` alone, and fail loudly on a run dated on a non-session day.
+
+Night counts after all exclusions: **107 total, 37 in-sample (to 05-29), 70 sealed (from
+06-01)**. Earlier desk text said 66 sealed — that subtracted all five manual-run nights, but
+only 07-06 falls in the sealed period. 70 is right.
+
 ## Publication time is deliberately early on many nights (Haci, 2026-09-10)
 
 28 of 42 in-sample runs finished after 23:00 UTC, but many later runs finish well before.

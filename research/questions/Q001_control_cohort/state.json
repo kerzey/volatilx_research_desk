@@ -1,6 +1,6 @@
 {
   "id": "Q001",
-  "state": "PREREG_DRAFT",
+  "state": "REJECTED",
   "history": [
     {
       "state": "IDEA",
@@ -12,6 +12,12 @@
       "at": "2026-09-10T22:21:52.427203+00:00",
       "by": "registrar",
       "note": ""
+    },
+    {
+      "state": "REJECTED",
+      "at": "2026-09-11T04:18:48.231599+00:00",
+      "by": "registrar",
+      "note": "Superseded by Q006 after the rule-5 amendment (path objective). PREREG.md was committed in bbed9aa so the guard treats it as locked; never run."
     }
   ]
 }

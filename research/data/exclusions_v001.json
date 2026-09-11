@@ -8,6 +8,12 @@
     "trading_dates": ["2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-07-06"],
     "late_but_clean": ["2026-04-01", "2026-04-02", "2026-04-03", "2026-04-06", "2026-04-24", "2026-05-01", "2026-05-15", "2026-07-02"]
   },
+  "non_session_runs": {
+    "reason": "run recorded on a day the NYSE was closed (no SPY bar); 0 picks published; found by the registrar in R1",
+    "trading_dates": ["2026-04-03"]
+  },
+  "night_counts_after_exclusions": {"all": 107, "in_sample_to_2026-05-29": 37, "sealed_from_2026-06-01": 70,
+    "note": "derive in eval.py from sas_runs minus manual_runs minus non_session_runs; do not hard-code"},
   "catalyst_layer_regime_change": {
     "reason": "earnings date resolver wrong before this date; platform commit 69ef05f",
     "fixed_from": "2026-06-01"
