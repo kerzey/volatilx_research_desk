@@ -23,6 +23,7 @@ freeze_dataset.py is what actually protects frozen data.
 """
 import json
 import os
+import re
 import subprocess
 import sys
 
@@ -33,6 +34,21 @@ PROTECTED_PREFIXES = (".claude/", "research/lib/validators.py", "research/lib/co
 DESK_AGENTS = {"data-steward", "registrar", "explorer", "researcher", "red-team", "brief-writer", "reporter"}
 
 ADMIN = os.environ.get("DESK_ADMIN", "").strip().lower() in {"1", "true", "yes"}
+
+# Alpaca keys can place orders; guard_bash blocks trading calls on the command line, and this
+# closes the other route — writing a trading call into a script and then running the script.
+# Scanned only in executable files, so prose that merely mentions an endpoint stays writable.
+# DESK_ADMIN lifts it, because the guard's own source necessarily contains these patterns.
+ALPACA_TRADING = re.compile(r"((paper-)?api\.alpaca\.markets|TradingClient|submit_order|replace_order|cancel_order|close_position|/v2/(orders|positions|account))", re.I)
+CODE_SUFFIXES = (".py", ".sh", ".ps1", ".ipynb", ".js", ".ts", ".bat", ".cmd")
+
+
+def written_text(tool_input) -> str:
+    parts = [tool_input.get("content") or "", tool_input.get("new_string") or ""]
+    for e in tool_input.get("edits") or []:
+        if isinstance(e, dict):
+            parts.append(e.get("new_string") or "")
+    return "\n".join(parts)
 
 
 def block(reason: str) -> None:
@@ -87,6 +103,8 @@ def main() -> None:
         block(f"{rel} is a credential/settings file")
     if is_locked_prereg(root, rel):
         block(f"{rel} is committed and therefore locked; register a new question instead")
+    if not ADMIN and rel.lower().endswith(CODE_SUFFIXES) and ALPACA_TRADING.search(written_text(tool_input)):
+        block(f"{rel} contains an Alpaca trading call; the desk uses market data only (data.alpaca.markets)")
 
     # Identity-dependent rule: enforced only when identity is actually available.
     if rel.startswith("research/data/") and agent and agent != "data-steward":

@@ -4,17 +4,26 @@ set -euo pipefail
 MODE="${1:-daily}"
 cd "$(dirname "$0")/.."
 set -a; [ -f .env.research ] && . ./.env.research; set +a
+
+# Git Bash rewrites POSIX-looking arguments when passing them to a native Windows
+# .exe, turning "/daily-check" into "C:/Program Files/Git/daily-check".
+export MSYS_NO_PATHCONV=1
+export MSYS2_ARG_CONV_EXCL='*'
 mkdir -p research/reports/daily research/reports/weekly logs
 
 TOOLS='Read,Grep,Glob,Bash(python research/*),Bash(psql $RESEARCH_DB_URL*),Bash(ls*),Bash(cat research/*),Write'
+# weekly-performance reads the frozen parquet, which needs `python -c`;
+# `Bash(python research/*)` alone matches only research/lib/*.py invocations.
+WEEKLY_TOOLS='Read,Grep,Glob,Bash(python*),Bash(ls*),Bash(cat research/*),Write,Edit'
 
 case "$MODE" in
   daily)
-    claude -p "/daily-check" --agent data-steward --allowedTools "$TOOLS" --output-format text \
-      > "research/reports/daily/$(date +%F).md"
+    # Deterministic check (research/lib/daily_check.py): no LLM needed for a mechanical
+    # comparison, same answer every run, seconds instead of ~20 minutes.
+    python research/lib/daily_check.py > "research/reports/daily/$(date +%F).md"
     REPORT="research/reports/daily/$(date +%F).md" ;;
   weekly)
-    claude -p "/weekly-performance" --agent data-steward --allowedTools "$TOOLS" --output-format text \
+    claude -p "/weekly-performance\n\nHeadless run: print the finished report to stdout - the caller redirects stdout to research/reports/weekly/<date>.md, so do not write that file yourself. The one file you may edit is research/BACKLOG.md, to append hypotheses as the skill describes. Commit nothing. Begin with the report itself; no preamble about tooling or access." --allowedTools "$WEEKLY_TOOLS" --output-format text \
       > "research/reports/weekly/$(date +%F).md"
     REPORT="research/reports/weekly/$(date +%F).md" ;;
   *) echo "unknown mode $MODE"; exit 1 ;;

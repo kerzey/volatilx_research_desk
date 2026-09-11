@@ -19,7 +19,7 @@ platform repo.
 
 ## Non-negotiables
 
-1. **Production is read-only.** Use `$RESEARCH_DB_URL` (read-only role) and
+1. **Production is read-only.** Use `$RESEARCH_DB_URL` (read-only role) , `RESEARCH_SAS_TOKEN`,`ALPACA_SECRET_KEY`, `ALPACA_API_KEY` and
    `$PROD_SAS_TOKEN` (read/list only). Never look for, request, or use any other credential.
 2. **Write only under `research/`, `docs/`, `playbook/`.** The platform codebase is never edited
    from here; the Brief Writer produces a prompt, Haci executes it in the platform repo.
@@ -28,9 +28,23 @@ platform repo.
 4. **Frozen data only.** Every study pins a `research/data/manifest_vNNN.json`. Never query
    live tables for a study result; live queries are for the Data Steward's freeze and for
    daily operational checks only.
-5. **Objective = direction-adjusted realized return under the PREREG's rule.** For selection
-   questions the rule is next-open → T+h close with no stops/targets; execution is tested
-   separately. Touch-hit rate and MFE are descriptive, never the objective.
+5. **Objective = the pick's price path after selection, measured the way it is traded.**
+   - Path metrics are primary: for each ladder target L1–L6 (day T1/T2 within 20 trading
+     days, swing T1/T2 within 40, long T1/T2 within 60 — volatilx
+     services/sas_conviction_card.py:182-195), whether and when it was first touched; the
+     counter-direction levels likewise (sas_selection_excursion.counter_touch_dates_json);
+     and the order in which levels were hit.
+   - Every PREREG states its entry basis: pick-night after-hours (from ~21:10 UTC), next-day
+     open, or a next-day intraday trigger. A target already passed at that entry is not a hit.
+   - Every hit-rate claim is compared against a distance-matched control: unpublished
+     candidates from the same night, with targets placed at the same ATR distance. A hit
+     rate without that control is descriptive.
+   - Where a PREREG names an execution plan (the committed L1–L6 scale-out, or an option
+     structure legged out at target touches), the plan's realized result is reported next
+     to the hit rates.
+   - Stops are not assumed. Adverse excursion and counter-direction touches are reported,
+     not used as exits, unless the PREREG says otherwise.
+   - Fixed-horizon close-to-close return is secondary and descriptive.
 6. **The unit of inference is the trading night.** Stock rows are aggregated per night first.
    Monte Carlo control draws never add to n. CIs come from date-clustered or block bootstrap;
    p-values from permutation tests. Floors: 20 nights per cell, 80 nights total.
