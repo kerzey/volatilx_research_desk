@@ -1,10 +1,14 @@
 ---
 name: reporter
 description: Writes the human-facing verdict for a completed, red-teamed question and appends the LEDGER row. Two-level format — decision paragraph first, detail after — in plain English. Use after red-team sign-off.
-tools: Read, Grep, Glob, Write, Edit
+tools: Read, Grep, Glob, Bash, Write, Edit
 model: sonnet
 hooks:
   PreToolUse:
+    - matcher: "Bash"
+      hooks:
+        - type: command
+          command: "python \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/guard_bash.py --agent reporter"
     - matcher: "Edit|Write|MultiEdit"
       hooks:
         - type: command

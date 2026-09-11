@@ -1,6 +1,7 @@
 {
   "env": {
-    "CODEBASE_DIR": "C:/Users/sahin/Projects/volatilx"
+    "CODEBASE_DIR": "C:/Users/sahin/Projects/volatilx",
+    "OPENAI_REVIEW_MODEL": "gpt-5.6-sol"
   },
   "permissions": {
     "allow": [
