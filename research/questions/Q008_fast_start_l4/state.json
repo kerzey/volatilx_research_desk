@@ -1,0 +1,18 @@
+{
+  "id": "Q008",
+  "state": "PREREG_DRAFT",
+  "history": [
+    {
+      "state": "IDEA",
+      "at": "2026-09-12T00:00:00+00:00",
+      "by": "haci",
+      "note": "H-031 (F4); '@registrar draft H-31'"
+    },
+    {
+      "state": "PREREG_DRAFT",
+      "at": "2026-09-12T00:00:00+00:00",
+      "by": "registrar",
+      "note": "draft 2026-09-12; hand-written by registrar (no shell) to mirror controller init + advance; timestamps are date-only"
+    }
+  ]
+}
