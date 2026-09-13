@@ -148,3 +148,107 @@ wrong per `CLAUDE.md`/`DATA_NOTES.md`).
 - `research/data/exclusions_v002.json` -- issued this session (R1).
 - `research/data/DATA_NOTES.md` -- paragraph added this session (R1).
 - This report: `research/reports/STEWARD_Q007_exposure.md`.
+
+---
+
+## R5 -- variant-B (B3 gap-matched control) feasibility, counts only
+
+Data Steward, 2026-09-13. Routed request R5 from `research/questions/Q007_gap_at_open/DECISIONS.md`
+("Routed requests" section). Frozen data only: `research/data/manifest_v001.json` +
+`research/data/manifest_prices_v001.json` (`v001_sas_candidates.parquet`,
+`p001_daily_split.parquet`). No live query. No `results/` directory was read (none exists for
+Q007). Counts and dates only -- no price level beyond `C_t`/`O_{t+1}`, no forward bar beyond the
+t+1 open, no touch, no return, no target, no outcome of any kind below.
+
+**Population (identical to R2, re-derived from the frozen parquet, not from a cached result):**
+published picks (`qualified IS TRUE AND selected_rank IS NOT NULL`, DP-28) on non-excluded nights
+(`research/data/exclusions_v002.json`), pick night >= 2026-06-01, 20-session forward window
+matured against the SPY-implied trading calendar in `prices_daily_split` (153 sessions,
+2026-02-02..2026-09-10; last matured pick night 2026-08-12) -- **394 published rows / 49 matured
+nights**, reproduced exactly. Applying the R2 funnel (8 no-ladder, 2 wrong-side, then per-arm
+passed-at-entry: 0 AGAINST / 7 FAVOUR / 0 FLAT / 2 MIDDLE excluded) gives the same eligible-pick
+counts as R2: **AGAINST 47, FAVOUR 35, FLAT 201** (MIDDLE's 92 excluded from R5 -- the request
+covers AGAINST/FAVOUR/FLAT only). Total eligible picks in scope: 283.
+
+**Method.** For each eligible pick p (night t, direction `dir_p`, arm), the B3 restricted pool is
+every same-night `sas_candidates` row that is **not** published (complement of the §2 predicate --
+includes qualified-false rows and dark-lane rows alike, per PREREG §3 B3 / §2), whose symbol has
+>= 60 daily bars dated <= t in `prices_daily_split` (2,437 non-published rows on the 49 matured
+nights; 2,432 have both a `c_t` and a session-t+1 open and >=60 bars -- 5 rows drop for a missing
+forward-open/close, per the same "missing forward bar" bookkeeping as R2). Each pool row's own gap
+is computed **direction-adjusted with p's direction**: `g_c = dir_p x (O_{t+1,c} - C_{t,c}) /
+C_{t,c} x 100`, and classified with p's own arm cuts (AGAINST <= -2.0, FLAT |g| < 1.0, FAVOUR >=
++2.0). The count reported is the size of that restricted pool in p's own group -- this is the
+**pool size before the nearest-10 feature match** (PREREG §3: B3 is missing if this pool has fewer
+than 3 rows), so the nearest-neighbour selection on `beta60`/`atr_pct`/`runup20` was not run; it is
+irrelevant to whether B3 is reachable at all. Because the restricted-pool count for a given pick
+depends only on (night, `dir_p`, arm-cut), not on the individual pick, picks sharing a night and a
+direction share the same pool count by construction.
+
+### (a) Picks per arm with >= 3 same-group non-published controls
+
+| Arm | Eligible picks | Picks with >= 3 controls | Share |
+|---|---|---|---|
+| AGAINST | 47 | 40 | 85.1% |
+| FAVOUR | 35 | 30 | 85.7% |
+| FLAT | 201 | 201 | 100.0% |
+
+### (b) Control-count distribution per arm
+
+| Arm | Median | 10th percentile | Min | Max |
+|---|---|---|---|---|
+| AGAINST | 7 | 1.6 | 0 | 26 |
+| FAVOUR | 10 | 1.4 | 0 | 20 |
+| FLAT | 28 | 19.0 | 11 | 45 |
+
+Two AGAINST picks and one FAVOUR pick have **zero** same-group non-published candidates on their
+night (i.e. no stock in the entire non-published pool gapped the same way, direction-adjusted, that
+night); a further 5 AGAINST and 4 FAVOUR picks have 1-2, still short of the 3-row PREREG floor.
+FLAT's minimum (11) is well clear of the floor at every eligible pick, because the FLAT band (|g| <
+1.0) is the densest part of the gap distribution.
+
+### (c) Variant-B contributing nights per arm
+
+A variant-B contributing night requires >= 1 eligible pick in that arm **with a valid B3 set (>= 3
+controls)** and >= 1 eligible FLAT pick **with a valid B3 set**, same night. All 46 of R2's
+FLAT-eligible nights clear the FLAT-side B3 floor (FLAT's minimum control count is 11), so the
+reduction below is driven entirely by the arm side.
+
+| Arm | Variant-B contributing nights | (for comparison: R2's exposure-only contributing nights) |
+|---|---|---|
+| AGAINST | 18 | 22 |
+| FAVOUR | 15 | 20 |
+| TOTAL (union) | 29 | 35 |
+
+### (d) Monthly run-rate and projected date to 80 variant-B contributing nights
+
+| Month | AGAINST | FAVOUR | TOTAL (union) |
+|---|---|---|---|
+| 2026-06 | 6 | 9 | 14 |
+| 2026-07 | 11 | 3 | 11 |
+| 2026-08 (partial -- matured only through 08-12) | 1 | 3 | 4 |
+
+Projection method identical to R2: rate = contributing nights / elapsed trading sessions from the
+first matured night (2026-06-01) to the last matured night (2026-08-12) inclusive = 51 sessions;
+projected forward at that constant rate, sessions converted to calendar days at 365/252.
+
+| Arm | n today | rate (per session) | sessions needed for 80 | projected date |
+|---|---|---|---|---|
+| AGAINST | 18 | 0.353 | 175.8 more | **2027-04-23** |
+| FAVOUR | 15 | 0.294 | 220.9 more | **2027-06-28** |
+| TOTAL (union) | 29 | 0.569 | 89.6 more | **2026-12-19** |
+
+Both arm-specific variant-B projections (AGAINST, FAVOUR) fall **after** the current hard stop of
+**2027-03-31** (DECISIONS.md item 10) -- AGAINST by about 3.5 weeks, FAVOUR by about 3 months. The
+union projection does not. These are mechanical extrapolations of the June-August run-rate only, on
+the same method R2 used; no reading of what this means for variant B vs. variant A is offered here
+-- per the routed request, that waiting-vs-sample trade-off is R-3, back to Haci with these numbers
+attached.
+
+---
+
+## Files (R5 addendum)
+
+- This report: `research/reports/STEWARD_Q007_exposure.md` (§R5 appended 2026-09-13).
+- No new data files were written; all counts were re-derived from `research/data/v001_sas_candidates.parquet`
+  and `research/data/p001_daily_split.parquet` against `research/data/exclusions_v002.json`.
