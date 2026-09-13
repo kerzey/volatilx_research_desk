@@ -80,3 +80,50 @@ Precondition: the Build column of the row in `research/ENHANCEMENTS.md` (or the 
   always built this way until its evidence reads PROSPECTIVE.
 Every brief ends with the exact before/after check the Data Steward will run at
 `/desk-run verify <id> <sha>`. Then set the row to `BRIEF_WRITTEN` with the brief's path.
+
+## Checks the coding agent can actually run (DP-49, DP-50)
+
+**There is one database.** `$RESEARCH_DB_URL` and the platform's production database are the same
+Postgres instance; the desk is separated by a read-only role, not by a copy. The coding agent in
+the platform repo holds the platform's **read-write** credential on it. So any DB command you put
+in a brief for that agent is a write-capable command pointed at live production data, whatever the
+command's own intent. Do not write one.
+
+Every check you address to the coding agent must be satisfiable from the repository alone:
+
+- the test suite (`python -m pytest tests/... -q`);
+- importing a pure function and asserting on its return;
+- `git show --stat <sha>`, `git diff`, a file hash — to prove a file was **not** changed;
+- a dry-run, and only after you have confirmed its entry point opens no connection. Check for a
+  schema or migration helper first; `scripts/backfill_outcomes.py` calls `create_tables()` before
+  it parses its own dry-run flag.
+
+Never write "run this script before and after and compare the output" as the coding agent's proof
+that it left a file alone. The diff proves that directly, needs no DB, and cannot be fooled by a
+flaky fetch.
+
+Anything that **reads** a table belongs in the brief's final section, addressed to the **Data
+Steward** on the read-only role. Anything that **writes** is **Haci's**, named as his, with the
+exact command, the number of rows it will touch, and what it will move on the product. Say in the
+brief which steps are whose, so the coding agent is never left deciding whether it may touch
+production.
+
+**Before-snapshots come from the freeze.** When the affected table is in a pinned manifest, name
+that parquet as the before state instead of asking anyone to capture a CSV first: it is
+sha256-pinned, immutable, and it predates the change by construction. A live "before" is not
+reproducible, because the rows behind it can be rewritten by the very repair you are briefing.
+Quote the relevant counts from the freeze in the brief so the comparison is already half-done.
+
+**Scope the repair from the frozen data, not from an estimate.** Count the exact rows a sweep has
+to touch — which dates, which columns, how many cells — and put the date list in the brief. State
+the counting rule you used, because "null today", "null and past its maturation window" and "null
+and beyond any self-healing window" are three different numbers and a brief that quotes one
+without saying which invites a contradictory recount. PI-001 produced two figures that both looked
+like "the hole" and differed by a factor of two for exactly that reason.
+
+**Check ship timing against every in-flight question (DP-50).** Before you write a repair brief,
+read `research/lib/desk_queue.py` output or `research/BOARD.md` for the locked questions. If the
+repair changes a column a locked PREREG reads, or changes which picks get published, the brief
+names the constraint in its own header — flag-off until that question's decision date, the
+PI-011 / Q010 pattern — and the repair log row in `research/data/DATA_NOTES.md` that will be
+written when it ships. A repair is never briefed without that check.

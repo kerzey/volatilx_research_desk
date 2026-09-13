@@ -114,3 +114,23 @@ once on its decision date, and writes briefs on request. His moments are: read t
 `/desk-run verify <id> <sha>`; and the three controller steps that stay `--by haci`
 (HUMAN_APPROVED, IMPLEMENTED_FLAG_OFF, RELEASE_APPROVED). Ideas go in `research/INBOX.md`.
 Nothing above changes: rules 1–15 bind the autonomous desk exactly as before.
+
+## One database (2026-09-13)
+
+`$RESEARCH_DB_URL` **is** the production database. There is no research copy: the desk is
+separated by a read-only role (`sas_research_ro` — `UPDATE` and `CREATE` are refused at grant
+level), not by a different instance. Rule 1 is unchanged and still binds; this says what it is
+protecting against.
+
+What follows from it, in full as DP-50 and `research/data/DATA_NOTES.md`:
+
+- **Rule 4 is load-bearing.** The pinned manifest is the only thing standing between a locked
+  question and a platform repair that rewrites history. Never take a number a PREREG will cite
+  from a live query.
+- **A successor freeze may disagree with its predecessor about the past**, because a repair can
+  land between them. That is not a bug in either. A question whose window spans a repair date
+  splits there, the way DP-06 splits the catalyst layer at 2026-06-01.
+- **Every repair that rewrites historical rows is logged** in `research/data/DATA_NOTES.md` with
+  its date, column, range and ship SHA, on the day it ships.
+- **A fix brief never hands the coding agent a database step** (DP-49): its credential on that
+  database is read-write.
