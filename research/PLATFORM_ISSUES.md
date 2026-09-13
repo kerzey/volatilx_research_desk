@@ -32,6 +32,8 @@ Statuses: `OPEN` · `HACI_DECIDED:<fix|research|accept>` · `BRIEF_WRITTEN` · `
 | PI-008 | low | HACI_DECIDED:accept | Smart-money layer weight forced to 0; CLAUDE.md weights text says 5 |
 | PI-009 | research | HACI_DECIDED:research | L1/L2 targets sit inside one day's range (median 0.31 / 0.55 ATR) — targets are not ATR-scaled |
 | PI-010 | research | HACI_DECIDED:research | Elite (90+) count falling: Apr 8 · May 13 · Jun 12 · Jul 8 · Aug 3 · Sep 2 |
+| PI-011 | high | OPEN | Printed swing stop on the wrong side of the pick-night close for 67 of 382 published picks (17.5%) |
+| PI-012 | med | OPEN | 2026-06-26: three qualified, ranked picks the night's own run audit does not record; no run-history table |
 
 ## Detail
 
@@ -103,3 +105,33 @@ the candidate median score fell 67.3 → 62.7 on 09-10 (daily check). Haci wants
 Candidates: score-distribution drift after the 06-01 catalyst fix, weaker tape, GEX nulls
 (+5 completeness offset), or universe changes. This is a Registrar question (calibration
 family F2), not a fix.
+
+### PI-011 — printed stop on the wrong side of the entry
+**Evidence:** STEWARD_Q009_exposure §R1(a). 67 of 382 published picks with a swing lane and an L3
+(pick nights 2026-06-01..08-12, matured) carry a printed swing `stop` on the **wrong side of the
+pick-night close** — for a bullish pick, a stop above the close, i.e. already breached at publication.
+**Cause (read-only):** the stop is written by the Principal Strategist off the lane `entry`, which may
+stray more than 5% from spot (`services/super_agent_select_service.py:101-111`), and is passed into
+`public_payload_json` **unvalidated** (`:94-95`, `:158`), while targets *are* checked against spot and
+entry (`:113-152`). It is shown to subscribers on the report card
+(`report_center_frontend/components/ReportCard.tsx:254-255`).
+**Desk impact:** these picks are excluded from Q009, which therefore speaks for 303 of 383 published
+picks (79%).
+**Recommend: fix** — a side-and-distance guard on the written stop, mirroring the existing target
+guard. **Timing note:** rule 11 applies with unusual force here — a stop-side guard must not go
+flag-on before Q010's decision date, or Q010 would be replicating Q009 on a different population
+(Q010 §10.6).
+
+### PI-012 — 2026-06-26: ranked picks the run audit does not record
+**Evidence:** STEWARD_Q009_exposure §R3 ruling 1. The frozen `sas_candidates` table holds 11 qualified
+rows with a `selected_rank` for that trading date; the run's contemporaneous `stats_json` records 8,
+all bullish. The three extra bearish rows (DPZ, COIN, AAPL) carry complete lane plans, including swing
+stops, with the payload `rank` matching the outer `selected_rank`. It is the only night in 113 with
+this mismatch.
+**Desk impact:** the whole night is excluded (`exclusions_v003.json`, `uncorroborated_publication_runs`);
+usable nights 103 → 102. Q006 and Q007 are locked citing earlier exclusions files and include that
+night — flagged to the Red Team for their reviews, never edited.
+**Recommend: research first** — the write path cannot be reconstructed from the desk side, because
+`super_agent_select_runs` is updated in place with no run-history table. Two questions for the platform:
+what wrote those rows, and should there be an append-only run-history/audit table — its absence is what
+makes this and the KT-audit re-run nights unrecoverable rather than merely detectable.
