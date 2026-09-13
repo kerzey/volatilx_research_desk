@@ -1,0 +1,8 @@
+{
+  "decision_date": "2027-03-22",
+  "extension_date": "2027-05-10",
+  "hard_stop": null,
+  "rule": "fixed",
+  "extended": false,
+  "note": "PREREG §5 DP-43 fixed recipe: window 2026-06-01..2027-02-12 (80 contributing nights at the measured 0.4510/session) + 20 sessions maturity + one-week margin, first Monday on or after; one automatic DP-13 extension to ..2027-03-30 decided 2027-05-10, then DEFERRED; gates fire on eval.py's measured counts, never the projection."
+}
