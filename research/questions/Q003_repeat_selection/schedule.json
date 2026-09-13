@@ -1,0 +1,8 @@
+{
+  "decision_date": "2026-12-15",
+  "extension_date": null,
+  "hard_stop": null,
+  "rule": "fixed",
+  "extended": false,
+  "note": "PREREG §5: n_paired ≥ 80 needs ≈ 94 eligible sealed nights. Successor freezes at the decision date (DP-23)."
+}

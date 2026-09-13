@@ -1,6 +1,6 @@
 {
   "id": "Q009",
-  "state": "PREREG_DRAFT",
+  "state": "PREREG_LOCKED",
   "history": [
     {
       "state": "IDEA",
@@ -12,6 +12,14 @@
       "at": "2026-09-13T18:49:11.764811+00:00",
       "by": "registrar",
       "note": "draft 2026-09-13; decisions applied; state file created late"
+    },
+    {
+      "state": "PREREG_LOCKED",
+      "at": "2026-09-13T18:53:50.320444+00:00",
+      "by": "haci",
+      "note": ""
     }
-  ]
+  ],
+  "prereg_commit": "f8324fcf53890725306692b030cd56a11e15e29a",
+  "prereg_sha256": "6c0f8f0460a04f6bf9ee51b079dfdf6b440c709804a9530b8753df7e2918b064"
 }

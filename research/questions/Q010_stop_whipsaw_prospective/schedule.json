@@ -1,0 +1,9 @@
+{
+  "decision_date": "2027-02-22",
+  "extension_date": null,
+  "hard_stop": null,
+  "rule": "fixed",
+  "extended": false,
+  "pin_at_decision": true,
+  "note": "PREREG §5: N = 46 sessions strictly after Q009's decision date D; decision Monday 2027-02-22 if D = 2026-11-09. If Q009 extends (D = 2026-12-21) recompute per the §5 table. One DP-13 extension of +30 sessions, then DEFERRED. No manifest exists for this question until its decision date (header), so the controller's DATASET_PINNED step runs then, on the successor freezes the steward builds — the manifests.json fallback in patch6 lets it read them from a locked PREREG."
+}

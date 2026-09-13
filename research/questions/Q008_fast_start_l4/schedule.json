@@ -1,0 +1,8 @@
+{
+  "decision_date": "2026-12-28",
+  "extension_date": "2027-02-03",
+  "hard_stop": null,
+  "rule": "fixed",
+  "extended": false,
+  "note": "PREREG §5 / DP-13: window 2026-06-01..2026-10-23, decision Monday 2026-12-28. If a gate is short on measured counts, one automatic extension to pick nights ..2026-11-30 (decision ≈ 2027-02-03; the steward fixes the exact session-count date when building the successor freezes), then DEFERRED."
+}

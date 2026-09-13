@@ -1,6 +1,6 @@
 {
   "id": "Q008",
-  "state": "PREREG_LOCKED",
+  "state": "DATASET_PINNED",
   "history": [
     {
       "state": "IDEA",
@@ -19,8 +19,20 @@
       "at": "2026-09-13T18:45:46.235504+00:00",
       "by": "haci",
       "note": ""
+    },
+    {
+      "state": "DATASET_PINNED",
+      "at": "2026-09-13T19:32:08.472561+00:00",
+      "by": "desk",
+      "note": "manifest_v001 + manifest_prices_v001 verified by the controller; successor freezes are built at the decision date (PREREG \u00a75, DP-23)"
     }
   ],
   "prereg_commit": "86157c04e28a48bbe1e315df617b75269094ba19",
-  "prereg_sha256": "3ec46ec4c7cfc910139010e38de341e255ae882d51237041461676e09287d081"
+  "prereg_sha256": "3ec46ec4c7cfc910139010e38de341e255ae882d51237041461676e09287d081",
+  "manifest": "research/data/manifest_v001.json",
+  "manifest_sha256": "b03f355a68373aadd0f2dc56c9154158929642291bf6caacb2f5a9bf15bef374",
+  "manifests": {
+    "research/data/manifest_v001.json": "b03f355a68373aadd0f2dc56c9154158929642291bf6caacb2f5a9bf15bef374",
+    "research/data/manifest_prices_v001.json": "73d2a895da7db724a236ea051d81944799135f0fb5fb3f1d022659f2b0c3b655"
+  }
 }

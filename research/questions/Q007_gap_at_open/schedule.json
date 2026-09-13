@@ -1,0 +1,9 @@
+{
+  "decision_date": null,
+  "extension_date": null,
+  "hard_stop": "2027-06-30",
+  "rule": "exposure-driven",
+  "extended": false,
+  "check_from": "2027-04-26",
+  "note": "PREREG §5: decision date = the first Monday on or after every retained arm has ≥ 80 contributing nights (B3-valid definition, DP-21). Run-rate projection reaches 80 on 2027-04-23 (both arms) and 2027-06-28; hard stop 2027-06-30. From check_from the steward counts exposure at each cycle — counts only, no outcome looks; when the count is met the desk sets decision_date to that Monday and runs."
+}

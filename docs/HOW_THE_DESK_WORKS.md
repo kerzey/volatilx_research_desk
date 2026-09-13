@@ -23,29 +23,32 @@ Plus two routine outputs that need nobody: the **daily check** (weekdays 17:45,
 `research/reports/daily/`) and the **weekly snapshot** (Saturday 07:00, `research/reports/weekly/`).
 If the computer was asleep and they didn't run: `docs/RUN_ROUTINES_MANUALLY.md`.
 
-## A question's life, and your three moments
+## A question's life, and your moments (autonomous mode, from 2026-09-13)
 
 ```
-BACKLOG idea
-  → @registrar drafts PREREG.md                 (agent)
-  → @decision-maker decide QNNN                 (agent; settles the open decisions from
-                                                 research/DECISION_POLICY.md, routes the rest)
-  → YOU answer the 1–3 questions it couldn't settle; @registrar apply QNNN folds them in
-  → YOU read it, commit it                       ← moment 1: lock
-  → controller: PREREG_LOCKED → DATASET_PINNED   (steward)
-  → @researcher writes eval.py once, runs it     (agent; no tuning while looking)
-  → validators.py mechanical checks              (script)
-  → @red-team attacks it                          (agent; sees only PREREG, eval.py, results)
-  → @reporter writes REPORT.md + LEDGER row       (agent)
+BACKLOG idea (or a line you wrote in research/INBOX.md)
+  → /desk-run: @registrar drafts PREREG.md          (agent)
+  → @decision-maker decide QNNN --autonomous         (agent; settles everything by
+                                                      research/DECISION_POLICY.md DP-01..48;
+                                                      what it defaulted for you goes on the board)
+  → @data-steward exposure count → @decision-maker record → @registrar apply
+  → the desk commits and locks (--by desk), writes schedule.json, pins the data
+  → the desk waits for the decision date (no interim looks)
+  → @data-steward freeze-for QNNN (successor freezes)  (agent)
+  → @researcher writes eval.py once, runs it          (agent; no tuning while looking)
+  → validators.py mechanical checks                   (script)
+  → @red-team attacks it                               (agent; sees only PREREG, eval.py, results)
+  → @reporter writes REPORT.md + LEDGER row, updates the lists, regenerates the board
   → verdict: NULL / INCONCLUSIVE / HISTORICALLY_CONFIRMED
-  → YOU decide: build it? trade it? drop it?      ← moment 2: HUMAN_APPROVED
-  → @brief-writer writes IMPLEMENTATION_BRIEF.md  (agent)
-  → YOU run the brief in the platform repo, flag OFF, record SHA  ← moment 3
-  → steward grades the dark column ≥ 30 nights → SHADOW_VALIDATED → you flip the flag
+  → YOU decide: build it?                              ← moment 1: HUMAN_APPROVED (controller)
+  → /desk-run prompt QNNN → IMPLEMENTATION_BRIEF.md    (agent)
+  → YOU run the brief in the platform repo, flag OFF, record SHA  ← moment 2
+  → steward grades the dark column ≥ 30 nights → SHADOW_VALIDATED → YOU flip the flag ← moment 3
 ```
 
-Only you can do the three ← moments. `research/lib/controller.py` refuses every step whose
-predecessor isn't done; agents don't argue with it.
+Only you can do the three ← moments; the controller refuses them from anyone else. Everything
+before the verdict the desk now does on its own. The full description, the sub-commands and the
+overnight schedule are in `docs/AUTONOMOUS_DESK.md`.
 
 **Trading rules for you** take a shorter path: a HISTORICALLY_CONFIRMED verdict → the Reporter
 writes `playbook/PB-NNN_slug.md` with the rule, its n and caveats, marked *trade small until
@@ -54,31 +57,31 @@ the lock date.
 
 ## Platform bugs take a different, shorter path
 
-A bug is not a finding. It goes in `research/PLATFORM_ISSUES.md` with evidence, you mark it
-`fix` / `research` / `accept`, and `@brief-writer fix-brief PI-NNN` produces a short prompt you
-hand to the coding agent in the platform repo. No pre-registration, no shadow period — but the
-brief still names a before/after check, and the steward confirms the data changed on the next
-freeze. Anything that turns out to be a *behaviour change* to scoring gets promoted to a question.
+A bug is not a finding. It goes in `research/PLATFORM_ISSUES.md` with evidence. You ask for the
+prompt — `/desk-run prompt PI-NNN` — and asking *is* your decision: the desk marks it `fix` and
+writes `research/briefs/PI-NNN_slug.md`, a short prompt you hand to the coding agent in the
+platform repo. When it is in, `/desk-run verify PI-NNN <sha>` and the steward runs the brief's
+before/after check. No pre-registration, no shadow period. Anything that turns out to be a
+*behaviour change* to scoring gets promoted to a question. Enhancements
+(`research/ENHANCEMENTS.md`) and your trade ideas (`research/TRADE_IDEAS.md`) take the same
+prompt → implement → verify route; behaviour changes wait for their question's verdict, or ship as
+a flag-off internal tool for you only.
 
 ## The commands you'll actually type
 
 ```bash
 ./scripts/start_desk.sh                  # start (Git Bash; loads .env.research; winpty)
 ./scripts/start_desk.sh --admin          # maintenance: enforcement files writable
-/desk-status                             # where everything is
-@registrar draft H-055                   # turn a backlog idea into a PREREG draft
-@decision-maker decide Q00N              # settle the draft's open decisions; asks you only the reserved ones
-@decision-maker record Q00N <answers>    # write your answers down; generalisable ones become standing rules
-@registrar apply Q00N                    # fold DECISIONS.md into the draft
-git add research/questions/Q00N_*/PREREG.md && git commit -m "PREREG Q00N locked"
-python research/lib/controller.py advance Q00N PREREG_LOCKED --by haci
-@data-steward advance Q00N DATASET_PINNED
-@researcher run Q00N
-python research/lib/validators.py --question Q00N
-@red-team review Q00N
-@reporter write Q00N
-python research/lib/controller.py advance Q00N HUMAN_APPROVED --by haci
-@brief-writer Q00N
+/desk-run                                # the desk works its queue; ends with "Waiting on you"
+/desk-run prompt PI-011                  # you want the implementation prompt (this is your decision)
+/desk-run verify PI-011 <sha>            # you implemented it; the desk checks
+/desk-run idea "picks that gap up and close red on day 1 are dead money"   # jumps the queue
+/desk-status                             # one-screen status (or just read research/BOARD.md)
+python research/lib/controller.py advance Q00N HUMAN_APPROVED --by haci     # yours: build a finding
+python research/lib/controller.py advance Q00N IMPLEMENTED_FLAG_OFF --by haci --note "PR … sha …"
+python research/lib/controller.py advance Q00N RELEASE_APPROVED --by haci   # yours: flip the flag
+# the old per-step commands (@registrar draft, @decision-maker decide --ask, @researcher run …)
+# still work when you want to drive one step by hand
 ```
 
 Files a human must edit (agents are blocked): `CLAUDE.md`, `.claude/**`, `research/lib/`
