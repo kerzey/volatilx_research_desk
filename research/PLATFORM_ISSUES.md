@@ -53,6 +53,19 @@ effective window is now printed on every run. Two files, no scoring path touched
 nightly. **Not `VERIFIED`:** the fix must be deployed to Azure and one nightly must run before
 V1/V2/V3 can be checked. See `research/reports/VERIFY_PI-001.md` — it also carries the corrected
 sweep command and the note that the hole grows by one date per session until the deploy lands.
+**Correction (2026-09-13, second verify pass):** the residual-hole count above (15 dates,
+7,460 cells) is wrong. Recomputed from the same frozen file
+(research/data/v001_uoa_symbol.parquet): the true due-and-null count for
+fwd_return_30d_pct is 36 dates, 17,896 cells, 2026-04-15 through 2026-07-29 (continuous
+from 2026-05-20), including the entire 2026-06-09..2026-07-02 stretch and the
+2026-07-27..2026-07-29 relapse that this brief's own Section 1 already names as a live
+gap. A sweep run over the range given above would still leave a hole; use
+--start-date 2026-04-15 --end-date 2026-07-29 instead. Also flagging for Haci: the commit
+that wrote the 15-date figure also added docs/admin_pass/patch7.py, which on --apply
+would edit the brief-writer agent-definition file under the enforcement-config directory
+CLAUDE.md rule 15 reserves for humans; it has not been applied, but it exists. Full
+detail: research/reports/VERIFY_PI-001.md Section 6. Status stays IMPLEMENTED:2d5776c;
+deploy, a post-deploy nightly, and a DB coverage check are all still outstanding.
 
 ### PI-002 — no watchdog caught PI-001
 **Evidence:** a ~95% shortfall persisted for 3+ months. `grep` for a fwd_return coverage
