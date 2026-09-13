@@ -21,6 +21,7 @@ what not to build and what not to market.
 
 Plus two routine outputs that need nobody: the **daily check** (weekdays 17:45,
 `research/reports/daily/`) and the **weekly snapshot** (Saturday 07:00, `research/reports/weekly/`).
+If the computer was asleep and they didn't run: `docs/RUN_ROUTINES_MANUALLY.md`.
 
 ## A question's life, and your three moments
 
