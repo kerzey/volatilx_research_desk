@@ -273,3 +273,81 @@ PREREG is updated to cite it.
   `research/data/v001_outcome_corrections.parquet` and `research/data/p001_daily_split.parquet`
   against `research/data/exclusions_v002.json`. No manifest, exclusions or state file was created
   or modified.
+
+---
+
+## Addendum, 2026-09-13 -- Q009 population under `exclusions_v003.json` (R4)
+
+Delivered as part of R4 (`research/questions/Q009_stop_whipsaw/DECISIONS.md`, "Routed requests"):
+`research/data/exclusions_v003.json` re-derived `night_counts_after_exclusions` and, per R4's
+request, this addendum re-derives Q009's R1 population under the new file so the Registrar can
+quote measured figures rather than the decision-maker's arithmetic. Same method, same inputs,
+same frozen tables as R1 above (`manifest_v001.json` + `manifest_prices_v001.json`, no bar dated
+after night t, counts only) -- the only change is the exclusion set: `exclusions_v002.json`'s
+`manual_runs.trading_dates` ∪ `non_session_runs.trading_dates`, now also excluding
+`exclusions_v003.json`'s new `uncorroborated_publication_runs.trading_dates` (2026-06-26, whole
+night).
+
+### Population funnel, re-derived (v003)
+
+| Stage | Removed | Remaining |
+|---|---|---|
+| Published, in-window, non-excluded, matured (20-session) | -- | 383 |
+| No lane-plan ladder at all | 8 | 375 |
+| Swing lane present but no L3 | 0 | 375 |
+| Swing lane and L3 present but `stop` NULL | 0 | 375 |
+| Non-bullish/bearish direction | 0 | 375 |
+| No `C_t` or no ATR | 0 | 375 |
+| `outcome_target_invalid` non-null | 4 | 371 |
+| Wrong-side stop (`s_close <= 0`) | 66 | 305 |
+| Wrong-side L3 (`d_close <= 0`) | 2 | 303 |
+| Symbol with fewer than 60 daily bars dated <= t | 0 | 303 |
+| **ELIGIBLE (all filters passed)** | -- | **303** |
+
+Matured nights fall from 49 to **48** (2026-06-26 was itself a matured night; removing it removes
+one whole night from the denominator, not a partial-night count). Published picks fall from 394
+to **383** -- exactly the 11 rows the night carried. Of those 11, one had already been removed by
+R1's wrong-side-stop filter (67 -> 66 at that step here), so eligible picks fall by exactly 10:
+**313 -> 303**, matching R3 ruling 1's count that 10 of the night's 11 rows sat in the eligible
+population.
+
+### Eligible picks by bucket (v003: 303 total, 47 nights)
+
+| Bucket | Picks | Share |
+|---|---|---|
+| TIGHT (`0 < s_close < 1.0`) | 282 | 93.1% |
+| MID (`1.0 <= s_close < 2.0`) | 21 | 6.9% |
+| WIDE (`s_close >= 2.0`) | 0 | 0.0% |
+
+Bucket composition is essentially unchanged from v002 (TIGHT 93.0% -> 93.1%, MID 7.0% -> 6.9%,
+WIDE still empty) -- the excluded night's picks were removed roughly in proportion, not
+concentrated in one bucket (9 TIGHT + 1 MID of the 10 eligible dropped rows).
+
+### Contributing nights (v003)
+
+All three definitions (P1 B1-valid, P2, P3 TIGHT) again collapse to the same count: **47 of 48**
+matured nights carry >= 1 eligible pick. The B1 control-pool condition still never binds
+separately in this window (every published pick has a large same-night non-published pool; the
+2026-06-26 exclusion removes the night's rows from both sides of that comparison, so it does not
+change which nights clear the >= 10-control floor).
+
+### Net effect of v003 on Q009's registered population
+
+| | v002 | v003 | Change |
+|---|---|---|---|
+| Matured nights | 49 | 48 | -1 |
+| Published picks (in-window, non-excluded, matured) | 394 | 383 | -11 |
+| Eligible picks | 313 | 303 | -10 |
+| Contributing nights (all 3 definitions) | 48 | 47 | -1 |
+| TIGHT / MID / WIDE | 291 / 22 / 0 | 282 / 21 / 0 | -9 / -1 / 0 |
+
+No gate changes: `eval.py` reads these measured counts directly, never a projection. The
+80-contributing-night floor (DP-21) and the 30-contributing-night-after-lock floor (DP-24) move
+by one fewer starting night; DECISIONS.md item 20 already priced this in ("cost is one night: 48
+-> 47 contributing nights and ~= 10 eligible picks, which changes no gate").
+
+**Files.** No new data files were written for this addendum; counts re-derived from the same
+frozen parquet as R1 (`v001_sas_candidates.parquet`, `v001_sas_runs.parquet`,
+`v001_outcome_corrections.parquet`, `p001_daily_split.parquet`) against
+`research/data/exclusions_v003.json`. No manifest, exclusions or state file was modified by this
+addendum; `exclusions_v003.json` itself was written separately as R4's deliverable.

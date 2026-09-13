@@ -1,9 +1,10 @@
 # Data notes — what the desk knows about the data that the tables don't say
 
 Read this before writing a PREREG or an eval.py. Each note gives the fact, who established it,
-and what a study must do about it. Machine-readable exclusions live in `exclusions_v002.json`
-(successor to `exclusions_v001.json`, which is superseded but never deleted or overwritten —
-see §“Re-run nights folded into exclusions_v002” below).
+and what a study must do about it. Machine-readable exclusions live in `exclusions_v003.json`
+(successor to `exclusions_v002.json` and `exclusions_v001.json`, both superseded but never
+deleted or overwritten — see §“Re-run nights folded into exclusions_v002” and
+§“2026-06-26 uncorroborated publication rows folded into exclusions_v003” below).
 
 ## Manual / late SAS runs (Haci, 2026-09-10)
 
@@ -68,6 +69,59 @@ ran late, not a manual re-run). This predates SAS's own history (first `sas_runs
 2026-04-01) so it does not affect any currently registered question, but any future study using
 those three tables for Jan–Mar 2026 nights must not treat row creation as 16:05-ET-available for
 that stretch.
+
+## 2026-06-26 uncorroborated publication rows folded into exclusions_v003 (steward, Q009 R3/R4, 2026-09-13)
+
+Routed by the Q009 decision-maker as R3/R4 (`research/questions/Q009_stop_whipsaw/DECISIONS.md`,
+items 20/22 and "Routed requests"). Ruling 1 of R3 found that the frozen `sas_candidates` table
+for trading_date **2026-06-26** carries **11** qualified rows with a non-null `selected_rank`,
+while that night's own contemporaneous run audit (`sas_runs.stats_json`) records
+`qualified_count: 8`, all bullish. The 3 extra bearish rows (**DPZ, COIN, AAPL**) are not
+corroborated by the run's own audit trail at all, yet each carries a fully-formed
+`public_payload_json` with complete `lane_plans` across all three lanes, including the
+swing-lane stop and L3 target. All 52 rows for the night share one `created_at`
+(2026-06-26 21:17:31.403724 UTC) -- a single-batch write, not a re-run -- so this is a
+**distinct failure mode** from the re-run signature `exclusions_v002.json` already excludes:
+partial row mutation after a clean single-batch write, rather than a timestamp-reset re-run.
+Checked against all 113 nights in the frozen history, **2026-06-26 is the only night** where the
+frozen qualified-row count disagrees with the run's own `stats_json.qualified_count`. Ruling 2 of
+R3 (the E9a correction batch, the wrong-side-target guard, and the cross-lane monotonic re-sort)
+came back **negative** -- no payload rewrite anywhere in the 795-row correction ledger.
+
+**`exclusions_v003.json`** (successor to `exclusions_v002.json`, declared by the Data Steward
+2026-09-13) carries everything from v002 unchanged (`manual_runs`, `non_session_runs`,
+`catalyst_layer_regime_change`, `regime_label_point_in_time_from`,
+`sas_candidates_availability_note_correction`) and adds one new block,
+`uncorroborated_publication_runs`, excluding trading_date **2026-06-26** in whole -- all 11
+qualified rows, not only the 3 uncorroborated ones. Whole-night scope is the conservative,
+KT-audit-consistent choice (the decision-maker's, per DECISIONS.md item 20): the 8 corroborated
+bullish rows came through the same write path and have not themselves been shown clean of it,
+and the desk's exclusion lists are night-level by precedent. The mutation cannot be dated more
+precisely than "after the 2026-06-26 16:05 ET run, before the 2026-09-10 freeze" --
+`super_agent_select_runs` is updated in place with no append-only run-history table, so the
+night's true 16:05 published set is not recoverable, only excluded.
+
+**Re-derived night counts (v003): 102 total, 34 in-sample (to 05-29), 68 sealed (from 06-01)** --
+down from v002's 103 / 34 / 69. The one newly-excluded night (2026-06-26) is sealed; no in-sample
+night count changes.
+
+**Q009 population under v003** (the question this exclusion exists for, and the reason it cannot
+lock without this file): re-deriving the full R1 funnel with 2026-06-26 also excluded gives
+**303 eligible picks on 47 contributing nights** (down from 313 picks / 48 nights under v002),
+buckets TIGHT 282 / MID 21 / WIDE 0. See
+`research/reports/STEWARD_Q009_exposure.md` addendum for the full re-derived funnel.
+
+**Rule for studies:** cite `exclusions_v003.json` going forward; `eval.py` reads
+`manual_runs.trading_dates` ∪ `non_session_runs.trading_dates` ∪
+`uncorroborated_publication_runs.trading_dates`, never hard-coded dates. Locked PREREGs that cite
+`exclusions_v001.json` or `exclusions_v002.json` are not edited retroactively -- the exclusions
+file a locked question cites stands as its population definition (DP-22). As of 2026-09-13 this
+affects `Q009` (PREREG_DRAFT -- cites this file; cannot lock without it); `Q008` (PREREG_DRAFT,
+cites v002 -- switches to this file at its decision pass under DP-22); `Q007` (PREREG_LOCKED
+2026-09-13, commit `b211292`, cites v002 -- 2026-06-26 falls inside its ≥ 2026-06-01 window; NOT
+edited, flagged to the Red Team for Q007's review); `Q006` (locked, cites v001 -- same treatment,
+already flagged for the v002 re-run nights and now also for 2026-06-26); `Q005`
+(LEDGERED/INCONCLUSIVE -- one night, no action).
 
 ## Publication time is deliberately early on many nights (Haci, 2026-09-10)
 

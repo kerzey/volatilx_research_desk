@@ -1,0 +1,55 @@
+{
+  "version": "003",
+  "supersedes": "research/data/exclusions_v002.json",
+  "manifest": "research/data/manifest_v001.json",
+  "declared_by": "data-steward",
+  "declared_on": "2026-09-13",
+  "issued_under": "research/questions/Q009_stop_whipsaw/DECISIONS.md (\"Routed requests\" R4, item 20) + DP-22, implementing R3 ruling 1 (research/reports/STEWARD_Q009_exposure.md §R3 ruling 1) at the whole-night scope DECISIONS.md item 20 chose",
+  "header_note": "Successor to exclusions_v002.json. Everything in v002 carries over unchanged: manual_runs (trading_dates and late_but_clean), non_session_runs, catalyst_layer_regime_change, regime_label_point_in_time_from, sas_candidates_availability_note_correction. Adds one new block, uncorroborated_publication_runs, excluding trading_date 2026-06-26 in whole (all 11 qualified/selected_rank rows that night, not only the 3 uncorroborated ones) on evidence from STEWARD_Q009_exposure.md section R3 ruling 1: that night's own sas_runs.stats_json records qualified_count 8, all bullish, while the frozen sas_candidates table carries 11 qualified rows with a non-null selected_rank -- 3 extra bearish rows (DPZ, COIN, AAPL) not corroborated by the run's own 16:05 ET audit, each carrying a fully-formed public_payload_json including swing-lane lane_plans. It is the only night in the entire 113-night frozen history where the actual qualified-row count disagrees with the run's own stats_json.qualified_count. Whole-night scope (not just the 3 rows) is the conservative, KT-audit-consistent choice: the 8 corroborated bullish rows came through the same write path and have not themselves been shown clean of it, and the desk's exclusion lists (manual_runs, non_session_runs) are night-level by precedent. This is a distinct criterion from manual_runs' re-run signature (a timestamp reset with the original 16:05 output unrecoverable) -- 2026-06-26 shows one uniform created_at for all 52 rows that night, i.e. a single-batch write, not a re-run -- so it is filed as a separate block rather than folded into manual_runs. Never overwrites v001 or v002 (frozen data unchanged; only the exclusion policy changes -- no new manifest required). Affected questions: Q009 (PREREG_DRAFT -- cites this file; it is the reason the file exists and cannot lock without it); Q008 (PREREG_DRAFT, cites v002 -- switches to this file at its decision pass under DP-22); Q007 (PREREG_LOCKED 2026-09-13, commit b211292, cites v002 -- 2026-06-26 falls inside its >= 2026-06-01 window; NOT edited, flagged to the Red Team for Q007's review per DP-22); Q006 (DATASET_PINNED/locked, cites v001 -- 2026-06-26 likewise inside its population; NOT edited, same flag, already carried forward from the v002 note); Q005 (LEDGERED/INCONCLUSIVE -- one night, no action).",
+  "manual_runs": {
+    "reason": "manual re-runs during development, finished one or more days after the trading date's next-session open; spot_close mixed-date; not actionable at publication. The 4 nights added in v002 (2026-04-02, 04-24, 05-15, 07-02) show the same signature at smaller gaps (19-51h vs 24-115h for the original 5): sas_candidates rows carry a creation timestamp and config hash from a re-run 19-51h after the 16:05 ET decision (run start/finish reset, run creation timestamp unchanged); the 16:05 candidate set is not recoverable (no run-history table). Confirmed by the Data Steward 2026-09-11 (research/reports/KT_AUDIT_manifest_v001_rerun_nights.md), corroborating Q005 red-team finding A1.",
+    "criterion": "super_agent_select_runs.finished_at later than the next trading session's open (original 5) OR sas_candidates row creation/config-hash shows a re-run 19h+ after the 16:05 ET decision with the original 16:05 output unrecoverable (KT-audit 4, folded into the same criterion since both make the frozen candidate row not the 16:05 decision's).",
+    "trading_dates": [
+      "2026-04-02",
+      "2026-04-24",
+      "2026-05-11",
+      "2026-05-12",
+      "2026-05-13",
+      "2026-05-14",
+      "2026-05-15",
+      "2026-07-02",
+      "2026-07-06"
+    ],
+    "late_but_clean": [
+      "2026-04-01",
+      "2026-04-03",
+      "2026-04-06",
+      "2026-05-01"
+    ]
+  },
+  "non_session_runs": {
+    "reason": "run recorded on a day the NYSE was closed (no SPY bar); 0 picks published; found by the registrar in R1",
+    "trading_dates": [
+      "2026-04-03"
+    ]
+  },
+  "uncorroborated_publication_runs": {
+    "reason": "the frozen sas_candidates table for this trading_date holds more qualified, ranked rows than the night's own contemporaneous run audit (sas_runs.stats_json) recorded as selected -- specifically, 3 additional bearish rows (DPZ, COIN, AAPL; ranks 1-3, duplicating the bullish top-3) with fully-formed public_payload_json (complete lane_plans across all three lanes, including the swing-lane stop and L3 target) that stats_json.qualified_count (8) and stats_json.direction_counts (0 bearish) do not corroborate. All 52 rows for the night share one created_at (2026-06-26 21:17:31.403724 UTC) -- a single-batch write, not a re-run -- so the manual_runs criterion (a timestamp-reset re-run) does not apply; this is a distinct failure mode: the publication predicate (qualified IS TRUE AND selected_rank IS NOT NULL) cannot be trusted for this single night because it is unclear which rows the 16:05 ET decision actually published. Checked against all 113 nights in the frozen history: 2026-06-26 is the only night where the frozen qualified-row count disagrees with the run's own stats_json.qualified_count. The mutation cannot be dated more precisely than \"after the 2026-06-26 16:05 ET run, before the 2026-09-10 freeze\" -- the frozen table carries no per-column timestamp. Whole night excluded (all 11 qualified/selected_rank rows), not only the 3 uncorroborated ones -- the 8 corroborated bullish rows have not themselves been shown clean of the same write path, and the desk's night-level exclusion precedent (manual_runs, non_session_runs) is followed rather than a row-level carve-out. Ruled by the Data Steward 2026-09-13 (research/reports/STEWARD_Q009_exposure.md section R3 ruling 1), per the red team's original 2026-06-26 flag.",
+    "criterion": "frozen sas_candidates qualified-row count for the trading_date disagrees with that night's own sas_runs.stats_json.qualified_count, with no timestamp-reset (re-run) signature present -- i.e. a single-batch write whose row set does not match its own contemporaneous run audit. New and distinct from the manual_runs criterion (partial row mutation after a clean single-batch write, not a re-run); filed as a separate block rather than added to manual_runs.",
+    "trading_dates": [
+      "2026-06-26"
+    ]
+  },
+  "night_counts_after_exclusions": {
+    "all": 102,
+    "in_sample_to_2026-05-29": 34,
+    "sealed_from_2026-06-01": 68,
+    "note": "derive in eval.py from sas_runs minus manual_runs.trading_dates minus non_session_runs.trading_dates minus uncorroborated_publication_runs.trading_dates; do not hard-code. Re-derived by the Data Steward 2026-09-13 from v001_sas_runs.parquet (113 total nights) against this file: v002 gave 103 (all)/34 (in-sample)/69 (sealed); v003 excludes one further night, 2026-06-26 (sealed period), giving 102 (all)/34 (in-sample)/68 (sealed). No in-sample night count changes -- 2026-06-26 falls after 2026-05-29."
+  },
+  "catalyst_layer_regime_change": {
+    "reason": "earnings date resolver wrong before this date; platform commit 69ef05f",
+    "fixed_from": "2026-06-01"
+  },
+  "regime_label_point_in_time_from": "2026-06-09",
+  "sas_candidates_availability_note_correction": "The freeze config's (research/lib/freeze_config.json) and manifest_v001's availability.sas_candidates note currently reads: \"written live at decision time; point-in-time by construction. Verified: sampled created_at/updated_at cluster same trading_date evening.\" This is amended (declarative correction here; the freeze config/manifest files themselves are not edited, per protocol -- never overwrite an existing manifest) to read: \"written live at decision time for the large majority of nights; point-in-time by construction EXCEPT on the 4 known re-run nights (2026-04-02, 04-24, 05-15, 07-02), where the frozen row is a re-run's output 19-51h after the 16:05 ET decision, not the decision itself, AND on 2026-06-26, where the frozen row set (11 qualified rows) does not match the night's own 16:05 ET run audit (8 qualified rows) despite a single uniform created_at with no re-run signature -- a distinct failure mode, partial row mutation rather than a re-run. super_agent_select_runs is updated in place (no append-only run-history/audit table), so neither a re-run night's original 16:05 candidate set nor 2026-06-26's true 16:05 published set is recoverable from anything the desk can query -- only excluded. See research/reports/KT_AUDIT_manifest_v001_rerun_nights.md section 6 for the re-run validator-gap analysis and research/reports/STEWARD_Q009_exposure.md section R3 ruling 1 for the 2026-06-26 finding."
+}
