@@ -28,7 +28,10 @@ If the computer was asleep and they didn't run: `docs/RUN_ROUTINES_MANUALLY.md`.
 ```
 BACKLOG idea
   → @registrar drafts PREREG.md                 (agent)
-  → YOU read it, set the MPE, commit it          ← moment 1: lock
+  → @decision-maker decide QNNN                 (agent; settles the open decisions from
+                                                 research/DECISION_POLICY.md, routes the rest)
+  → YOU answer the 1–3 questions it couldn't settle; @registrar apply QNNN folds them in
+  → YOU read it, commit it                       ← moment 1: lock
   → controller: PREREG_LOCKED → DATASET_PINNED   (steward)
   → @researcher writes eval.py once, runs it     (agent; no tuning while looking)
   → validators.py mechanical checks              (script)
@@ -64,6 +67,9 @@ freeze. Anything that turns out to be a *behaviour change* to scoring gets promo
 ./scripts/start_desk.sh --admin          # maintenance: enforcement files writable
 /desk-status                             # where everything is
 @registrar draft H-055                   # turn a backlog idea into a PREREG draft
+@decision-maker decide Q00N              # settle the draft's open decisions; asks you only the reserved ones
+@decision-maker record Q00N <answers>    # write your answers down; generalisable ones become standing rules
+@registrar apply Q00N                    # fold DECISIONS.md into the draft
 git add research/questions/Q00N_*/PREREG.md && git commit -m "PREREG Q00N locked"
 python research/lib/controller.py advance Q00N PREREG_LOCKED --by haci
 @data-steward advance Q00N DATASET_PINNED

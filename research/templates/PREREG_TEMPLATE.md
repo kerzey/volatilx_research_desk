@@ -50,3 +50,9 @@ Owner: implementer. Shadow period before flip: ≥ 20 trading days.
 - <look-ahead risk, e.g. regime label finalized after the fact>
 - <denominator risk>
 - <regime confound>
+
+## 11. Open decisions before lock
+<Only what research/DECISION_POLICY.md does not settle; cite DP-ids inline where it does.
+ Resolved by `@decision-maker decide QNNN`, folded back by `@registrar apply QNNN`.>
+1. **<decision in one line>** — Options: A <…> / B <…>. Recommendation: A, because <one line>.
+   Changes: §<n>, §<m>.

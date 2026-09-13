@@ -1,6 +1,6 @@
 {
   "id": "Q004",
-  "state": "PREREG_DRAFT",
+  "state": "DATASET_PINNED",
   "history": [
     {
       "state": "IDEA",
@@ -12,6 +12,26 @@
       "at": "2026-09-11T04:18:49.385135+00:00",
       "by": "registrar",
       "note": "R1 draft 2026-09-10"
+    },
+    {
+      "state": "PREREG_LOCKED",
+      "at": "2026-09-11T16:47:54.226872+00:00",
+      "by": "haci",
+      "note": ""
+    },
+    {
+      "state": "DATASET_PINNED",
+      "at": "2026-09-13T04:06:48.745501+00:00",
+      "by": "data-steward",
+      "note": "pinned; both manifests verified"
     }
-  ]
+  ],
+  "prereg_commit": "c52fa1611a43ad6060b05669854dd3d33d6a3758",
+  "prereg_sha256": "2e27bd2318b51cc1ccaef01fbe54b71fbfd6717f1c7e3c1204cd18512e7b1fc2",
+  "manifest": "research/data/manifest_v001.json",
+  "manifest_sha256": "b03f355a68373aadd0f2dc56c9154158929642291bf6caacb2f5a9bf15bef374",
+  "manifests": {
+    "research/data/manifest_v001.json": "b03f355a68373aadd0f2dc56c9154158929642291bf6caacb2f5a9bf15bef374",
+    "research/data/manifest_prices_v001.json": "73d2a895da7db724a236ea051d81944799135f0fb5fb3f1d022659f2b0c3b655"
+  }
 }
