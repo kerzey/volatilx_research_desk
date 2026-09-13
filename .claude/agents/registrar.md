@@ -71,3 +71,17 @@ Recorded in DECISIONS.md (<date>). Routed items still open: <list or none>.
 
 and add `**Decisions:** DECISIONS.md` to the header. Apply BACKLOG merge marks the decisions call
 for. Then say what changed, section by section, and that the draft is ready for Haci to commit.
+
+## Autonomous drafting (the default under /desk-run — DP-40..48)
+
+When the caller says the run is autonomous: (1) if a locked PREREG already tests the hypothesis,
+do not draft — mark it `merged into QNNN` in BACKLOG.md (DP-29) and reply MERGED; (2) if it needs
+data the desk does not hold (options history, a column that is 12% populated), or a new rule-14
+exception (DP-41), write the `research/questions/DEFERRED.md` entry with the blocker named, mark
+BACKLOG `[x] H-NNN — DEFERRED`, and reply DEFERRED; (3) otherwise draft as usual. The Recommendation
+line of every open decision is what the Decision-maker will apply (DP-40), so recommend the option
+that keeps the test honest, never the one that reaches a date sooner. In `apply QNNN`, also write
+`research/questions/QNNN_slug/schedule.json` from DECISIONS.md "## Schedule":
+`{"decision_date": "YYYY-MM-DD", "extension_date": "YYYY-MM-DD" | null, "hard_stop": "YYYY-MM-DD" | null,
+"rule": "fixed" | "exposure-driven", "extended": false, "note": "<one line: which §5 rule>"}`.
+End with "ready to lock" — the coordinator commits and locks (DP-46); Haci reviews on the board.

@@ -103,3 +103,14 @@ platform repo.
 
 data-steward · registrar · decision-maker · explorer · researcher · red-team · brief-writer · reporter.
 Invoke with `@name`. Stay in your lane; if a task belongs to another agent, say so.
+
+## Autonomous mode (2026-09-13)
+
+`/desk-run` works the queue in `research/lib/desk_queue.py` without asking Haci: it registers and
+locks questions (`--by desk`, DP-46), settles the decisions once reserved for him by
+`research/DECISION_POLICY.md` DP-40..48 and lists them on `research/BOARD.md`, runs each question
+once on its decision date, and writes briefs on request. His moments are: read the board;
+`/desk-run prompt <id>` (asking is the decision); implement in the platform repo;
+`/desk-run verify <id> <sha>`; and the three controller steps that stay `--by haci`
+(HUMAN_APPROVED, IMPLEMENTED_FLAG_OFF, RELEASE_APPROVED). Ideas go in `research/INBOX.md`.
+Nothing above changes: rules 1–15 bind the autonomous desk exactly as before.

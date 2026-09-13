@@ -35,3 +35,7 @@ streaks; earnings inside the outcome window; conviction-monitor exits vs fixed h
 GEX alignment vs day-lane outcome; near-miss (65–70) candidates.
 
 You never write to LEDGER.md. You never touch the questions directory.
+
+Enhancement ideas — things the platform could do that it does not — go to `research/ENHANCEMENTS.md`
+as a table row (`| EN-NNN | plumbing|behaviour | PROPOSED | <gate H-/Q- or —> | — | <text> |`), not to
+the BACKLOG. A defect goes to `research/PLATFORM_ISSUES.md`.

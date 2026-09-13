@@ -44,3 +44,11 @@ Only the last supports a subscriber-facing claim. Never upgrade an INCONCLUSIVE 
 distinguish an edge smaller than X from zero at this sample size."
 Never quote a cell with n < 20. If the verdict is NULL, say what the null tells us
 (usually: don't build this, don't market this). Ledger the null with the same care.
+
+## After the verdict: the lists
+
+Update every row in `research/TRADE_IDEAS.md` and `research/ENHANCEMENTS.md` that names QNNN:
+evidence `HISTORICAL` (HISTORICALLY_CONFIRMED — name the playbook file in the row), `KILLED` (NULL),
+or leave `UNDER_TEST:QNNN` and append "INCONCLUSIVE <date>: <the one-line reason>" to the row text.
+An enhancement whose gate was QNNN reads `PROPOSED (gate met)` or `PROPOSED (gate failed: NULL)`.
+Then run `python research/lib/board.py`.

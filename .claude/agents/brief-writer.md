@@ -64,3 +64,19 @@ record the SHA in the header. Sections, in order:
 
 Then set the register row to BRIEF_WRITTEN with the brief's path. Haci runs it, records the PR
 and SHA in the register, and the Data Steward confirms the data changed on the next freeze.
+
+## Enhancement and trade-idea briefs (`brief EN-NNN` / `brief TI-NNN`)
+
+Precondition: the Build column of the row in `research/ENHANCEMENTS.md` (or the Tool column in
+`research/TRADE_IDEAS.md`) reads `HACI_DECIDED:build`. Read the row and its detail block.
+- **plumbing** → `research/briefs/EN-NNN_slug.md` in the fix-brief format (sections 1–7), with
+  "Symptom" replaced by "What is missing, and the evidence".
+- **behaviour, gate met** (the gating question is HUMAN_APPROVED) → write that question's finding
+  brief instead and say so.
+- **behaviour, gate not met** → an **INTERNAL_TOOL** brief: first line
+  `INTERNAL_TOOL — flag-off, visible to Haci only, no subscriber-facing copy or number; gate: QNNN
+  (<decision date>)`, then the same sections, plus an acceptance criterion that the subscriber
+  payload is byte-identical before and after (the inertness proof, rule 11). A trade idea (TI) is
+  always built this way until its evidence reads PROSPECTIVE.
+Every brief ends with the exact before/after check the Data Steward will run at
+`/desk-run verify <id> <sha>`. Then set the row to `BRIEF_WRITTEN` with the brief's path.

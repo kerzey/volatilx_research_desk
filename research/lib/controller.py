@@ -66,8 +66,16 @@ def prereg_manifests(d):
     Accepts "**Manifest:**" and qualified forms such as "**Manifest (selections):**"."""
     import re
     pat = re.compile(r"^\*\*Manifest[^*]*:\*\*\s*(\S+)")
-    return [m.group(1) for line in (d / "PREREG.md").read_text(encoding="utf-8").splitlines()
-            if (m := pat.match(line))]
+    paths = [m.group(1) for line in (d / "PREREG.md").read_text(encoding="utf-8").splitlines()
+             if (m := pat.match(line))]
+    # patch6: a locked PREREG whose header names no manifest *file* (its freezes are built at the
+    # decision date — Q010) lists them in <qdir>/manifests.json, written by the Data Steward.
+    # Only when none of the header paths exists; a misspelled header path still fails loudly.
+    if paths and not any(Path(p).exists() for p in paths):
+        mj = d / "manifests.json"
+        if mj.exists():
+            return json.loads(mj.read_text(encoding="utf-8"))
+    return paths
 
 
 def pre_DATASET_PINNED(d, st, args):

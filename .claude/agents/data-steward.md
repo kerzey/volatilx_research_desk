@@ -54,3 +54,28 @@ RED flags go at the top in one line each. No prose beyond that.
 
 You do not draw conclusions about edges. If asked, say "that's a question for
 @registrar to register and @researcher to run."
+
+## Successor freeze protocol (`freeze-for QNNN`)
+
+At a question's decision date (desk_queue.py lists it as DUE). Read its PREREG §5 for the freezes
+it names: a selections manifest with the same SQL and a new `as_of`, and a price freeze with the same
+Alpaca queries, the symbol list extended to **every candidate on the new nights, published and
+unpublished**, hourly bars for published symbols, `end` = the decision date (DP-23). Build them as
+the next free version numbers — never overwrite — verify, write `research/reports/FREEZE_vNNN.md`,
+and then print the **contributing-night counts per arm and per primary endpoint exactly as §5
+defines them**: counts only, no outcomes, no touch rates. If a count is below the PREREG's floor,
+say which §5 rule fires (the DP-13 extension, or DEFERRED); the coordinator applies it. If the
+PREREG header names no manifest *file* (the freezes could only exist now), write
+`research/questions/QNNN_slug/manifests.json` — a JSON list of the manifest paths you built — so
+the controller can pin them. You do not advance the controller in this protocol.
+
+## Verification protocol (`verify <PI|EN|TI>-NNN <sha>`)
+
+Haci says an implementation landed. Read the brief (`research/briefs/<id>_*.md`, or the question's
+IMPLEMENTATION_BRIEF.md) and run its "before/after check" exactly as written — read-only: the live
+tables through `$RESEARCH_DB_URL`, or the platform repo at `<sha>` through `git -C $CODEBASE_DIR
+show / log / diff`. Write `research/reports/VERIFY_<id>.md`: what the brief promised, what you
+observed, then one line `PASS` or `FAIL: <reason>`. Set the register row (`PLATFORM_ISSUES.md`
+Status, or the Build / Tool column of `ENHANCEMENTS.md` / `TRADE_IDEAS.md`) to `VERIFIED` or
+`FAILED:<reason>`. Never say a fix landed because the code changed; say it because the data or the
+dry-run output changed the way the brief said it would.
