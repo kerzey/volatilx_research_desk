@@ -6,6 +6,36 @@ and what a study must do about it. Machine-readable exclusions live in `exclusio
 deleted or overwritten — see §“Re-run nights folded into exclusions_v002” and
 §“2026-06-26 uncorroborated publication rows folded into exclusions_v003” below).
 
+## One database: `$RESEARCH_DB_URL` **is** production (Haci, 2026-09-13)
+
+There is no separate research database. `$RESEARCH_DB_URL` points at the same Postgres instance
+the platform writes to every night; the desk is separated from it by a **role**
+(`sas_research_ro`, read-only — `UPDATE` and `CREATE` are refused at grant level, verified in
+`docs/SETUP_STATUS.md`), not by a copy. Standing consequences are DP-50; the ones that bite an
+`eval.py` or a PREREG:
+
+- **A live query is not reproducible.** The rows behind it can be rewritten by a platform repair
+  between one run and the next. Anything that has to be stable — a before-snapshot, an exposure
+  count, a population funnel, any number a PREREG cites — comes from a pinned manifest, never from
+  a live query. Rule 4 is the thing protecting locked questions from a repair, so it is
+  load-bearing, not housekeeping.
+- **A successor freeze can disagree with its predecessor about the past.** `manifest_v002` re-runs
+  `manifest_v001`'s SQL against tables a repair may have changed in the meantime. That is not a
+  bug in either freeze. A question whose window spans a repair date treats the repaired column as
+  two different features and splits there, exactly as DP-06 splits the catalyst layer at
+  2026-06-01.
+- **The repair log below is the record of when that happened.** Check it before trusting any
+  column across a date boundary.
+
+### Repair log — platform changes that rewrote historical rows
+
+Every fix that changes values already written gets a row here on the day it ships, with the ship
+SHA. A repair that is only forward-looking (a new column, a guard on future writes) does not.
+
+| shipped | SHA | table.column | date range rewritten | raised by |
+|---|---|---|---|---|
+| _pending_ | `2d5776c` (on branch `fix/pi-001-backfill-window-floor`, **not merged to main as of 2026-09-13**) | `uoa_symbol_daily.fwd_return_5/7/14/30d_pct` | nothing yet. The code fix only widens which NULLs the nightly revisits; it overwrites no value. If Haci runs the PI-001 catch-up sweep, that fills NULLs over 2026-04-15..2026-07-29 and gets its own row here. | PI-001 |
+
 ## Manual / late SAS runs (Haci, 2026-09-10)
 
 The runs for **2026-05-11, 05-12, 05-13, 05-14** and **2026-07-06** finished one or more

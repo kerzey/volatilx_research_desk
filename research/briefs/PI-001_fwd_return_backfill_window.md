@@ -463,17 +463,28 @@ reported it could not run §4(b) or Step B. Full working: `research/reports/VERI
 **(a) §4(b) should never have been asked of the coding agent.** Its purpose is to prove
 `scripts/backfill_outcomes.py` was not modified. The commit touches two files and that is not one
 of them, so `git show --stat 2d5776c` proves it without a database. A fix brief must not hand the
-coding agent a step that needs a DB — the only one configured in the platform repo is production.
-Recorded as DP-49.
+coding agent a DB step at all: there is one database, `$RESEARCH_DB_URL` is production separated
+only by a read-only role, and the coding agent's credential on it is read-write. Recorded as DP-49
+and DP-50.
 
-**(b) Step B's date range is wrong — it misses two holed dates.** Measured, not estimated, the
-residual hole is **`fwd_return_30d_pct` only, 15 dates, 7,460 cells, all at 0%**:
-2026-04-15, 2026-04-17, then 2026-05-20..2026-06-08. The 14d/7d/5d cliffs (2026-06-12, 06-24,
-06-26) all sit inside the 65-session self-heal window and need no sweep. Corrected command:
+**(a2) `2d5776c` is on branch `fix/pi-001-backfill-window-floor`, not on `main`.** Production still
+runs `fa70688`. Nothing in §8 can be checked until the branch is merged, deployed, and one nightly
+has run.
+
+**(b) Step B's date range is wrong.** Corrected twice, then settled. `fwd_return_30d_pct` is the
+only column affected, and among dates whose 30-session window had closed by the freeze `as_of`:
+**35 dates and 17,402 cells sit at zero coverage** across 2026-04-15..2026-07-29, a further 15
+dates are partially filled by the bulletin trickle, and **15 of the zero dates, before 2026-06-08,
+can never be reached by any nightly window**. An earlier version of this addendum quoted that last
+figure as the sweep scope; it is the right answer to a different question and too narrow for the
+sweep, because it assumed a deploy that has not happened. Settled range, wider on purpose so the
+result does not depend on deploy timing, and free because the backfill writes only NULLs:
 
 ```
-python scripts/backfill_outcomes.py --tables uoa --start-date 2026-04-15 --end-date 2026-06-10 --dry-run --verbose
+python scripts/backfill_outcomes.py --tables uoa --start-date 2026-04-15 --end-date 2026-07-29 --dry-run --verbose
 ```
+
+Full reconciliation in `research/reports/VERIFY_PI-001.md` §7.
 
 **(c) The §8 before-snapshot already exists.** `research/data/v001_uoa_symbol.parquet`, sha256-pinned
 in `manifest_v001.json`, holds all eleven V2 columns for 2026-01-07..2026-09-10 and shows the

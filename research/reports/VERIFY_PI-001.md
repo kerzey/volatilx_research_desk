@@ -226,3 +226,56 @@ if its 30-session window had already closed as of the 2026-09-10 freeze as_of):
     2026-07-01 (497), 2026-07-02 (499), 2026-07-27 (494), 2026-07-28 (496), 2026-07-29 (493)
     Total: 35 dates in this contiguous run, 17,402 cells, plus the earlier isolated
     2026-04-15/04-17 pair already listed above (36 dates / 17,896 cells total).
+
+## 7. Reconciliation of the two hole figures, and what the shared database changes (2026-09-13)
+
+Written after Haci established that `$RESEARCH_DB_URL` and the production database are the same
+instance. This section reconciles §6 with the figure in commit `a439133` rather than replacing
+either; §1–§6 above stand as written.
+
+### 7a. Neither count was arithmetically wrong. They counted different sets.
+
+Recomputed a third time from `research/data/v001_uoa_symbol.parquet`, counting only dates whose
+30-session window had closed by the freeze `as_of` 2026-09-10:
+
+| set | dates | missing cells | range |
+|---|---|---|---|
+| due and **zero** 30d coverage | 35 | 17,402 | 2026-04-15 .. 2026-07-29 |
+| due and partially filled, under 95% | 15 | 7,098 | the ~24-symbol bulletin trickle |
+| all due dates under 95% | 50 | 24,500 | 2026-04-15 .. 2026-07-29 |
+| of the zero set, unreachable by any nightly window | 15 | 7,460 | 2026-04-15 .. 2026-06-08 |
+
+- **§6's date list is correct and matches this recount exactly**: 35 dates, 17,402 cells. Its
+  headline of "36 dates / 17,896 cells" double-counts — the list already contains the
+  2026-04-15 / 04-17 pair that the caption then adds again.
+- **`a439133`'s "15 dates / 7,460 cells" is the fourth row**, the subset no nightly window can
+  ever reach. It was correct for that question and wrong as a sweep scope, because it assumed a
+  deploy that had not happened. §6 is right that a sweep over 2026-04-15..2026-06-10 leaves a hole.
+- Both summaries omitted the 15 partially-filled dates.
+
+**Settled sweep range: `--start-date 2026-04-15 --end-date 2026-07-29`.** Widening costs nothing,
+because the backfill writes only NULLs, and it removes the dependence on deploy timing entirely.
+
+### 7b. The isolated 2026-01-24 null
+
+§6 is right to set it aside. It predates the 2026-04-05 wrapper that caused this defect, so it has
+a different cause and does not belong in this count. Not investigated here.
+
+### 7c. What the shared database changes about this verification
+
+`$RESEARCH_DB_URL` is production, separated by a read-only role rather than by a copy (DP-50).
+Three corrections to how §2e and §4 should be read:
+
+- **The coverage check is not structurally blocked, only environmentally.** §2e records the DB
+  check as NOT RUN because the URL is unset in that session. It is runnable by the Data Steward in
+  any session that has the read-only role, against the same rows the platform writes. No separate
+  research database has to be provisioned, and none exists to be waited for.
+- **The V2 before-snapshot must come from the freeze, not from a live capture.** A live "before"
+  is not reproducible: the rows behind it can be rewritten by the very sweep being verified.
+  `v001_uoa_symbol.parquet` is sha256-pinned in `manifest_v001`, holds all eleven V2 columns for
+  2026-01-07..2026-09-10, and predates the commit by construction. It reads 24 / 24 / 24 / 0 on
+  the fixed date 2026-07-28, matching the brief's §1 prediction.
+- **If the sweep is run, it gets a repair-log row** in `research/data/DATA_NOTES.md` naming the
+  column, the date range and the ship SHA, so any later freeze that disagrees with `manifest_v001`
+  about those cells has a documented reason (DP-50a). Research impact remains nil either way:
+  `fwd_return_*` is banned as a study outcome and no locked PREREG reads it.

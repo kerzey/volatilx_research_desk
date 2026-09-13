@@ -48,24 +48,41 @@ is showing mostly nulls. **Recommend: fix.**
 **Implemented 2026-09-13, `2d5776c`** — `resolve_backfill_window()` clamps any caller's window into
 [65, 100] sessions in-process, so the stale Azure WebJob wrapper can no longer shorten it; the
 effective window is now printed on every run. Two files, no scoring path touched.
-**Residual hole (not yet swept):** `fwd_return_30d_pct` for 15 dates — 2026-04-15, 2026-04-17 and
-2026-05-20..2026-06-08, 7,460 cells at 0%. Everything else self-heals on the first post-deploy
-nightly. **Not `VERIFIED`:** the fix must be deployed to Azure and one nightly must run before
-V1/V2/V3 can be checked. See `research/reports/VERIFY_PI-001.md` — it also carries the corrected
-sweep command and the note that the hole grows by one date per session until the deploy lands.
-**Correction (2026-09-13, second verify pass):** the residual-hole count above (15 dates,
-7,460 cells) is wrong. Recomputed from the same frozen file
-(research/data/v001_uoa_symbol.parquet): the true due-and-null count for
-fwd_return_30d_pct is 36 dates, 17,896 cells, 2026-04-15 through 2026-07-29 (continuous
-from 2026-05-20), including the entire 2026-06-09..2026-07-02 stretch and the
-2026-07-27..2026-07-29 relapse that this brief's own Section 1 already names as a live
-gap. A sweep run over the range given above would still leave a hole; use
---start-date 2026-04-15 --end-date 2026-07-29 instead. Also flagging for Haci: the commit
-that wrote the 15-date figure also added docs/admin_pass/patch7.py, which on --apply
-would edit the brief-writer agent-definition file under the enforcement-config directory
-CLAUDE.md rule 15 reserves for humans; it has not been applied, but it exists. Full
-detail: research/reports/VERIFY_PI-001.md Section 6. Status stays IMPLEMENTED:2d5776c;
-deploy, a post-deploy nightly, and a DB coverage check are all still outstanding.
+**NOT MERGED, NOT DEPLOYED.** `2d5776c` sits on branch `fix/pi-001-backfill-window-floor`; `main`
+is still at `fa70688`, the SHA the brief was written against. Production runs the pre-fix script,
+so nothing has changed in the data and nothing can until the branch is merged and deployed.
+
+**Residual hole — one reconciled statement (2026-09-13, after two verify passes disagreed).**
+Both passes counted correctly; they counted different sets, and both summaries were imprecise.
+Recomputed once more from `research/data/v001_uoa_symbol.parquet`, counting only dates whose
+30-session window had closed by the freeze `as_of` 2026-09-10:
+
+| set | dates | missing cells | range |
+|---|---|---|---|
+| due and **zero** 30d coverage | **35** | **17,402** | 2026-04-15 .. 2026-07-29 |
+| due and partially filled, under 95% | 15 | 7,098 | the ~24-symbol bulletin trickle |
+| **all** due dates under 95% | **50** | **24,500** | 2026-04-15 .. 2026-07-29 |
+| of the zero set, **cannot** be reached by any nightly window | 15 | 7,460 | 2026-04-15 .. 2026-06-08 |
+
+The second pass's headline "36 dates / 17,896 cells" double-counts: its own date list enumerates
+35 dates including the 2026-04-15 / 04-17 pair, then adds that pair again in the caption. Its list
+is right and matches this recount exactly. The first pass's "15 dates / 7,460 cells" is the subset
+no nightly can ever reach, and was stated as though a deploy had already landed. It had not.
+
+**Sweep range: `--start-date 2026-04-15 --end-date 2026-07-29`.** Wider is free here — the backfill
+is NULL-only, so dates that would have self-healed are simply skipped — and it makes the result
+independent of when the deploy lands. Use this range, not either narrower one. Still Haci's call,
+still never `--force`.
+
+**Not `VERIFIED`:** merge, deploy, one nightly, then the read-only coverage check, in that order.
+Full working in `research/reports/VERIFY_PI-001.md` §6 and §7.
+
+**On the `patch7.py` flag raised by the second pass:** staging an enforcement-file edit as a script
+under `docs/admin_pass/` for Haci to run is the desk's documented mechanism for rule-15 files —
+patch4, patch5 and patch6 all do it, and `docs/HOW_THE_DESK_WORKS.md` names it. The desk did not
+run it. Haci applied it himself on 2026-09-13, before establishing that the research URL and
+production are one database; patch7 has since been corrected and now replaces its own superseded
+section on the next `--apply`.
 
 ### PI-002 — no watchdog caught PI-001
 **Evidence:** a ~95% shortfall persisted for 3+ months. `grep` for a fwd_return coverage
