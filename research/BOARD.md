@@ -37,12 +37,17 @@ _none yet — every question so far is NULL, INCONCLUSIVE, or still waiting for 
 | Q006 | does SAS selection beat a distance-matched control from its own universe, on the price path? | DATASET_PINNED | 2026-10-05 |
 | Q002 | do SAS picks reach the near targets sooner than matched candidates? | DATASET_PINNED | 2026-10-12 |
 | Q004 | does it matter whether you buy the pick after hours, at the open, or at 10:00? | DATASET_PINNED | 2026-10-26 |
+| Q009 | does the stop printed on a SAS pick shake traders out of trades that would have reached the target anyway? | DATASET_PINNED | 2026-11-09 |
 | Q011 | is it better to rest a limit order below the pick-night close and buy the day-1 dip, or just buy at the next open? | DATASET_PINNED | 2026-12-14 |
 | Q003 | are first-time picks weaker than picks SAS keeps re-selecting? | DATASET_PINNED | 2026-12-15 |
 | Q008 | when a pick held from the pick-night close reaches its first target within two sessions, is it more likely to go on to i | DATASET_PINNED | 2026-12-28 |
 | Q010 | does Q009's stop result repeat on nights nobody had seen when it was registered? | PREREG_LOCKED | 2027-02-22 |
+| Q016 | Q016 — two-sidedness by beta and ATR (does volatility at selection predict a round trip?) | DATASET_PINNED | 2027-02-22 |
+| Q012 | for a pick below 90, is it better to take the first small target and put the money into the next pick, or to hold the co | DATASET_PINNED | 2027-03-22 |
+| Q013 | does a pick whose earnings report lands within three sessions run a worse path than a pick whose report is further out? | DATASET_PINNED | 2027-03-22 |
+| Q014 | does a week of repeated unusual-options activity before the pick night make a SAS pick better, and does SAS add anything | DATASET_PINNED | 2027-04-05 |
 | Q007 | for a pick already held from the pick-night close, does a next-morning gap of more than 2% predict the rest of the trade | DATASET_PINNED | 2027-04-26 (exposure check; hard stop 2027-06-30) |
-| Q009 | does the stop printed on a SAS pick shake traders out of trades that would have reached the target anyway? | PREREG_LOCKED | — |
+| Q015 | do picks scoring 85–90 reach the swing target and then hand it back more often than picks scoring 80–85, and does exitin | DATASET_PINNED | 2027-08-30 |
 
 ## 4. Platform issues
 
@@ -62,6 +67,7 @@ _Source: `research/PLATFORM_ISSUES.md`. Statuses: OPEN → HACI_DECIDED:fix/rese
 | PI-010 | HACI_DECIDED:research | Elite (90+) count falling: Apr 8 · May 13 · Jun 12 · Jul 8 · Aug 3 · Sep 2 |
 | PI-011 | HACI_DECIDED:fix | Printed swing stop on the wrong side of the pick-night close for 67 of 382 published picks (17.5%) |
 | PI-012 | HACI_DECIDED:research | 2026-06-26: three qualified, ranked picks the night's own run audit does not record; no run-history table |
+| PI-013 | OPEN | `uoa_symbol_daily.score_swing` / `score_long` overwritten in place by the next-morning OI-confirmation pass; no point-in-time copy |
 
 ## 5. Enhancements to build in the platform
 
@@ -111,20 +117,35 @@ _Each was a question the desk would once have asked you. It took the recommended
 
 - **Q011** #8 window and decision date — chose window 2026-06-01..2026-11-06, decide Monday 2026-12-14, one
 - **Q011** #9 verdict status of the thin k = 0.5 arm — chose demotion to descriptive decided **at lock** from
+- **Q012** #5 window and decision date — chose start nights 2026-06-01..**2026-12-10**, decide **Monday
+- **Q012** #6 elite (90+) arm — chose demotion to **descriptive at lock**, printed-or-SUPPRESSED decided at the
+- **Q012** #7 capital budget — chose a **60-session budget for both plans**, slot = one unit of capital, ATR
+- **Q013** #3 window, decision date and extension — chose DP-43's fixed recipe computed at `record` from the
+- **Q014** #4 E2's status — chose both E1 and E2 primary, BH across m = 2, each with its own 80-night gate;
+- **Q014** #5 window and decision date — chose DP-43's recipe from 2026-06-01; **settled at `record` on the
+- **Q014** #5b rate used — chose the pooled measured 0.4314 E1 nights/session; not taken: the fastest month
+- **Q015** #1 H-060's missing baselines — chose the adjacent traded band **80–85** as the primary comparator,
+- **Q015** #4 window, decision date and extension — chose, on the Steward's measured numbers, the **slowest**
 
 ## 8. Backlog and calendar
 
-- Open hypotheses: **22** · registered: 13 · deferred (data missing): H-055
-- Next to register (DP-47 order): H-066, H-064, H-062, H-040, H-060
+- Open hypotheses: **16** · registered: 19 · deferred (data missing): H-055, H-062
+- Next to register (DP-47 order): H-061, H-051, H-050, H-033, H-041
 
 | decides on | Q |
 |---|---|
 | 2026-10-05 | Q006 |
 | 2026-10-12 | Q002 |
 | 2026-10-26 | Q004 |
+| 2026-11-09 | Q009 |
 | 2026-12-14 | Q011 |
 | 2026-12-15 | Q003 |
 | 2026-12-28 | Q008 |
 | 2027-02-22 | Q010 |
+| 2027-02-22 | Q016 |
+| 2027-03-22 | Q012 |
+| 2027-03-22 | Q013 |
+| 2027-04-05 | Q014 |
 | 2027-04-26 | Q007 |
+| 2027-08-30 | Q015 |
 
