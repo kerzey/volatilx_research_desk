@@ -37,6 +37,7 @@ _none yet — every question so far is NULL, INCONCLUSIVE, or still waiting for 
 | Q006 | does SAS selection beat a distance-matched control from its own universe, on the price path? | DATASET_PINNED | 2026-10-05 |
 | Q002 | do SAS picks reach the near targets sooner than matched candidates? | DATASET_PINNED | 2026-10-12 |
 | Q004 | does it matter whether you buy the pick after hours, at the open, or at 10:00? | DATASET_PINNED | 2026-10-26 |
+| Q011 | is it better to rest a limit order below the pick-night close and buy the day-1 dip, or just buy at the next open? | DATASET_PINNED | 2026-12-14 |
 | Q003 | are first-time picks weaker than picks SAS keeps re-selecting? | DATASET_PINNED | 2026-12-15 |
 | Q008 | when a pick held from the pick-night close reaches its first target within two sessions, is it more likely to go on to i | DATASET_PINNED | 2026-12-28 |
 | Q010 | does Q009's stop result repeat on nights nobody had seen when it was registered? | PREREG_LOCKED | 2027-02-22 |
@@ -106,19 +107,22 @@ _Source: `research/TRADE_IDEAS.md`._
 
 ## 7. Decisions the desk made for you (autonomous mode)
 
-_none yet_
+_Each was a question the desk would once have asked you. It took the recommended or the stricter option (DP-40..45). The locked question stands; to overturn one, say so and the desk registers a successor question._
+
+- **Q011** #8 window and decision date — chose window 2026-06-01..2026-11-06, decide Monday 2026-12-14, one
+- **Q011** #9 verdict status of the thin k = 0.5 arm — chose demotion to descriptive decided **at lock** from
 
 ## 8. Backlog and calendar
 
-- Open hypotheses: **24** · registered: 11 · deferred (data missing): H-055
-- Inbox items waiting: 1
-- Next to register (DP-47 order): H-058, H-053, H-066, H-064, H-062
+- Open hypotheses: **23** · registered: 12 · deferred (data missing): H-055
+- Next to register (DP-47 order): H-053, H-066, H-064, H-062, H-040
 
 | decides on | Q |
 |---|---|
 | 2026-10-05 | Q006 |
 | 2026-10-12 | Q002 |
 | 2026-10-26 | Q004 |
+| 2026-12-14 | Q011 |
 | 2026-12-15 | Q003 |
 | 2026-12-28 | Q008 |
 | 2027-02-22 | Q010 |

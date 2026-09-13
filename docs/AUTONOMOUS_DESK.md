@@ -123,8 +123,13 @@ Brief Writer (EN-/TI- briefs, INTERNAL_TOOL), Reporter (update the lists), Explo
 - Q010 cannot be pinned until its decision date (its header names no file); patch6's controller
   fallback is what will let the steward pin it then. Until patch6 is applied it stays
   PREREG_LOCKED, which the queue treats as in flight.
-- The first autonomous registration (H-058) — see the final message of this session for what
-  happened; the DECISIONS.md and board entries are the evidence.
+- The first autonomous registration ran end to end on H-058 → **Q011 day-1 dip limit**:
+  registrar draft (7 open decisions) → decision-maker (14 decided, 2 defaulted under DP-43, none
+  asked) → steward exposure count (369 eligible picks, 47 contributing nights, both limit arms
+  clear the 20-night floor) → decision-maker record (decision date 2026-12-14, extension
+  2027-02-01) → registrar apply → desk commit → `PREREG_LOCKED --by desk` → `DATASET_PINNED`.
+  Zero questions to Haci. Evidence: `research/questions/Q011_day1_dip_limit/DECISIONS.md`
+  and board §7.
 - **Not tested:** the headless `desk` mode of the routine script. This session had no
   `RESEARCH_DB_URL`, and sourcing `.env.research` is denied to it, so the scheduled run was not
   exercised end to end. Run `./scripts/research_routines.sh desk` once by hand from Git Bash

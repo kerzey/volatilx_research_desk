@@ -93,7 +93,11 @@ def question_rows() -> list:
         title = first[0].lstrip("# ").strip() if first else d.name
         hyps = re.findall(r"\bH-\d{3}\b", " ".join(_read(d / "PREREG.md").splitlines()[:12]))
         decisions = _read(d / "DECISIONS.md")
-        defaulted = [l.strip() for l in decisions.splitlines() if "DEFAULTED" in l and l.strip().startswith("|")]
+        # prefer the plain-English list the decision-maker writes; fall back to the table rows
+        sect = decisions.split("## Defaulted on Haci's behalf", 1)
+        defaulted = [l.strip()[2:] for l in sect[1].split("\n## ", 1)[0].splitlines() if l.strip().startswith("- ")] if len(sect) > 1 else []
+        if not defaulted:
+            defaulted = [l.strip() for l in decisions.splitlines() if "DEFAULTED" in l and l.strip().startswith("|")]
         rows.append({
             "id": d.name.split("_", 1)[0], "dir": d.name, "title": title,
             "state": st.get("state", "(no state.json)"),
