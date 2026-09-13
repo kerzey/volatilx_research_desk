@@ -452,3 +452,34 @@ GROUP BY 1 ORDER BY 1;
 Dates before 2026-06-11 only reach PASS if Haci ran the Step B live sweep; if he did not, note that
 in the verify record and leave PI-001 at `IMPLEMENTED:<sha>` with a residual-hole note rather than
 `VERIFIED`.
+
+---
+
+## 9. Addendum, 2026-09-13 — corrections after implementation (`2d5776c`)
+
+Three corrections to this brief, established from the frozen dataset after the coding agent
+reported it could not run §4(b) or Step B. Full working: `research/reports/VERIFY_PI-001.md`.
+
+**(a) §4(b) should never have been asked of the coding agent.** Its purpose is to prove
+`scripts/backfill_outcomes.py` was not modified. The commit touches two files and that is not one
+of them, so `git show --stat 2d5776c` proves it without a database. A fix brief must not hand the
+coding agent a step that needs a DB — the only one configured in the platform repo is production.
+Recorded as DP-49.
+
+**(b) Step B's date range is wrong — it misses two holed dates.** Measured, not estimated, the
+residual hole is **`fwd_return_30d_pct` only, 15 dates, 7,460 cells, all at 0%**:
+2026-04-15, 2026-04-17, then 2026-05-20..2026-06-08. The 14d/7d/5d cliffs (2026-06-12, 06-24,
+06-26) all sit inside the 65-session self-heal window and need no sweep. Corrected command:
+
+```
+python scripts/backfill_outcomes.py --tables uoa --start-date 2026-04-15 --end-date 2026-06-10 --dry-run --verbose
+```
+
+**(c) The §8 before-snapshot already exists.** `research/data/v001_uoa_symbol.parquet`, sha256-pinned
+in `manifest_v001.json`, holds all eleven V2 columns for 2026-01-07..2026-09-10 and shows the
+predicted 24/24/24/0 on 2026-07-28. Compare V2 against it rather than taking a live CSV: immutable,
+checksummed, and it predates the commit by construction.
+
+**Also noted:** the `create_tables()` DDL at `scripts/backfill_outcomes.py:816` already runs against
+production on every nightly, because `scripts/run_nightly_pipeline.py:223` invokes that script as a
+subprocess each night. Running the sweep by hand adds no DDL exposure.

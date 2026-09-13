@@ -22,7 +22,7 @@ Statuses: `OPEN` · `HACI_DECIDED:<fix|research|accept>` · `BRIEF_WRITTEN` · `
 
 | ID | Severity | Status | Issue |
 |---|---|---|---|
-| PI-001 | high | BRIEF_WRITTEN | `uoa_symbol_daily.fwd_return_*` still ~95% degraded; 30d relapsed to 0% from 07-27 — brief: `research/briefs/PI-001_fwd_return_backfill_window.md` |
+| PI-001 | high | IMPLEMENTED:2d5776c | `uoa_symbol_daily.fwd_return_*` still ~95% degraded; 30d relapsed to 0% from 07-27 — brief: `research/briefs/PI-001_fwd_return_backfill_window.md` |
 | PI-002 | high | HACI_DECIDED:fix | No coverage watchdog fires on PI-001 (none found in the codebase by that name) |
 | PI-003 | med | HACI_DECIDED:fix | `atr_pct` corrupted around splits (ATR computed on raw bars) |
 | PI-004 | med | HACI_DECIDED:fix | Manual re-runs indistinguishable from nightly runs in `super_agent_select_runs` |
@@ -45,6 +45,14 @@ Statuses: `OPEN` · `HACI_DECIDED:<fix|research|accept>` · `BRIEF_WRITTEN` · `
 **Desk impact:** none now — the desk computes forward returns from its own price freeze.
 **Platform impact:** anything on the product that reads these columns (UOA performance surfaces)
 is showing mostly nulls. **Recommend: fix.**
+**Implemented 2026-09-13, `2d5776c`** — `resolve_backfill_window()` clamps any caller's window into
+[65, 100] sessions in-process, so the stale Azure WebJob wrapper can no longer shorten it; the
+effective window is now printed on every run. Two files, no scoring path touched.
+**Residual hole (not yet swept):** `fwd_return_30d_pct` for 15 dates — 2026-04-15, 2026-04-17 and
+2026-05-20..2026-06-08, 7,460 cells at 0%. Everything else self-heals on the first post-deploy
+nightly. **Not `VERIFIED`:** the fix must be deployed to Azure and one nightly must run before
+V1/V2/V3 can be checked. See `research/reports/VERIFY_PI-001.md` — it also carries the corrected
+sweep command and the note that the hole grows by one date per session until the deploy lands.
 
 ### PI-002 — no watchdog caught PI-001
 **Evidence:** a ~95% shortfall persisted for 3+ months. `grep` for a fwd_return coverage

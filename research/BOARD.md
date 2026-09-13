@@ -8,7 +8,6 @@ _Generated 2026-09-13 by `research/lib/board.py`. Do not edit; edit the source f
 
 **Ready when you ask** (you already decided these; the desk writes the prompt on request):
 
-- **PI-001** — `uoa_symbol_daily.fwd_return_*` still ~95% degraded; 30d relapsed to 0% from 07-27  →  `/desk-run prompt PI-001`
 - **PI-002** — No coverage watchdog fires on PI-001 (none found in the codebase by that name)  →  `/desk-run prompt PI-002`
 - **PI-003** — `atr_pct` corrupted around splits (ATR computed on raw bars)  →  `/desk-run prompt PI-003`
 - **PI-004** — Manual re-runs indistinguishable from nightly runs in `super_agent_select_runs`  →  `/desk-run prompt PI-004`
@@ -55,7 +54,7 @@ _Source: `research/PLATFORM_ISSUES.md`. Statuses: OPEN → HACI_DECIDED:fix/rese
 
 | ID | status | issue |
 |---|---|---|
-| PI-001 | HACI_DECIDED:fix | `uoa_symbol_daily.fwd_return_*` still ~95% degraded; 30d relapsed to 0% from 07-27 |
+| PI-001 | IMPLEMENTED:2d5776c | `uoa_symbol_daily.fwd_return_*` still ~95% degraded; 30d relapsed to 0% from 07-27 — brief: `research/briefs/PI-001_fwd_return_backfill_wind |
 | PI-002 | HACI_DECIDED:fix | No coverage watchdog fires on PI-001 (none found in the codebase by that name) |
 | PI-003 | HACI_DECIDED:fix | `atr_pct` corrupted around splits (ATR computed on raw bars) |
 | PI-004 | HACI_DECIDED:fix | Manual re-runs indistinguishable from nightly runs in `super_agent_select_runs` |
