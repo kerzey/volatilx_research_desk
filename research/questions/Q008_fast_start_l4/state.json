@@ -1,6 +1,6 @@
 {
   "id": "Q008",
-  "state": "PREREG_DRAFT",
+  "state": "PREREG_LOCKED",
   "history": [
     {
       "state": "IDEA",
@@ -13,6 +13,14 @@
       "at": "2026-09-12T00:00:00+00:00",
       "by": "registrar",
       "note": "draft 2026-09-12; hand-written by registrar (no shell) to mirror controller init + advance; timestamps are date-only"
+    },
+    {
+      "state": "PREREG_LOCKED",
+      "at": "2026-09-13T18:45:46.235504+00:00",
+      "by": "haci",
+      "note": ""
     }
-  ]
+  ],
+  "prereg_commit": "86157c04e28a48bbe1e315df617b75269094ba19",
+  "prereg_sha256": "3ec46ec4c7cfc910139010e38de341e255ae882d51237041461676e09287d081"
 }

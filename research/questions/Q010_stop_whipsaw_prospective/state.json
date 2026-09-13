@@ -1,0 +1,17 @@
+{
+  "id": "Q010",
+  "state": "PREREG_DRAFT",
+  "history": [
+    {
+      "state": "IDEA",
+      "at": "2026-09-13T18:49:13.597072+00:00",
+      "by": "agent"
+    },
+    {
+      "state": "PREREG_DRAFT",
+      "at": "2026-09-13T18:49:13.851287+00:00",
+      "by": "registrar",
+      "note": "draft 2026-09-13; decisions applied; state file created late"
+    }
+  ]
+}
