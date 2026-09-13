@@ -1,7 +1,9 @@
 # Data notes — what the desk knows about the data that the tables don't say
 
 Read this before writing a PREREG or an eval.py. Each note gives the fact, who established it,
-and what a study must do about it. Machine-readable exclusions live in `exclusions_v001.json`.
+and what a study must do about it. Machine-readable exclusions live in `exclusions_v002.json`
+(successor to `exclusions_v001.json`, which is superseded but never deleted or overwritten —
+see §“Re-run nights folded into exclusions_v002” below).
 
 ## Manual / late SAS runs (Haci, 2026-09-10)
 
@@ -31,6 +33,41 @@ bars, never from `sas_runs` alone, and fail loudly on a run dated on a non-sessi
 Night counts after all exclusions: **107 total, 37 in-sample (to 05-29), 70 sealed (from
 06-01)**. Earlier desk text said 66 sealed — that subtracted all five manual-run nights, but
 only 07-06 falls in the sealed period. 70 is right.
+
+## Re-run nights folded into exclusions_v002 (steward, KT audit, 2026-09-12)
+
+The knowledge-time audit (`research/reports/KT_AUDIT_manifest_v001_rerun_nights.md`) found that
+4 of the 8 dates `exclusions_v001.json` had filed under `manual_runs.late_but_clean` —
+**2026-04-02, 04-24, 05-15, 07-02** — are not clean: `sas_candidates` on those nights carries a
+re-run's creation timestamp and config hash, 19–51 hours after the 16:05 ET decision (run
+start/finish reset, run-row creation timestamp unchanged). Because `super_agent_select_runs` is
+updated in place — there is no append-only run-history table — the original 16:05 candidate set
+for those 4 nights is not recoverable from anything the desk can query. `exclusions_v002.json`
+moves these 4 dates into `manual_runs.trading_dates` (now 9 dates total) and reduces
+`late_but_clean` to the 4 remaining genuinely benign nights (04-01, 04-03, 04-06, 05-01 — single
+continuous scheduled runs, no timestamp reset, no config swap). `non_session_runs`,
+`catalyst_layer_regime_change` and `regime_label_point_in_time_from` carry over unchanged.
+
+**Corrected night counts (v002): 103 total, 34 in-sample (to 05-29), 69 sealed (from 06-01)** —
+down from v001's 107 / 37 / 70. Three of the four newly-excluded nights are in-sample
+(04-02, 04-24, 05-15); one is sealed (07-02).
+
+**Rule for studies:** cite `exclusions_v002.json` going forward; `eval.py` reads the JSON, never
+hard-codes dates. Locked PREREGs that cite `exclusions_v001.json` are not edited retroactively —
+the exclusions file a locked question cites stands as its population definition (DP-22); any
+locked question whose registered population includes these 4 nights is flagged to the Red Team,
+not silently re-scoped. As of 2026-09-12 this affects `Q006` (`DATASET_PINNED`, cites v001,
+not yet evaluated — flagged, not edited) and `Q005` (`LEDGERED`/`INCONCLUSIVE` — the red team's
+own hand-check already showed dropping these 4 nights does not change the verdict, so no further
+action). `Q007`/`Q008`/`Q009` (all `PREREG_DRAFT`) cite `exclusions_v002.json`.
+
+Separately, and out of scope for this correction: the KT audit also found `uoa_symbol`,
+`gex_symbol` and `projection_bull` rows for roughly 2026-01-07 through 2026-03-20 were written
+15–70 hours after their declared 16:05 ET / lag-0 availability (the scheduled nightly job itself
+ran late, not a manual re-run). This predates SAS's own history (first `sas_runs` row is
+2026-04-01) so it does not affect any currently registered question, but any future study using
+those three tables for Jan–Mar 2026 nights must not treat row creation as 16:05-ET-available for
+that stretch.
 
 ## Publication time is deliberately early on many nights (Haci, 2026-09-10)
 

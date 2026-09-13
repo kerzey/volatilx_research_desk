@@ -1,0 +1,48 @@
+{
+  "version": "002",
+  "supersedes": "research/data/exclusions_v001.json",
+  "manifest": "research/data/manifest_v001.json",
+  "declared_by": "data-steward",
+  "declared_on": "2026-09-12",
+  "issued_under": "research/reports/KT_AUDIT_manifest_v001_rerun_nights.md §7 (proposed addendum, verbatim) + DP-22 (routed request R1, Q007 DECISIONS.md)",
+  "header_note": "Successor to exclusions_v001.json. Adds the 4 confirmed re-run nights from the KT audit (2026-04-02, 2026-04-24, 2026-05-15, 2026-07-02) to manual_runs.trading_dates; reduces manual_runs.late_but_clean to the 4 remaining genuinely benign late-but-same-evening nights. non_session_runs, catalyst_layer_regime_change and regime_label_point_in_time_from carry over unchanged from v001. Never overwrites v001 (frozen data unchanged; only the exclusion policy changes — no new manifest required). Affected questions: Q007 (PREREG_DRAFT, cites this file; only 2026-07-02 falls inside its ≥ 2026-06-01 window, so its population is unchanged from the v001+PREREG-cited-07-02 fallback — see Q007 DECISIONS.md item 6); Q008 and Q009 (PREREG_DRAFT, cite this file going forward); Q006 (state DATASET_PINNED, locked citing manifest_v001 and exclusions_v001.json — NOT edited; flagged to the Red Team per the KT audit §5, since Q006's registered population as written includes all 4 newly-excluded nights and has not been sensitivity-checked against them). Q005 is LEDGERED/INCONCLUSIVE; the red team's hand-check already showed dropping these 4 nights does not change its verdict — no action required there.",
+  "manual_runs": {
+    "reason": "manual re-runs during development, finished one or more days after the trading date's next-session open; spot_close mixed-date; not actionable at publication. The 4 nights added in v002 (2026-04-02, 04-24, 05-15, 07-02) show the same signature at smaller gaps (19-51h vs 24-115h for the original 5): sas_candidates rows carry a creation timestamp and config hash from a re-run 19-51h after the 16:05 ET decision (run start/finish reset, run creation timestamp unchanged); the 16:05 candidate set is not recoverable (no run-history table). Confirmed by the Data Steward 2026-09-11 (research/reports/KT_AUDIT_manifest_v001_rerun_nights.md), corroborating Q005 red-team finding A1.",
+    "criterion": "super_agent_select_runs.finished_at later than the next trading session's open (original 5) OR sas_candidates row creation/config-hash shows a re-run 19h+ after the 16:05 ET decision with the original 16:05 output unrecoverable (KT-audit 4, folded into the same criterion since both make the frozen candidate row not the 16:05 decision's).",
+    "trading_dates": [
+      "2026-04-02",
+      "2026-04-24",
+      "2026-05-11",
+      "2026-05-12",
+      "2026-05-13",
+      "2026-05-14",
+      "2026-05-15",
+      "2026-07-02",
+      "2026-07-06"
+    ],
+    "late_but_clean": [
+      "2026-04-01",
+      "2026-04-03",
+      "2026-04-06",
+      "2026-05-01"
+    ]
+  },
+  "non_session_runs": {
+    "reason": "run recorded on a day the NYSE was closed (no SPY bar); 0 picks published; found by the registrar in R1",
+    "trading_dates": [
+      "2026-04-03"
+    ]
+  },
+  "night_counts_after_exclusions": {
+    "all": 103,
+    "in_sample_to_2026-05-29": 34,
+    "sealed_from_2026-06-01": 69,
+    "note": "derive in eval.py from sas_runs minus manual_runs.trading_dates minus non_session_runs.trading_dates; do not hard-code. 2026-04-03 is counted once (it is a non_session_runs exclusion, not also a manual_runs exclusion — it does not appear in manual_runs.trading_dates). Verified by re-deriving from v001_sas_runs.parquet (113 total nights): v001 gave 107 (all)/37 (in-sample)/70 (sealed); v002 excludes 4 more nights (2026-04-02, 04-24, 05-15 — in-sample; 2026-07-02 — sealed), giving 103 (all)/34 (in-sample)/69 (sealed). The sealed count moves from 70 to 69 because 2026-07-02 is now excluded via this file rather than via a PREREG-cited date; questions that already applied the KT-audit fallback for 07-02 (e.g. Q007 §2) see no population change, only a citation change."
+  },
+  "catalyst_layer_regime_change": {
+    "reason": "earnings date resolver wrong before this date; platform commit 69ef05f",
+    "fixed_from": "2026-06-01"
+  },
+  "regime_label_point_in_time_from": "2026-06-09",
+  "sas_candidates_availability_note_correction": "The freeze config's (research/lib/freeze_config.json) and manifest_v001's availability.sas_candidates note currently reads: 'written live at decision time; point-in-time by construction. Verified: sampled created_at/updated_at cluster same trading_date evening.' This is amended (declarative correction here; the freeze config/manifest files themselves are not edited, per protocol — never overwrite an existing manifest) to read: 'written live at decision time for the large majority of nights; point-in-time by construction EXCEPT on the 4 known re-run nights above (2026-04-02, 04-24, 05-15, 07-02), where the frozen row is a re-run's output 19-51h after the 16:05 ET decision, not the decision itself. super_agent_select_runs is updated in place (no append-only run-history/audit table), so a re-run night's original 16:05 candidate set is not recoverable from anything the desk can query — only excluded. The original freeze verification (a 20-row sample out of 6,479 sas_candidates rows) had roughly a 50% chance of missing all ~4 re-run nights' ~231 rows entirely (231/6479 ≈ 3.6%), which is how it was missed; see research/reports/KT_AUDIT_manifest_v001_rerun_nights.md §6 for the validator-gap analysis.'"
+}

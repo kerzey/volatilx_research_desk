@@ -29,6 +29,8 @@ generalises beyond that one question. One-off answers stay in that question's `D
 | DP-06 | The catalyst layer is a different feature before and after 2026-06-01 (earnings fix `69ef05f`). Earnings questions are sealed-period only, or split at that date. | Haci 2026-09-10; DATA_NOTES |
 | DP-07 | Platform defects are not research questions. They go to `PLATFORM_ISSUES.md`; Haci marks fix / research / accept. | Haci 2026-09-10 |
 | DP-08 | Speed is part of the claim: the desk measures *when* a target is first touched (sessions from entry), not only whether. L1/L2 are reachable by many stocks; the edge to test is speed. | Haci 2026-09-10; H-065 / H-066 |
+| DP-09 | When the entry basis is the next-session open spread and L3 is the primary level, the primary clock is **L3 within 20 sessions** (the spread horizon, ≈ expiry), not the platform's 40-session swing-lane window; the 40-session result is reported alongside, descriptively, wherever it has matured. Sample floors and decision dates are computed on the 20-session window. | Haci 2026-09-12, Q007 |
+| DP-10 | MPE for any **per-trade endpoint denominated in ATR**: **0.25 ATR per trade**. Set once, applies to every such endpoint; smaller values are not accepted and a larger one needs a one-line reason from the Registrar. | Haci 2026-09-12, Q007 |
 
 ## Defaults (desk convention; Haci can overturn)
 
