@@ -101,5 +101,5 @@ platform repo.
 
 ## Agents
 
-data-steward · registrar · explorer · researcher · red-team · brief-writer · reporter.
+data-steward · registrar · decision-maker · explorer · researcher · red-team · brief-writer · reporter.
 Invoke with `@name`. Stay in your lane; if a task belongs to another agent, say so.
