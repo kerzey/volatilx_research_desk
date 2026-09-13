@@ -123,7 +123,7 @@ def main() -> None:
         L.append("_Each was a question the desk would once have asked you. It took the recommended or the stricter option (DP-40..45). "
                  "The locked question stands; to overturn one, say so and the desk registers a successor question._\n")
         for x in q["defaulted_decisions"]:
-            L.append(f"- **{x['id']}** {x['line'][:200]}")
+            L.append(f"- **{x['id']}** {x['line'][:320]}")
         L.append("")
     else:
         L.append("_none yet_\n")
