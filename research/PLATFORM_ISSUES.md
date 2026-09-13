@@ -34,6 +34,7 @@ Statuses: `OPEN` · `HACI_DECIDED:<fix|research|accept>` · `BRIEF_WRITTEN` · `
 | PI-010 | research | HACI_DECIDED:research | Elite (90+) count falling: Apr 8 · May 13 · Jun 12 · Jul 8 · Aug 3 · Sep 2 |
 | PI-011 | high | HACI_DECIDED:fix | Printed swing stop on the wrong side of the pick-night close for 67 of 382 published picks (17.5%) |
 | PI-012 | med | HACI_DECIDED:research | 2026-06-26: three qualified, ranked picks the night's own run audit does not record; no run-history table |
+| PI-013 | med | OPEN | `uoa_symbol_daily.score_swing` / `score_long` overwritten in place by the next-morning OI-confirmation pass; no point-in-time copy |
 
 ## Detail
 
@@ -135,3 +136,19 @@ night — flagged to the Red Team for their reviews, never edited.
 `super_agent_select_runs` is updated in place with no run-history table. Two questions for the platform:
 what wrote those rows, and should there be an append-only run-history/audit table — its absence is what
 makes this and the KT-audit re-run nights unrecoverable rather than merely detectable.
+
+### PI-013 — UOA scores rewritten next morning with no audit trail
+**Evidence:** Registrar draft of Q014 (H-040), 2026-09-13. volatilx `services/uoa_screener.py:2236-2239`
+multiplies `score_swing` and `score_long` in place by `oi_mult` (0.90 / 1.00 / 1.05 / 1.10, stored in
+`oi_confirm_mult`, `:2223-2232`) during the next-morning open-interest confirmation pass, and the
+bulletin's lists are re-ranked from the mutated scores (`:2245-2303`). `label_*` is written once,
+pre-multiplier (`:1728-1734`). The row therefore carries the *morning* score under a column that
+every downstream reader treats as the 16:05 ET screener output. FREEZE_v001 §7 flagged the OI lag
+for older rows only.
+**Desk impact:** any study conditioning on `score_swing` / `score_long` must divide out
+`oi_confirm_mult` to recover the pick-night value (Q014 PREREG §2.1 does exactly that; no rule-14
+exception needed because the multiplier is stored). Rows where `oi_confirm_mult` is null cannot be
+told apart from unconfirmed ones.
+**Recommend: fix** — keep the 16:05 score in its own column (`score_swing_pt`, `score_long_pt`) or write
+the confirmed score to a new column and leave the original untouched; either way the point-in-time
+value must survive. Fix, not research: no behaviour changes, only where a value is stored.
