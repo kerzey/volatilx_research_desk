@@ -1,6 +1,6 @@
 {
   "id": "Q016",
-  "state": "PREREG_DRAFT",
+  "state": "DATASET_PINNED",
   "history": [
     {
       "state": "IDEA",
@@ -12,6 +12,26 @@
       "at": "2026-09-13T21:33:19.681432+00:00",
       "by": "registrar",
       "note": ""
+    },
+    {
+      "state": "PREREG_LOCKED",
+      "at": "2026-09-13T22:04:34.556535+00:00",
+      "by": "desk",
+      "note": "DP-46: DECISIONS.md complete, no pending items"
+    },
+    {
+      "state": "DATASET_PINNED",
+      "at": "2026-09-13T22:04:38.809419+00:00",
+      "by": "desk",
+      "note": ""
     }
-  ]
+  ],
+  "prereg_commit": "4809e7efa7a5f336ffe7baf6bd9a15b523f56546",
+  "prereg_sha256": "1e4699c59f90f613e89f5c33ac0750d82361575371c5d01547737564febc017c",
+  "manifest": "research/data/manifest_v001.json",
+  "manifest_sha256": "b03f355a68373aadd0f2dc56c9154158929642291bf6caacb2f5a9bf15bef374",
+  "manifests": {
+    "research/data/manifest_v001.json": "b03f355a68373aadd0f2dc56c9154158929642291bf6caacb2f5a9bf15bef374",
+    "research/data/manifest_prices_v001.json": "73d2a895da7db724a236ea051d81944799135f0fb5fb3f1d022659f2b0c3b655"
+  }
 }
