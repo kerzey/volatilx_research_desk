@@ -2284,3 +2284,242 @@ recorded so that a successor does not claim the Q005 history as unread.
 
 Under this file's preamble **nothing here may be reported, briefed or quoted** until a trigger is
 met.
+
+---
+
+## H-021 — "IV/RV ratio at selection vs realized return by lane" — **the desk holds no implied volatility in any freeze; the one platform table that stores it is unfrozen, has no knowledge-time declaration, and is rewritten on re-runs**
+
+**Deferred 2026-09-14 by the registrar, autonomous run (DP-40..48, DP-52..58), on this file's
+first admission ground: the objective cannot be measured with the artefacts the desk holds.** The
+blocker is **provisioning plus a knowledge-time declaration, not a rule-14 grant**. The data sits in
+the platform database the desk already reads, but no manifest pins it and no Steward has declared
+when it is written. Not drafted: no `QNNN` directory, no question number consumed (the H-062 /
+H-014 precedent). Not merged (DP-29): no PREREG under `research/questions/` reads implied volatility,
+`uoa_contract_daily` or an IV/RV quantity.
+
+### What the question is, and why it is worth keeping
+
+At 16:05 ET on the pick night, the options market prices how far a stock is expected to move
+(implied volatility, IV). The pinned bars say how far it has actually been moving (realized
+volatility, RV). If IV runs well above RV, the market expects more travel than the tape has shown,
+so a target set in ATR units (an RV-type measure) may be *nearer* in market terms than it looks. If
+IV runs below RV, the reverse holds. That makes IV/RV a candidate lane rule ("prefer day-lane picks
+with IV/RV > 1") and a candidate guide line. It is also an unused signal: no SAS layer reads IV.
+
+**The entry as filed is not registrable even with data.** "Realized return" is a fixed-horizon
+return, which rule 5 makes secondary and descriptive. On re-entry the endpoint is the path, by DP-42:
+first touch of the lane's primary target within the lane window from the DP-03 entry, IV/RV
+terciles within night, against the rule-5 distance-matched control. Two overlaps must be declared at
+re-entry: IV/RV is mechanically related to `atr_pct`, which Q016 already conditions on, and to
+`gex_context`, which Q021 uses.
+
+### Why it cannot be registered — what the frozen data and the platform actually hold
+
+Checked read-only against the platform working tree on 2026-09-14 (manifest_v001 platform SHA
+`fa70688`):
+
+| place | what it holds | usable for H-021? |
+|---|---|---|
+| `manifest_v001.json` (11 tables), `manifest_prices_v001.json`, `manifest_prices_universe_v001.json` | No column named or meaning implied volatility. `uoa_symbol` holds premium, score and OI-confirm columns. `gex_symbol` holds net GEX, flip, walls and `pin_risk`. `whale_ledger` is an option-*contract* ledger with **0 rows** (FREEZE_v001 §1, §5). The price manifests hold equity bars only (Alpaca `feed=sip`). | **No.** Nothing to compute IV from. |
+| `sas_candidates.context_json` (frozen, 16:05 ET) | `_build_options_flow_context` copies the night's top five `uoa_contract_daily` rows by premium but **drops `iv`**. It keeps strike, DTE, premium, OI, spread and buy/sell premium (volatilx `services/symbol_context_builder.py:274-291`, query `:491-497`). The `whale_watch` source payload carries no `iv` key either. | **No.** The only 16:05 snapshot of contract rows omits the field. |
+| `uoa_contract_daily.iv` (platform, **not frozen**) | Per-contract IV from Alpaca's option chain, `greeks.iv` beside `latest_quote` (`services/uoa_screener.py:1035`, `:1067-1069`, written `:1443-1457`). Scope: strikes within ±10% of spot (`moneyness_band`, `:800`), DTE buckets including 10–45 and 60–180, at most 60 contracts per symbol ranked by volume/OI/spread (`:799`, `:1098-1110`), and spread, OI and snapshot-volume filters (`:1045-1065`). | **Not as held.** It exists, but it has three defects, listed below. |
+| `gex_contract_snapshot.iv` (platform, **not frozen**) | Per-contract IV, but `store_contract_snapshot` defaults to `False` (`services/gex.py:35`). Only a manual `scripts/run_gex_nightly.py --store-contracts` enables it (`:41`, `:54`). The scheduled path passes `False` (`scripts/run_gex_uoa.py:54`), and the model calls it an "optional debugging/backtest table" (`models.py:1657`). | **No.** Expected to be empty or sporadic. Unmeasured, and not worth measuring before the first row. |
+| `ai_agents/options_client.py:1116`, `ai_agents/earnings_agent.py:919-996` | `atm_iv` fetched live for an on-demand earnings report. Not persisted to any nightly table. | **No.** Not a panel. |
+
+**The three defects of `uoa_contract_daily.iv`, each enough by itself:**
+
+1. **Unfrozen (rule 4).** No manifest pins it, so no PREREG may cite a number from it. Under DP-50
+   the live rows are exactly what a platform repair can rewrite.
+2. **No knowledge-time declaration (rule 14).** `freeze_config.availability` has no entry for the
+   table. The IV is the chain snapshot *at the moment the run executes*, so it is point-in-time only
+   for rows the live nightly run wrote. Any run with `force=True` **deletes the date's rows and
+   re-inserts them from a later snapshot** (`services/uoa_screener.py:1282-1287`). The flag is
+   exposed by `scripts/run_uoa_nightly.py:49`, `scripts/run_uoa_range.py:43`, `:76-82` and
+   `scripts/run_uoa_oi_gex_for_day.py:161`, and the platform's own log message asks operators to
+   re-run with `--force` to populate baseline OI (`services/uoa_screener.py:2324`). The delete
+   filters on `trading_date` alone, so a **single-symbol** `run_uoa_range.py --force` run wipes
+   **every** symbol's contract rows for each date in its range and re-inserts only the one symbol.
+   A date touched that way is incomplete as well as late. UOA dates have
+   been backfilled before: FREEZE_v001 §7 found "older, backfilled rows" in `uoa_symbol`, and the
+   2026-07-02 pipeline repair sits inside the window. A re-run row carries an IV from a later date
+   under the old `trading_date`. That is a future read, not a lag, and no rule-14 grant should
+   license it. Such rows must be identified and dropped, which needs `created_at`. **`updated_at`
+   cannot be used**, because `scripts/backfill_outcomes.py:216` rewrites the table's `fwd_return_*`
+   columns in place. The run order is favourable: the SAS universe builder reads the UOA bulletin
+   and `uoa_contract_daily` for the same `trading_date` (`services/candidate_universe_builder.py:91`,
+   `:105`), so a live UOA run precedes the SAS run. But this is a Steward verification item, not an
+   assumption the registrar may make.
+3. **Coverage of both arms is unmeasured.** The UOA universe is capped by `UOA_MAX_SYMBOLS` (code
+   default 250, `services/uoa_scheduler.py:96`, while `uoa_symbol` carries ~495–500 symbols a night
+   in manifest_v001 per FREEZE_v001 §5, so production sets it higher) and gated on price and 20-day
+   dollar volume (`services/uoa_screener.py:1321`). SAS
+   candidates also enter from the projection libraries. So some published picks, and more of the
+   unpublished controls, may have no contract rows, or none near the money at a usable tenor. If IV
+   is computable mainly for liquid, densely-struck names, the IV/RV arm becomes a liquidity screen,
+   and the distance-matched control is drawn from a different population than the picks (the Q021
+   pin-risk lesson).
+
+**Exposure (DP-43, DP-53) is not measured and cannot be measured** until the table is frozen and
+the point-in-time rows are identified. No decision date is projected, and none is invented.
+
+### What was considered and rejected before deferring
+
+- **Querying `uoa_contract_daily` live to size the question:** refused. Rule 4 and DP-50(c) say
+  exposure counts come from a pinned freeze, and the registrar does not query databases.
+- **An IV proxy from pinned equity bars** (e.g. Parkinson or Garman–Klass range volatility):
+  **rejected.** It is another realized measure. IV/RV built from it would be RV/RV and would answer
+  a different question, one Q016's ATR terciles already sit near.
+- **`uoa_symbol` premium or score columns as an "options interest" stand-in:** rejected. Premium
+  is not implied volatility, and those columns are already F1/Q029 flow-layer inputs.
+- **Registering on the published picks only, where coverage is probably better:** rejected. Rule 5
+  requires the control, and the control is the unpublished candidates, so their coverage is the
+  binding one.
+- **Waiting for EN-011 (an options EOD history feed) alone:** kept as an alternative trigger, not
+  the only one. The platform's own table may be enough once frozen, and EN-011 is procurement.
+
+### What would move it back into the backlog
+
+Either route is enough. Every count is **measured by the Steward on a pinned freeze**, never taken
+from a live query or a projection.
+
+1. **Freeze the platform's table and pass a counts-only coverage probe.** The Steward adds
+   `uoa_contract_daily` to `freeze_config` with at least `trading_date`, `underlying_symbol`,
+   `contract_symbol`, `option_type`, `expiration_date`, `strike_price`, `dte`, `spot_close`, `bid`,
+   `ask`, `iv` and `created_at`, pins it in a manifest, and declares its availability after
+   verifying it on `created_at`. The probe then reports, over a trailing quarter of pick nights
+   ≥ 2026-06-01 (DP-06), with no IV value or outcome read:
+   - **(i) point-in-time share:** ≥ **95%** of nights have every `uoa_contract_daily` row with a
+     `created_at` on the `trading_date` and no later than that night's `sas_runs.started_at`. Rows
+     on other nights are excluded from any future population and the dates are named.
+   - **(ii) pick coverage:** ≥ **90%** of published picks have a computable ATM IV from a
+     point-in-time row. Computable means at least one call and one put with non-null `iv`, strike
+     within ±5% of `spot_close`, DTE 10–45. The Q030 ≥ 90% coverage bar.
+   - **(iii) control coverage:** ≥ **90%** of same-night unpublished candidates meet the same test,
+     **and** (iii) sits within 10 pp of (ii), so the control is not a different population.
+   - **(iv) rate:** nights with ≥ 3 IV-computable picks **and** ≥ 5 IV-computable controls, per
+     elapsed session, reach the DP-43 gate **re-solved from the re-entry lock date**. For
+     orientation only: Q027's gate at a 2026-09-14 lock was 0.36/session for a 20-session endpoint.
+2. **EN-011 lands.** A sha256-pinned options EOD history with per-contract IV for every candidate
+   symbol, published and unpublished, over the window, with an as-of time per row. Then (ii)–(iv)
+   above are measured on that freeze instead.
+
+A third, forward-only path is a platform ENHANCEMENT, not filed here and Haci's call under DP-48:
+persist a night-level ATM IV per candidate into the 16:05 `context_json`, which would make it
+point-in-time by construction. The window would then start at its ship date (DP-06), prospective
+only.
+
+### Bookkeeping while deferred
+
+No verdict, no `eval.py`, no `results/`, no schedule, and **no outcome or IV value of any kind
+read**. Evidence is code, manifests, FREEZE_v001 and schema only. **F3's correction set is unchanged
+at Q021 alone (1 primary).** H-021 does not join it while deferred (the H-062 precedent). No locked
+file was edited. **DP-41 is not engaged**: nothing asks for a later clock, and a row rewritten after
+the fact is dropped, not licensed. Under this file's preamble **nothing here may be reported,
+briefed or quoted** until a trigger is met.
+
+---
+
+## H-022 — "Opportunistic vs routine insider buys inside the window" — **the desk and the platform hold no insider-transaction (Form 4) record at all; what the platform calls "insider" is an options-flow screen**
+
+**Deferred 2026-09-14 by the registrar, autonomous run (DP-40..48, DP-52..58), on this file's
+first admission ground: the objective cannot be measured with the artefacts the desk holds.** The
+blocker is **procurement**, not provisioning, accrual or a grant. Not drafted: no `QNNN` directory,
+no question number consumed. Not merged (DP-29): no PREREG under `research/questions/` reads an
+insider transaction. Q029's flow layer contains the options-flow "insider watch" component named
+below, which is a different quantity.
+
+### What the question is, and why it is worth keeping
+
+Cohen, Malloy and Pomorski (2012) split corporate insiders' open-market purchases into two kinds.
+A **routine** buyer trades in the same calendar month year after year, e.g. a director who buys
+every March. An **opportunistic** buyer breaks that pattern. Opportunistic purchases carry
+information and routine ones largely do not. The hypothesis: when an SAS pick (or candidate) has an
+opportunistic insider purchase filed shortly before the pick night, its price path is better than
+the same night's picks with a routine purchase, and better than distance-matched controls. If it
+holds, it is a flag on the conviction card and a candidate catalyst input. If it fails, the desk
+stops treating "insiders are buying" as a reason to trust a pick. The platform already turns net
+insider shares into sentiment for its earnings report (`ai_agents/earnings_agent.py:839-851`,
+`:1194-1199`, ±5 to a directional score), with no distinction of kind. That is the decision this
+question would test.
+
+### Why it cannot be registered — what the frozen data and the platform actually hold
+
+Checked read-only against the platform working tree on 2026-09-14 (manifest_v001 platform SHA
+`fa70688`):
+
+| place | what it actually is | usable for H-022? |
+|---|---|---|
+| `whale_watch_ledger` (frozen as `whale_ledger`) | **0 rows** (FREEZE_v001 §1, §5; `manifest_v001.json` `availability.whale_ledger`). It is also **an option-contract outcome ledger, not an insider record**: `contract_symbol`, `strike_price`, `entry_bid/ask`, `mfe_pct`, `realized_mechanical_pnl_pct` (`manifest_v001.json:432-462`; volatilx `models.py:1111-1150`). | **No.** Empty, and the wrong kind of record even if full. |
+| The candidate universe's `whale_watch` source (`services/candidate_universe_builder.py:51-68`, added `:105-109`) | `_build_insider_watch` (`routers/uoa_screener.py:311-329`) ranks **single large option prints** from `uoa_contract_daily`: OTM ≥ 20%, DTE 10–45, `premium_max` ≥ $75K, spike ≥ 6× the symbol's recent median (`services/super_agent_select_models.py:114-120`). Its own docstring calls them "potential 'insider/whale' single prints". The nominal gate is "unsatisfiable on the captured chain band", so a relaxed tier serves every session (`models.py:1211-1218`, `insider_watch_serve_audit`). In scoring it is a 0.12-weight component of the flow layer, "Whale/insider print strength elevated" (`services/super_agent_select_scoring.py:761-800`). | **No.** An options-flow inference about informed trading, not a disclosed transaction by a named insider. **Never read `source_membership_json` `whale_watch` as insider buying.** |
+| Any platform table | The ORM declares **no** insider-transaction, Form 4, SEC-filing or reporting-owner table (`models.py` table list). A repo-wide search for `form4`, `transaction_code`, `10b5`, `edgar`, `reporting_owner`, `insider_transaction` finds nothing that stores such a record. | **No.** |
+| FMP `insider-trading/latest` (`ai_agents/fmp_client.py:139-150`; `fmp_mcp_server/server.py:2316-2326`) | Fetched **live, on demand**, limit 20, for an earnings report or an Omega chat tool. Netted into `net_insider_shares` inside that report and **never persisted to a nightly table**. The "latest" endpoint returns the most recent filings, not a symbol's history. | **No.** No panel, no history, no as-of time. |
+
+**Why a 0-row ledger or a latest-20 endpoint could not supply this even in principle.** The
+routine/opportunistic label is a property of the **individual insider's own multi-year history**:
+routine means the same insider traded in the same calendar month in each of the prior three years.
+Classifying one purchase in June 2026 needs that reporting owner's Form 4 history from at least
+June 2023, for every candidate symbol, published and unpublished, because the control is the
+unpublished pool (rule 5). The desk holds none of it for any symbol.
+
+**Rule 14 would also bind on the right clock.** A Form 4 purchase becomes knowable when the filing
+is **accepted by the SEC** (up to two business days after the trade), not on the transaction date.
+A future freeze must carry the acceptance datetime, and a purchase counts on pick night *t* only if
+it was accepted by 16:05 ET. Dating by transaction date would be a look-ahead of up to two sessions.
+
+**Exposure (DP-43, DP-53) is unmeasured and is likely the next blocker.** Open-market purchases
+(code P) are a small share of Form 4 filings, most filings being sales, grants and exercises. The
+SAS book leans towards large, momentum-driven names where insiders mostly sell. So nights carrying
+both an opportunistic and a routine purchase inside a short look-back may be rare. That is a
+prediction to be falsified by a count, not a number the registrar may assume, which is why trigger
+(2) below is required and not optional.
+
+### What was considered and rejected before deferring
+
+- **Using the `whale_watch` / insider-watch options source as the "insider" variable:** rejected.
+  It is a different hypothesis about options flow, already inside Q029's flow layer, and relabelling
+  it would produce a number that looks like an insider finding and is not one.
+- **FMP net insider shares without the routine/opportunistic split:** rejected. It is not
+  point-in-time (no stored history, no acceptance time), and it drops the distinction the
+  hypothesis exists to test (DP-25).
+- **Classifying on a shorter history** (e.g. one prior year): rejected under DP-45. With less
+  history, more insiders look "opportunistic" by default, which inflates the treatment arm with
+  mislabelled routine traders. It is a different, weaker classifier.
+- **Published picks only:** rejected. The rule-5 control is the unpublished pool, and its coverage
+  binds.
+
+### What would move it back into the backlog
+
+**Both conditions are required**, each measured by the Steward on a pinned freeze:
+
+1. **A point-in-time insider-transaction freeze exists.** A sha256-pinned Form 4 dataset covering
+   **every SAS candidate symbol** (published and unpublished) from **≥ 36 months before the first
+   pick night of the intended window** through its end. It must carry, per transaction: issuer
+   symbol, **reporting-owner CIK** (a stable per-insider id), transaction code (at least P and S),
+   transaction date, shares and price, and **SEC acceptance datetime**, with
+   `freeze_config.availability` declared on the acceptance datetime. Candidate sources: SEC EDGAR
+   Form 4 filings (public, acceptance-timestamped) or FMP's historical insider-trading search on the
+   platform's existing subscription, if it carries acceptance times. Procurement is Haci's call. The
+   desk asks for nothing here and files nothing against the platform.
+2. **A counts-only exposure probe clears the DP-43 gate.** On that freeze, over a trailing quarter
+   of pick nights ≥ 2026-06-01, with no outcome read, the Steward reports:
+   - per pick night, the number of candidates with ≥ 1 **opportunistic** P-coded purchase accepted
+     within the 20 sessions up to 16:05 ET on the pick night, and the number with ≥ 1 **routine**
+     P-coded purchase;
+   - nights carrying ≥ 1 opportunistic-purchase pick **and** ≥ 3 distance-matched controls, per
+     elapsed session.
+
+   That rate must reach the DP-43 gate re-solved from the re-entry lock date (orientation only:
+   0.36/session at a 2026-09-14 lock for a 20-session endpoint). If it falls short, H-022 returns
+   here on the second admission ground with the measured rate named. The 20-session look-back is the
+   registrar's reading of "inside window" and is an open decision at re-entry, not a registered
+   value.
+
+### Bookkeeping while deferred
+
+No verdict, no `eval.py`, no `results/`, no schedule, and **no outcome of any kind read**. Evidence
+is code, manifests and FREEZE_v001 only. **F3's correction set is unchanged at Q021 alone
+(1 primary).** No locked file was edited. **DP-41 is not engaged** (no later clock is requested).
+**Naming hazard carried forward:** on this platform "insider watch", the `whale_watch` universe
+source and `whale_watch_ledger` are all **options-flow** objects, and any successor question or
+brief must say so wherever the word "insider" appears. Under this file's preamble **nothing here
+may be reported, briefed or quoted** until both triggers are met.

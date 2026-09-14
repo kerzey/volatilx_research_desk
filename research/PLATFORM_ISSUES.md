@@ -38,6 +38,7 @@ Statuses: `OPEN` · `HACI_DECIDED:<fix|research|accept>` · `BRIEF_WRITTEN` · `
 | PI-014 | high | OPEN | Conviction Monitor's polarity arm silent since 2026-06-01: `polarity_unavailable_coverage_low` on 100% of in-scope rows, 0 polarity HOLD/EXIT rows — the EXIT tier is the technical arm alone |
 | PI-015 | high | OPEN | Projection layer (v1.6 weight 29, the largest) unscored — `available: false` — on 72.2% of published and 74.3% of capped main-lane rows; `overall_score` is a six-layer blend on ~3 of 4 picks |
 | PI-016 | med | OPEN | Conviction label degenerate on the published slate: `completeness_score` never below 65.37 (min 65.3686 of 4,195 scored rows), so `_confidence_label`'s completeness arm is inert — 401 high / 141 medium / **0 low** on 542 published rows, every `medium` the `[80,82)` score sliver; the subscriber sentence at `services/super_agent_select_public.py:212` re-prints "is the score ≥ 82" |
+| PI-017 | high | OPEN | A forced UOA re-run deletes the **whole trading date** from `uoa_contract_daily`, `uoa_symbol_daily` and `uoa_bulletins`, then rebuilds only the symbols it was given — so the single-symbol range runner with `--force` wipes ~498 other symbols and the night's bulletins (a SAS candidate-universe source); the run still records `success`. Signature seen once, 2026-01-09 (23 of ~499 symbols), before every study window |
 
 ## Detail
 
@@ -430,3 +431,54 @@ describing the output as conviction on subscriber-facing surfaces, since on the 
 configuration it carries no information the printed score does not already carry. Either way, any
 change to how the slate is *scored or ordered* still needs a research question and a full brief
 (rule 11) — and the question of whether the label predicts anything remains **Q036, DEFERRED**.
+
+### PI-017 — a forced UOA re-run for one symbol deletes every symbol's rows for that date
+
+**Found 2026-09-14** by the Registrar while triaging H-021; confirmed by the coordinator in the code
+and in the database (read-only, counts only).
+
+**The code.** `services/uoa_screener.py:1282-1287` — when `force` is set, the screener deletes rows
+filtered on **`trading_date` only**, from three tables, before recomputing:
+
+```python
+if force:
+    # Clear existing rows for that date to avoid duplication.
+    db.query(UoaContractDaily).filter(UoaContractDaily.trading_date == trade_date).delete(...)
+    db.query(UoaSymbolDaily).filter(UoaSymbolDaily.trading_date == trade_date).delete(...)
+    db.query(UoaBulletin).filter(UoaBulletin.trading_date == trade_date).delete(...)
+```
+
+It then recomputes only `_resolve_universe(db, cfg, universe)` (`:1289`). The range runner in the
+platform's `scripts/` directory (`run_uoa_range`) makes `--symbol` **required** (`:34`), passes
+`universe=[sym]` (`:79`), and offers `--force` as "Recompute and overwrite rows for each date"
+(`:43`). So the documented way to repair one symbol's UOA history deletes every other symbol's
+contracts and symbol rows, and the night's bulletin, for each date in the range — and restores one.
+
+**Why it matters beyond UOA.** `uoa_bulletins` feed the SAS candidate universe
+(`services/candidate_universe_builder.py`), and `uoa_symbol_daily` carries the flow features and the
+`fwd_return_*` columns PI-001 is about. One mistaken repair silently shrinks a night's candidate pool
+and flow layer, and the run is still recorded `status = success`.
+
+**Evidence of the signature in history — an inference, not proof.** Counts only:
+- The only trading date with fewer than 200 `uoa_symbol_daily` rows is **2026-01-09: 23 rows, 23
+  symbols**, between 2026-01-08 (498) and 2026-01-12 (499).
+- Its `uoa_runs` row (id 5, `nightly`) carries `config_json = {"force": true}` and
+  `symbols_considered = 23`; it started 2026-01-12 19:09:46 UTC and **finished 22 seconds later with
+  `status = success`**. Neighbouring nightlies consider 503 symbols and take about six minutes.
+- Whether that date held ~499 rows before the forced run cannot be established from current rows.
+
+2026-01-09 is before every registered study window (the frozen candidate history starts 2026-04-01),
+so **no locked question is affected**. The hazard is forward-looking: the next single-symbol repair.
+
+**Expected behaviour.** A forced re-run replaces exactly what it recomputes: contract and symbol rows
+deleted on `trading_date` **and** `symbol IN (<resolved universe>)`; the bulletin rebuilt from the
+full date's symbol rows, not the partial universe. Or: refuse `--force` when the universe is narrower
+than what is stored for the date.
+
+**Reproducing check (Data Steward, read-only).** Per trading date, `count(DISTINCT symbol)` in
+`uoa_symbol_daily` beside `uoa_runs.config_json->>'force'` and `stats_json->>'symbols_considered'`;
+flag any date where a forced run considered fewer symbols than its neighbours.
+
+**Suggested route.** Plain bug fix that restores intended behaviour → `fix-brief` once Haci decides
+`fix`. Under DP-49 the brief changes the delete predicate only; it never hands the coding agent a
+database step, and it does not repair 2026-01-09.
