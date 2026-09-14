@@ -279,3 +279,67 @@ Three corrections to how §2e and §4 should be read:
   column, the date range and the ship SHA, so any later freeze that disagrees with `manifest_v001`
   about those cells has a documented reason (DP-50a). Research impact remains nil either way:
   `fwd_return_*` is banned as a study outcome and no locked PREREG reads it.
+
+
+## 8. 2026-09-14 pass -- /desk-run verify PI-001 2d5776c
+
+PENDING.
+
+### 8a. Merge confirmed
+
+`git log main --oneline` and `git show --stat` (read-only, no `merge-base`/`branch` calls, both of
+which this desk's own sandbox guard blocks) confirm:
+
+- `main`'s tip commit is `d19c9a9` ("Merge pull request #27 from kerzey/feat/en-002-speed-to-target-internal"),
+  a later, unrelated PR.
+- Commit `4775e49` -- "Merge pull request #26 from kerzey/fix/pi-001-backfill-window-floor" -- is
+  reachable from `main` (found via `git log main --oneline`), authored/merged by kerzey
+  <hbsabd@gmail.com>, 2026-09-13 18:02:57 -0500, with parents `fa70688` (the SHA the brief was
+  written against) and `2d5776c` (the fix commit itself).
+- `git show --stat 4775e49` and `git show --stat 2d5776c` both list exactly two files, both named
+  by the brief 3/5: `scripts/run_nightly_pipeline.py` and
+  `tests/test_nightly_pipeline_backfill_window.py`. Nothing else changed. This matches the 2026-09-13
+  pass's 2a static diff review exactly -- the merge introduced no new files and no scope creep.
+
+Yesterday's record ("NOT MERGED, NOT DEPLOYED", 2b above) is now half-corrected: **merged**, via
+PR #26, into `main`. No live table read or write was used to establish this -- git-only, per DP-49.
+
+### 8b. Deploy status -- unknown, as scoped by this task
+
+Whether production is now running the code on `main` (versus still serving a stale deployed copy,
+per the brief's 3 A' mechanism) cannot be read off git history or a table snapshot alone without
+also knowing whether a nightly has executed since the merge. The task framing already states this
+is unknown to the desk, and that at most one nightly (2026-09-14 16:05 ET) could have run since the
+merge, probably none yet. This pass records deploy state as UNKNOWN rather than inferring it from
+the merge timestamp.
+
+### 8c. Coverage check -- NOT RUN
+
+The research credential (`RESEARCH_DB_URL`) is unset in this session (checked directly: the
+variable is empty). Per CLAUDE.md rule 4 and this brief's 8, a read-only comparison against
+`uoa_symbol_daily` is the correct check once that credential is available -- V1 (fixed-date
+coverage on 2026-07-28), V2 (row-level immutability against the pinned
+`research/data/v001_uoa_symbol.parquet` before-snapshot, per 7c above -- not a freshly captured
+before-snapshot), and V3 (trailing frontier, 2026-06-11..2026-08-14, checking for no cliff). None
+were executed this pass. No coverage numbers to report.
+
+### 8d. Decision
+
+Per the task's explicit rule, VERIFIED requires the after-deploy coverage check to pass; FAILED is
+never appropriate merely because deploy hasn't happened. Neither condition is met (the check itself
+did not run this pass), so the verdict is **PENDING** -- not VERIFIED, not FAILED. The
+`PLATFORM_ISSUES.md` PI-001 status row is left at `IMPLEMENTED:2d5776c` (unchanged); only its prose
+detail paragraph is revised to reflect the merge -- see that file.
+
+**Exact remaining steps, in order:**
+
+1. Confirm/execute the production deploy of `main` (the brief's 3 A' ops action: verify in Kudu
+   that the WebJob wrapper resolves to the deployed copy of the merged script; restart the app if
+   needed).
+2. Let at least one nightly pipeline run complete against the deployed code; confirm its log prints
+   `backfill_window_trading_days=65` (or `70`) and `backfill_window_clamped=False`.
+3. From a session where the research credential is available, re-run the brief's 8 V1/V2/V3
+   read-only checks against `uoa_symbol_daily`, comparing V2 against
+   `research/data/v001_uoa_symbol.parquet` (not a fresh capture, per 7c above).
+4. Only if all four PASS criteria in the brief's 8 are met, mark PI-001 `VERIFIED` and revise this
+   report and `PLATFORM_ISSUES.md` accordingly.

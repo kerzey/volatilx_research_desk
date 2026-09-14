@@ -49,9 +49,7 @@ is showing mostly nulls. **Recommend: fix.**
 **Implemented 2026-09-13, `2d5776c`** — `resolve_backfill_window()` clamps any caller's window into
 [65, 100] sessions in-process, so the stale Azure WebJob wrapper can no longer shorten it; the
 effective window is now printed on every run. Two files, no scoring path touched.
-**NOT MERGED, NOT DEPLOYED.** `2d5776c` sits on branch `fix/pi-001-backfill-window-floor`; `main`
-is still at `fa70688`, the SHA the brief was written against. Production runs the pre-fix script,
-so nothing has changed in the data and nothing can until the branch is merged and deployed.
+**MERGED, DEPLOY UNKNOWN (corrected 2026-09-14).** `2d5776c` is on `main` via merge commit `4775e49` (PR #26, "Merge pull request #26 from kerzey/fix/pi-001-backfill-window-floor", 2026-09-13 18:02:57 -0500); `git show --stat 4775e49` confirms exactly the two files the brief named (`scripts/run_nightly_pipeline.py`, `tests/test_nightly_pipeline_backfill_window.py`) and nothing else. Whether this has reached the production WebJob (brief §3 Step A') and whether a nightly has run it are unknown to the desk from a read-only git+DB check. See `research/reports/VERIFY_PI-001.md` §8 for the 2026-09-14 pass -- verdict PENDING, not VERIFIED.
 
 **Residual hole — one reconciled statement (2026-09-13, after two verify passes disagreed).**
 Both passes counted correctly; they counted different sets, and both summaries were imprecise.
