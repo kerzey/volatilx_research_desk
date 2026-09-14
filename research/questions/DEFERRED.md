@@ -667,6 +667,25 @@ file's preamble **nothing here may be reported, briefed or quoted.**
 
 ## Q030 / H-074 — "Does the candidate universe contain the market's big movers before they move?" — **the base-universe price freeze cannot be built: no Alpaca credentials in the desk's session**
 
+
+> **TRIGGER MET 2026-09-14 — this deferral is lifted; the entry is kept as the record of why it was made.**
+> Both limbs were measured in a desk session, never inferred. **(1) Credentials present:** `ALPACA_API_KEY`
+> and `ALPACA_SECRET_KEY` are both present, asserted by a direct presence test (`research/lib/desk_env.py`,
+> which returns names and never values); they were always in `.env.research` and always loaded for headless
+> runs by `scripts/research_routines.sh:13` — the interactive session that measured the deferral simply had
+> not loaded them, so the blocker was **provisioning of one session**, not procurement.
+> **(2) Coverage 97.55%** against the ≥ 90% gate: **2,346 of 2,405** blob symbols returned ≥ 60 daily bars
+> over 2026-06-01..2026-09-11 (`feed=sip`, `adjustment=split`); 59 short or absent, named in the report.
+> The blob re-verified at **2,405** entries and sha256 `c4d12610…0201` against the **committed** bytes of
+> `4171b1a` — a Windows checkout rewrites LF to CRLF, so the working-tree copy hashes differently and must
+> never be hashed in its place. Measurement: `research/reports/STEWARD_Q030_universe_coverage_probe.md`.
+> **What happens next, in the order this entry already fixed:** R2(iii) builds and pins
+> `manifest_prices_universe_vNNN`; R2(iv)'s counts-only dry run fixes the suppression list; Q030 re-enters
+> the queue at the front and `@registrar apply Q030` folds DECISIONS.md items 1–13 and Corrections 1–7 into
+> the PREREG before any lock. **§5.2's schedule is re-derived from the actual lock date, out only** (DP-43,
+> DP-45): the 2027-04-12 decision date and every date beside it were the arithmetic at a 2026-09-14 lock and
+> are not carried forward. The rate limb is not re-measured; 0.6761 is re-tested only as an inequality
+> against the gate re-solved from the new lock date (Correction 3).
 **Deferred 2026-09-14 by the registrar, autonomous run (DP-40..48), on this file's first admission
 ground: the objective cannot be measured with the artefacts the desk holds.** The blocker is
 **provisioning, not procurement, not accrual and not a grant** — the data exists at a vendor the
@@ -1052,6 +1071,19 @@ quoted.**
 
 ## Q032 / H-079 — "Does the SAS selection edge exist only in identifiable tape states?" — **§2.2's arm cannot be assigned: the SPY history the partition needs exists in no pinned freeze and cannot be fetched without Alpaca credentials**
 
+
+> **TRIGGER MET 2026-09-14 — this deferral is lifted; the entry is kept as the record of why it was made.**
+> Limb **(g)**, the only failing limb, was attempted for the first time and **passes**: SPY returns **424**
+> split-adjusted daily bars for 2025-01-02..2026-09-11, against the **≥ 250** prior SPY sessions `vol_t`'s
+> expanding-window tercile needs and the 200 `trend_t`'s mean needs — so the arm is assignable from the
+> first session of the window, and the "first session with ≥ 250 prior SPY sessions is never" finding is
+> superseded (it described `manifest_prices_v001`'s 153 bars, not what the vendor supplies). Credentials
+> were present all along in `.env.research` and loaded for every headless run by
+> `scripts/research_routines.sh:13`; the measuring session had not loaded them. Limbs (a)–(f) cleared on
+> 2026-09-14 and are not re-measured. Measurement: `research/reports/STEWARD_Q032_spy_history_probe.md`.
+> **Next:** R2(i) pins the SPY history into a freeze, then Q032 re-enters the queue and resumes at
+> `@registrar apply Q032` with its DECISIONS.md binding in full. The drafted schedule is re-derived from the
+> actual lock date, **out only** (DP-43, DP-45).
 **Deferred 2026-09-14 by the registrar, autonomous run (DP-40..48), on this file's first admission
 ground: the objective cannot be measured with the artefacts the desk holds.** The blocker is
 **provisioning — not procurement, not accrual, not a grant and not the DP-43 ceiling**. It is the
@@ -1444,6 +1476,13 @@ the triggers are met.
 
 ## Q033 / H-081 — `V = G_μ − G_α`, the interaction endpoint (P2 only) — **the tape arm cannot be assigned: the SPY history the partition needs exists in no pinned freeze and cannot be fetched without Alpaca credentials**
 
+
+> **TRIGGER MET 2026-09-14 — this deferral is lifted; the entry is kept as the record of why it was made.**
+> P2's tape arm shares Q032's limb (g) verbatim, and that limb now **passes**: SPY returns **424**
+> split-adjusted daily bars for 2025-01-02..2026-09-11 against the ≥ 250 required
+> (`research/reports/STEWARD_Q032_spy_history_probe.md`). **Q033's P1 is locked and pinned and is not
+> touched by this** — P2 rejoins as a second primary only at a successor PREREG or by the route its own
+> entry names, never by editing the locked Q033 PREREG (DP-22).
 **Deferred 2026-09-14 by the registrar, autonomous run (DP-40..48), on this file's first admission
 ground: the objective cannot be measured with the artefacts the desk holds.** This is an
 **endpoint-level deferral, not a question-level one** — the H-067 / Q024 precedent.

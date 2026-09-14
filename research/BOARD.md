@@ -186,6 +186,7 @@ _Each was a question the desk would once have asked you. It took the recommended
 
 - Open hypotheses: **5** · registered: 48 · deferred (data missing): H-041, H-055, H-062, H-067, H-078, H-080
 - Next to register (DP-47 order): H-014, H-002, H-021, H-022
+- **Deferrals lifted, resuming at the front of the queue:** Q030, Q032 — the blocker was measured away, so each resumes at `@registrar apply` with its DECISIONS.md binding in full and its schedule re-derived from the actual lock date, out only (DP-43, DP-45)
 
 | decides on | Q |
 |---|---|

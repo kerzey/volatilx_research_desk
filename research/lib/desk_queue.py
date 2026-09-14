@@ -34,7 +34,14 @@ QDIR = ROOT / "research/questions"
 # its FAIL branch stops everything else; H-070 is DP-51 bookkeeping; then the cheap all-candidate
 # diagnostics (H-073 IC, H-076 structure) that H-075 / H-082 / H-083 / H-084 build on; H-074 needs
 # the Steward's universe price freeze first; H-077 is a synthesis after verdicts; H-078 defers.
-PRIORITY = ["H-069", "H-070", "H-073", "H-076", "H-075", "H-074", "H-082", "H-079", "H-080",
+# 2026-09-14 (second pass): H-074 and H-079 were deferred on "no Alpaca credentials in the desk's
+# session". The credentials were in .env.research all along — scripts/research_routines.sh:13 loads
+# them for every headless run — and research/lib/desk_env.py now loads them for any session. Both
+# triggers were measured and cleared (coverage 97.55% vs a 90% gate; SPY 424 sessions vs 250), so
+# the two questions re-enter at the very front, ahead of the remaining program items (the Q020
+# precedent: a lifted deferral resumes at the head of the queue).
+PRIORITY = ["H-074", "H-079",
+            "H-069", "H-070", "H-073", "H-076", "H-075", "H-082", "H-080",
             "H-081", "H-084", "H-083", "H-077", "H-078",
             "H-058", "H-053", "H-066", "H-064", "H-062", "H-040", "H-060", "H-059", "H-061",
             "H-051", "H-050", "H-033", "H-041", "H-034", "H-013", "H-011", "H-010", "H-012",
@@ -134,6 +141,25 @@ def backlog() -> dict:
     return {"open": open_, "registered": done, "deferred": deferred}
 
 
+def lifted_deferrals() -> dict:
+    """{QNNN: one-line reason} for DEFERRED.md entries carrying a TRIGGER MET banner.
+
+    A deferral is lifted by *measuring* the blocker away, never by a date. When the Steward's
+    probe clears the trigger the entry keeps its history and gains a banner; this reads the
+    banner so the question surfaces as work instead of sitting silently in DEFERRED.md.
+    """
+    out, cur = {}, None
+    for line in _read(QDIR / "DEFERRED.md").splitlines():
+        m = re.match(r"^## (Q\d{3})\b", line)
+        if m:
+            cur = m.group(1)
+            continue
+        if cur and "TRIGGER MET" in line:
+            out[cur] = line.lstrip("> ").strip()[:160]
+            cur = None
+    return out
+
+
 def inbox() -> list:
     return [l[6:].strip() for l in _read(ROOT / "research/INBOX.md").splitlines() if l.startswith("- [ ] ")]
 
@@ -164,6 +190,8 @@ def build_queue(today: date = None, max_register: int = 2) -> dict:
     order = {h: i for i, h in enumerate(PRIORITY)}
     candidates.sort(key=lambda e: (order.get(e["id"], 999), e["id"]))
 
+    trigger_met = lifted_deferrals()
+    resumable = []
     due, in_flight, runs, drafts, needs_pin, for_haci, desk_todo, ready_for_prompt = [], [], [], [], [], [], [], []
     for q in qs:
         s, sch = q["state"], q["schedule"]
@@ -179,6 +207,11 @@ def build_queue(today: date = None, max_register: int = 2) -> dict:
                 in_flight.append({**q, "due_on": dd or "unknown — write schedule.json"})
         elif s == "PREREG_LOCKED":
             needs_pin.append(q)
+        elif s == "DEFERRED" and q["id"] in trigger_met:
+            # A deferral whose DEFERRED.md entry now carries a TRIGGER MET banner. The blocker was
+            # measured away, so the question resumes at `@registrar apply` and goes to the front of
+            # the queue (the Q020 precedent) — it is neither a fresh draft nor still deferred.
+            resumable.append({**q, "why": trigger_met[q["id"]]})
         elif s in ("IDEA", "PREREG_DRAFT"):
             drafts.append(q)
         elif s in ("EVALUATED", "VALIDATED", "REDTEAM_SIGNED"):
@@ -217,6 +250,7 @@ def build_queue(today: date = None, max_register: int = 2) -> dict:
     defaulted = [{"id": q["id"], "line": l} for q in qs for l in q["defaulted_decisions"]]
     return {
         "today": today.isoformat(),
+        "resumable": resumable,
         "due": due, "runs_in_progress": runs, "needs_pin": needs_pin, "drafts": drafts,
         "in_flight": in_flight,
         "to_register": candidates[:max_register], "to_register_total": len(candidates),
@@ -235,6 +269,9 @@ def print_text(q: dict) -> None:
     n = 0
     for s in q["inbox"]:
         n += 1; print(f"  {n}. INBOX → backlog entry: {s[:110]}")
+    for x in q["resumable"]:
+        n += 1; print(f"  {n}. RESUME {x['id']} (deferral lifted): @registrar apply {x['id']} → lock → pin")
+        print(f"       {x['why'][:120]}")
     for e in q["stale_backlog"]:
         n += 1; print(f"  {n}. BACKLOG bookkeeping: mark {e['id']} registered (a PREREG names it)")
     for x in q["runs_in_progress"]:

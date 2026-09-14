@@ -136,6 +136,11 @@ def main() -> None:
         L.append(f"- Inbox items waiting: {len(q['inbox'])}")
     nxt = ", ".join(e["id"] for e in q["to_register"]) or "—"
     L.append(f"- Next to register (DP-47 order): {nxt}")
+    if q.get("resumable"):
+        L.append(f"- **Deferrals lifted, resuming at the front of the queue:** "
+                 f"{', '.join(x['id'] for x in q['resumable'])} — the blocker was measured away, "
+                 f"so each resumes at `@registrar apply` with its DECISIONS.md binding in full and "
+                 f"its schedule re-derived from the actual lock date, out only (DP-43, DP-45)")
     L.append("")
     cal = [(str(x.get("due_on"))[:10], x["id"]) for x in q["in_flight"] if x.get("due_on") and re.match(r"\d{4}", str(x["due_on"]))]
     if cal:

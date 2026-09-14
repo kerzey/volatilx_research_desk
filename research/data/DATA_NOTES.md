@@ -271,3 +271,37 @@ code-default reading and is flagged to the Red Team rather than edited.
   Use `computation_version = 'v2'`.
 - Smart-money layer: weight forced to 0 by config
   (`services/super_agent_select_scoring.py:709-710`); the column has been null since April.
+
+## Alpaca access from the desk session, and one config defect (2026-09-14)
+
+**The credentials were never missing.** `.env.research` holds `ALPACA_API_KEY` and
+`ALPACA_SECRET_KEY`, and `scripts/research_routines.sh:13` loads it for every headless `daily` /
+`weekly` / `desk` run. What an interactive session lacked was the *load* — the agent cannot source
+the file itself (`Read(.env.*)` is denied, and the deny rule covers sourcing it in a shell). Q030,
+Q032 and Q033-P2 were each deferred on "no Alpaca credentials in the desk's session", which was
+true of the session that measured it and false of the environment the Steward runs in.
+
+`research/lib/desk_env.py` closes the gap: it loads the file into `os.environ` for desk tools,
+never overwrites a variable already set, and **returns variable names, never values** — presence is
+all any caller can learn. `present()` is the direct test the Q024 R1(d) precedent asks for.
+
+**Defect: `ALPACA_DATA_FEED` is malformed.** The value is four alphabetic characters beginning
+`sip` — a typo of `sip` — and Alpaca answers it with **HTTP 400** on every request. It matters
+because `research/lib/freeze_prices.py:104` defaults `--feed` to that variable, so the next price
+freeze run without an explicit `--feed` fails outright. `manifest_prices_v001` records `feed=sip`,
+so the variable was correct when that freeze ran or the flag was passed by hand. Every probe on
+2026-09-14 passed `--feed sip` explicitly. **The fix is Haci's**, a one-character edit in a file
+the desk may not read; until it lands, every price fetch must pass `--feed sip` on the command line.
+
+**Hash the committed bytes, not the working tree.** `data/sp500_sectors.json` pins at sha256
+`c4d12610…0201`, the content of platform commit `4171b1a`. A Windows checkout with
+`core.autocrlf=true` rewrites LF to CRLF, so the on-disk file hashes to something else
+(`fc13551c…`) while being the same content. Verify the pin with
+`git show 4171b1a:data/sp500_sectors.json | sha256sum`, never by hashing the working-tree file.
+The mapping carries **2,405** entries, as the Q030 / Q024 / Q022 pins record.
+
+**Measured coverage over that universe (2026-09-14, counts only, no freeze):** 2,346 of 2,405
+symbols returned ≥ 60 daily bars over 2026-06-01..2026-09-11 on `feed=sip`, `adjustment=split` —
+**97.55%**, against Q030's ≥ 90% gate. 59 symbols short or absent, named in
+`research/reports/STEWARD_Q030_universe_coverage_probe.md`. Symbols without bars are counted and
+named, never back-filled or imputed.
