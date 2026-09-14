@@ -1,0 +1,10 @@
+{
+  "decision_date": "2027-05-17",
+  "extension_date": "2027-06-28",
+  "hard_stop": "2027-06-28",
+  "rule": "exposure-driven",
+  "extended": false,
+  "check_from": "2027-05-17",
+  "pin_at_decision": true,
+  "note": "PREREG §5: prospective window pick nights 2026-09-14..2027-04-07 (142 elapsed sessions) sized on R1's measured 0.5652 contributing nights/elapsed session (26/46, tied across SPY/SECRAND/MOM20/MOM60/TECH) rather than the drafted 0.75, giving 80.3 projected against the 80 floor; +20-session maturity (2027-05-05) +1wk margin, first Monday on/after = 2027-05-17; single DP-13 extension to window end 2027-05-19 decided Monday 2027-06-28 (hard stop), then DEFERRED; gates ≥80 contributing nights per registered arm and ≥30 post-lock (DP-21/DP-24) on eval.py's measured counts; the EW arm is conditional on the Steward's RSP pinnability check, R2's first action before manifest_prices_v002 is pinned (pinnable → m=6, else EW deferred as an arm, m=5, no proxy). Pin at decision: the population enters only through the successor freezes named in §5, so the DATASET_PINNED step runs at the decision date on those manifests."
+}
