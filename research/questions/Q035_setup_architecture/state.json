@@ -1,0 +1,23 @@
+{
+  "id": "Q035",
+  "state": "DEFERRED",
+  "history": [
+    {
+      "state": "IDEA",
+      "at": "2026-09-14T13:42:52.590143+00:00",
+      "by": "agent"
+    },
+    {
+      "state": "PREREG_DRAFT",
+      "at": "2026-09-14T13:43:01.085732+00:00",
+      "by": "registrar",
+      "note": ""
+    },
+    {
+      "state": "DEFERRED",
+      "at": "2026-09-14T14:25:57.367439+00:00",
+      "by": "desk",
+      "note": "R1 testability limbs c, d, f short: median publishable-set size 5 against 11, reorder rate 0.2683 against 0.50, reconstruction undefined; driver is the projection layer unscored on 72 percent of published rows (PI-015); not time-curable"
+    }
+  ]
+}

@@ -1621,3 +1621,230 @@ those nights** and must run **prospective-only from its own lock**, with Q033's 
 panel — exactly the constraint Q033 itself applied to the sealed 2026-06-01..2026-08-12 stretch.
 Under this file's preamble **nothing here may be reported, briefed or quoted** until the trigger is
 met.
+
+---
+
+## Q035 / H-083 — "Would a setup-specific ranker (A flow · B projection-or-technical · C catalyst) pick a better eight than the universal 0–100 score?" — **the night's publishable choice set cannot be reconstructed: the projection layer is unscored on three of every four rows**
+
+**Deferred 2026-09-14 by the registrar, autonomous run (DP-40..48), on this file's second admission
+ground _as amended in the next paragraph_: the blocker is a **platform data-completeness gap, not
+elapsed time**.** Drafted at `research/questions/Q035_setup_architecture/PREREG.md`; decided and
+recorded at `research/questions/Q035_setup_architecture/DECISIONS.md` ("# RECORD — 2026-09-14",
+items 1–4 and "Re-entry condition"); measured at `research/reports/STEWARD_Q035_exposure.md`
+(data-steward, 2026-09-14, R1, nine limbs, counts only). **Never locked: no `PREREG_LOCKED`, no
+`schedule.json`, no `pin_at_decision`** — the Q020 / Q025 / Q030 precedent; `state.json` reads
+`PREREG_DRAFT` at this writing and the controller's transition to `DEFERRED` is the coordinator's
+step, not the registrar's. **Both files are preserved exactly as drafted**; where the draft's body
+and `DECISIONS.md` "# RECORD — 2026-09-14" disagree — the provisional schedule, the §7 correction-set
+figure — **the RECORD governs, and a successor builds from the RECORD, not from the draft.**
+**The question number Q035 is consumed by this entry and is not reused.**
+
+**The amendment, stated once so a successor entry can cite it.** The second admission ground as
+written (DP-43) is a *sample-size* ground: it admits a question whose earliest honest decision date
+sits more than 12 months after lock, and it asks for the measured exposure rate, the projected floor
+date and the re-check trigger. Q035 satisfies that ground on limb (b) alone — floor B projects at
+**≈ 237 elapsed sessions** against the **225** admissible under the ceiling (below) — but that is the
+*lesser* of two independent grounds and it is not what is wrong with this question. Three limbs fail
+that **no window of any length reaches**, because each is a property of the shape of a single night's
+choice set rather than of how many nights have accumulated, and their single common cause is a
+**platform column that is incomplete**. The entry therefore names **the measured limb counts, the
+completeness gap that drives them, and a measured re-check trigger in place of an accrual date**, and
+records that **no DP-13 extension is available**: thirty, ninety or two hundred and twenty-five more
+sessions add nights shaped exactly like the ones measured.
+
+### What the question is, and why it is worth keeping
+
+Haci's H13, *A/B/C architecture*. Each night the platform sorts its publishable candidates by one
+universal 0–100 score and publishes the top eight. H-083 asks whether sorting each candidate by the
+signal that is actually driving *it* — flow (setup **A**), projection-or-technical continuation
+(**B**), catalyst (**C**), with a residual bucket **O** handed back to the universal rule — would
+publish eight names that reach a target **2.0 ATR** away more often, within 20 sessions of the
+session t+1 open, against the same night's distance-matched pool. Two primaries were registered, both
+two-sided, both **MPE ±5.0 pp (DP-20, DP-44)**: **P1**, a ranker whose three weights are fitted once
+after the lock commit and never refit, and **P2**, the pure ranker (`w ≡ 1`), which needs no fit, no
+training data and no artefact and is the form of H13 that cannot be argued with. It is a question
+about *ordering inside the publishable set* and says nothing about the 80 floor, the 90 line or the
+8-slot cap, all of which are held as fixed configuration identical in both arms. The design is
+complete and stands; nothing about it is unanswerable in principle — only unreconstructable on the
+data the platform currently writes.
+
+### Why it cannot be registered — the three limbs that fail, and the one thing that drives all three
+
+The lock-or-DEFER gate (PREREG §5.3 R1 as amended by `DECISIONS.md` items 2, 4, 13, 14 and 19) has
+seven gated limbs; the branch that fires on any short limb was fixed at `decide`, **before any count
+was seen**. Measured on `manifest_v001` + `manifest_prices_v001` against `exclusions_v003.json`, pick
+nights **2026-06-01..2026-09-10**, **N = 71** elapsed sessions, **68** non-excluded, counts only, no
+outcome column of any kind read, **no live query** (DP-50(c)):
+
+| limb | floor, fixed at `decide` and never moved | measured | result |
+|---|---|---:|---|
+| **(c) reorder room** | median `\|P_t\| ≥ 11` **and** `\|P_t\| ≥ 9` on **≥ 80%** of nights | **median 5** (mean 5.83, min 1 / max 14); **31.7%** (13/41) | **SHORT — both sub-clauses** |
+| **(d) reorder rate** | **≥ 0.50** of contributing nights | **0.2683** (11/41); mean names swapped over all nights **0.34** | **SHORT** |
+| **(f) reconstruction correctness** | agreement **≥ 0.90** on nights where §2.5 removed no row | registered population **empty — 0 of 41** qualifying nights; **0.00** on the only computable proxy | **SHORT — undefined on its own registered population** |
+
+They are not three findings. **(d) is mechanically downstream of (c)** — a set whose median size is 5
+cannot reorder a slate of 8 — and **(f) is (c) again at the other end**: once the completeness screen
+removes roughly 70% of a night's rows, the top-8-by-`overall_score` of what survives is not the eight
+names the platform actually published, because most of the published eight are themselves among the
+rows the screen just removed.
+
+**The driver, named exactly.** The **projection** layer — v1.6 weight **29**, the single largest of
+the seven — carries `score: null, available: false, reasons: ["Projection context unavailable"],
+weight: 0.0` in `score_details_json.weighted_dimensions.projection` on **72.2% of the 579 `selected`
+(published) main-lane rows** and **74.3% of the 692 `capped_by_max_output` rows** in this window, read
+directly off the frozen rows before any Q035 screen touched them, and **not** concentrated in one
+timeframe (short, swing and long all sit at 71–79%). It takes the median `|P_t|` from **16**
+pre-screen to **3** after completeness and **5** after gradeability. A **second, independent desk
+measurement of the same hole** corroborates it on a different population:
+`research/questions/Q029_layer_value_ablation/PREREG.md` records `projection_score` non-null on
+**62.74%** of its segment rows, clearing 70% in **no month measured** (49.44% → 65.11% peak,
+plateauing below the floor from July), which is why Q029 registered `projection` as **UNEVALUABLE**
+on its E1 and E2 endpoints. Two questions, two populations, one gap. It is filed as
+**`research/PLATFORM_ISSUES.md` PI-015** (high, OPEN) — a recommendation only; the decision is Haci's.
+
+**Limb (b), on the reading that governs.** The rarest setup (**C**, catalyst) places at least one name
+on **6** nights: **0.0845 per elapsed session on the full-window reading, against a floor of ≥ 0.09 —
+SHORT**. The reading was settled at `record` and a re-attempt inherits it: **numerator and denominator
+are counted over the same period, and the period is the full window** (the
+Q019/Q022/Q023/Q027/Q031/Q032/Q033 elapsed-session convention). The sub-period reading — 6 nights over
+the 51 sessions that happen to be t+20-gradeable inside this freeze, **0.1176**, which *passes* — is
+**not taken**: it divides by a denominator the freeze's own right-censoring chose, and DP-45 forbids
+taking an option because it clears a floor more easily. On the governing reading, **floor B (20 nights
+in setup C) projects at ≈ 237 elapsed sessions against the 225 admissible under DP-43's 12-month
+ceiling** from a 2026-09-14 lock (20 sessions of maturity, a one-week margin, latest admissible
+decision Monday 2027-09-13, last window end 2027-08-06) — the second, independent ground. At the
+sub-period reading it would be ≈ 170 sessions, inside the ceiling; that reading is recorded and not
+used.
+
+**What was *not* the problem — recorded so a re-attempt does not go looking in the wrong place.** Four
+of the seven gated limbs clear, two of them comfortably:
+
+- **(a) contributing-night rate: 0.5775** (41/71 full window; 0.8039 on the t+20-evaluable sub-period)
+  against a floor of **≥ 0.36**. Nights are not scarce. Floors A, C and D would all be reached well
+  inside the ceiling at this rate.
+- **(e) partition viability: row-weighted margin share 0.615** against **≥ 0.60**, and **≥ 4 layers
+  carrying non-zero within-night variance on 85.4%** of nights (35/41) against **≥ 80%**. **PASS,
+  narrowly.** The A/B/C partition itself separates; it is not the defect.
+- **(g) DP-50(a)/(b) commit sweep since `fa70688`: NONE.** HEAD reconfirmed at `d19c9a9`; no weight,
+  threshold, cap, completeness floor, bear-lane setting, enable-flag or v1.7 promotion has landed
+  since the pin. No mid-window ship explains any count above.
+- **(h), informational: 442 of 2,739 non-bearish-lane rows (16.1%) are `mixed`, and 0 of them reach
+  `qualification_reason IN ('selected','capped_by_max_output')` or the published slate.** The
+  population correction the `decide` pass made — reading the platform's main lane as *non-bearish*
+  (bullish + mixed, `services/super_agent_select_scoring.py:1643`, docstring `:1628`) rather than
+  bullish-only — is **verified right against the code and numerically inert on this window**. It was
+  the `decide` pass's headline finding, and it changed no number here. (Limb (i), the printed swing
+  target distance in ATR units, was not computed and is non-gating in every branch.)
+
+One further measurement is worth keeping, because it is the cleanest evidence that the population
+correction is sound and that the defect is the screen's input rather than the question's construction:
+on the **raw** `P_t` (direction + qualification-reason filter alone, 1,185 rows / 68 nights) the
+reconstructed universal slate agrees with the platform's actual published slate on **68 / 68 nights =
+100%**.
+
+### What was considered and rejected before deferring
+
+Each of these would have bought a testable question by weakening it, which `DECISIONS.md` item 4 and
+DP-45 forbid. They are listed because a deferred question is exactly where the temptation lands.
+
+- **Re-specifying `P_t`** — widening it to the published eight, narrowing it, rebuilding it without
+  the completeness screen, or rebuilding it on a bullish-only or an all-lane filter. **Rejected.**
+- **Loosening the §2.5(3) completeness screen beyond the one reading settled at `record`.**
+  **Rejected.** The settled reading excludes **`smart_money_confirmation_score` and only it** — that
+  column is null on **100% of the entire 6,479-row frozen `sas_candidates` table** (PI-008's weight-0
+  layer, the one §2.3 already accommodates with its zero-variance argmax exclusion), so a literal
+  screen would empty `P_t` **on every window, forever**, and a screen that empties its own population
+  on all inputs is not a screen. The **projection** nulls stay inside the screen and keep removing
+  rows: they are a genuine gap in a weight-29 layer, not a structural constant. Loosening the screen
+  to reach the gate is the move this entry explicitly refuses.
+- **Merging the setups** — folding C into B, or making O a setup — to cure limb (b). **Rejected.**
+- **Reducing any floor** — the median `|P_t| ≥ 11`, the `≥ 9` on 80% of nights, the reorder rate 0.50,
+  the reconstruction 0.90, or 80/20 (DP-21). **Rejected.**
+- **Taking limb (b)'s sub-period reading**, which passes the gate and shortens the floor-B projection
+  from ≈ 237 sessions to ≈ 170. **Rejected under DP-45**, on principle and not on arithmetic: it
+  borrows the freeze's right-censoring as a denominator.
+- **DP-13's single automatic extension.** **Rejected.** DP-13 rescues a *count* that is marginal at a
+  decision date. Limbs (c), (d) and (f) are **testability limbs, not sample-rate gates**
+  (`DECISIONS.md` item 14's own words), and the null-projection share is flat across the freeze at
+  71–79% in every timeframe bucket, so more nights arrive with the same median `|P_t|`, the same
+  reorder rate and the same empty (f) population.
+
+**Stated plainly, because it is the whole point of this entry: Q035 is not re-registered on a weaker
+partition, a merged setup, a widened `P_t` or a reduced floor. A different partition, a different
+population or a different screen is a different question with its own id**, registered from the
+BACKLOG with its own PREREG, its own MPEs and its own §10 — never Q035 re-entering under its own
+number on a weaker construction.
+
+### Re-entry condition — the five triggers, verbatim from `DECISIONS.md`
+
+Q035 returns to the backlog when the Steward measures, on a successor freeze **over a trailing
+quarter**, all of the following. They are the registered floors, unchanged; the fourth is the driver
+that has to move first and is stated because the other three are mechanically downstream of it.
+
+1. **Reorder room** — median `|P_t| ≥ 11` **and** `|P_t| ≥ 9` on **≥ 80%** of contributing nights.
+   *Measured 2026-09-14: median **5**, **31.7%**.*
+2. **Reorder rate** — pure-ranker slate differs from the reconstructed universal slate on **≥ 0.50** of
+   contributing nights. *Measured: **0.2683**.*
+3. **Reconstruction correctness** — agreement **≥ 0.90** on a **non-empty** population of nights where
+   §2.5 removes no row. *Measured: population **empty** (0/41); **0.00** on the proxy.*
+4. **Projection-layer coverage, the driver** — `projection_score` non-null (`available: true`) on
+   **≥ 70%** of both `selected` and `capped_by_max_output` main-lane rows, i.e. a null share **≤ 30%**
+   against today's **72.2%** and **74.3%**. The 30% is not a new floor: it is what trigger 1 requires
+   arithmetically — the pre-screen median `|P_t|` is **16**, so a screen removing more than ~31% of a
+   night's rows cannot leave a median of 11. It is **necessary, not sufficient**, and triggers 1–3 are
+   re-measured on their own terms regardless of it.
+5. **Rate gates, unchanged** — contributing nights **≥ 0.36** and rarest-setup nights **≥ 0.09** per
+   elapsed session, **on the full-window reading** (settled above). *Measured: **0.5775** (clears) and
+   **0.0845** (short).*
+
+**No calendar re-check date is named and none is invented.** The trigger is a measurement, and the
+measurement that has to move first is trigger 4 — which moves only if the platform's projection
+coverage changes (PI-015), not if nights accrue.
+
+### What a re-attempt must re-measure
+
+Nothing in the Steward's report is inherited as a measurement; only the **readings** (limb (b)'s
+full-window convention; the completeness screen's `smart_money_confirmation_score` exclusion) and the
+**refusals** (the list above) carry forward. A re-attempt re-runs **all seven gated limbs from
+scratch** on the successor freeze, over a trailing quarter, with: the non-bearish-lane population
+correction and the `qualification_reason IN ('selected','capped_by_max_output')` reason set; limb (f)
+measured on its **own registered population**, with the qualifying-night count stated even when it is
+zero; the mixed-row share re-reported (inert today, not inert by construction); and the DP-50(a)/(b)
+commit sweep repeated. **The sweep is load-bearing for a re-attempt in a way it was not for this
+lock:** if a projection-coverage repair ships, `projection_score` becomes **two different features**
+at the ship date (DP-06 / DP-50(a)), and so does every setup label derived from it and the
+`overall_score` that ranks the universal arm — a re-attempt's window **splits at the repair date and
+may use the post-repair segment only**, with its elapsed-session count starting there.
+
+### Bookkeeping while deferred
+
+**No verdict of any kind was produced.** Q035 returns no CONFIRMED, no NULL, no INCONCLUSIVE, no `Δ_t`,
+no P1 number and no P2 number; a gate shortfall is not a verdict. **No `eval.py` and no `fit.py` were
+written, no `results/` directory exists, no `setup_model_v001.json` was produced and no
+`setup_model_v001.sha256` was committed**; the 2026-10-05 script deadline is **void**. No outcome —
+touch, first-touch date, return, excursion or arm difference — was read for this question at any
+point: R1 read forward bars only to establish that a bar exists, and its counts are `NON_QUOTABLE`
+exposure measurements, never a result about setup architecture.
+
+**Correction set.** Q035's two primaries **never join F8**, which stays at **1** — Q033's P1 alone
+(the H-062 / Q025 / H-074 precedent: a deferred question leaves the correction set, and one that never
+locked never enters it). The draft's own §7 figure (Q033 as 2, F8 as 4) is superseded on both counts
+and no locked file is edited.
+
+**Successor freezes and Steward requests.** R3 (the successor selection and price freeze pair) and R2
+(`fit.py` / `eval.py` / the artefact) are **WITHDRAWN** — a deferred question builds no freeze, writes
+no script and runs no fit — and Q035's line in the R3 request is struck. **The successor freezes
+Q027, Q029, Q031, Q033 and Q034 need are unaffected and are not edited**: Q035 was a subset of that
+build, never a driver of it. **No successor freeze is built or requested for this question.**
+
+**`research/BACKLOG.md`** marks **H-083 — DEFERRED (Q035 drafted; …)**, not registered. The related
+platform fact is filed as **PI-015** (`research/PLATFORM_ISSUES.md`, high, OPEN) with a repo-only
+check (DP-49) and a DP-50(b) ship-timing paragraph; that filing is a **recommendation**, and nothing
+further is filed until `/desk-run prompt PI-015`.
+
+**Rule 14 note, carried forward:** Q035 requested no exception and needed none — every input is a
+16:05 ET candidate column, a bar dated ≤ t, or the session t+1 open used only as an entry price.
+**DP-05 is untouched and DP-41 is not engaged**, and a successor inherits that clean position.
+
+Under this file's preamble **nothing here may be reported, briefed or quoted** until the triggers are
+met.

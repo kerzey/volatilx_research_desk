@@ -36,6 +36,7 @@ Statuses: `OPEN` · `HACI_DECIDED:<fix|research|accept>` · `BRIEF_WRITTEN` · `
 | PI-012 | med | HACI_DECIDED:research | 2026-06-26: three qualified, ranked picks the night's own run audit does not record; no run-history table |
 | PI-013 | med | OPEN | `uoa_symbol_daily.score_swing` / `score_long` overwritten in place by the next-morning OI-confirmation pass; no point-in-time copy |
 | PI-014 | high | OPEN | Conviction Monitor's polarity arm silent since 2026-06-01: `polarity_unavailable_coverage_low` on 100% of in-scope rows, 0 polarity HOLD/EXIT rows — the EXIT tier is the technical arm alone |
+| PI-015 | high | OPEN | Projection layer (v1.6 weight 29, the largest) unscored — `available: false` — on 72.2% of published and 74.3% of capped main-lane rows; `overall_score` is a six-layer blend on ~3 of 4 picks |
 
 ## Detail
 
@@ -246,3 +247,83 @@ nights/session — ≈ 8 months to refill the floor — and if that pushes the d
 ship before ≈ **2027-03-08** is survivable and one after it is not. **The desk does not ask for the
 fix to be held**: a live surface with one of its two arms silent is worse than a research question
 that may have to restart. The cost is written here so the choice is made with it in view.
+
+### PI-015 — the projection layer, v1.6's largest weight, is unscored on three of every four picks
+**Filed 2026-09-14 by the registrar (autonomous run, DP-40..48), on the decision-maker's
+recommendation at `research/questions/Q035_setup_architecture/DECISIONS.md`, "Platform issue
+recommended to the Registrar" (DP-48). Severity high, status OPEN. Recommendation only — the decision
+is Haci's, and `HACI_DECIDED` stays unset until `/desk-run prompt PI-015`.**
+
+**Measured numbers, and where the desk read them.** `research/reports/STEWARD_Q035_exposure.md`
+(Headline and limbs (a), (c), (f)), on the pinned `manifest_v001`, pick nights 2026-06-01..2026-09-10:
+**72.2% of 579** `selected` bull-lane rows and **74.3% of 692** `capped_by_max_output` rows carry
+`score: null, available: false, reasons: ["Projection context unavailable"], weight: 0.0` in
+`score_details_json.weighted_dimensions.projection`; **not** concentrated in one timeframe (short,
+swing and long all 71–79%); read directly off the frozen rows before any Q035 screen touched them.
+**Second, independent desk measurement of the same hole:**
+`research/questions/Q029_layer_value_ablation/PREREG.md` records `projection_score` non-null on
+**62.74%** of its segment rows, clearing 70% in **no month measured** (49.44% → 65.11% peak,
+plateauing below the floor from July) — which is why Q029 registered `projection` as **UNEVALUABLE**
+on its E1 and E2 endpoints. Two questions, two populations, one gap. *(Related but not new:
+`smart_money_confirmation_score` is null on 100% of all 6,479 frozen rows — that is PI-008's weight-0
+layer, recorded here only because it is what made Q035's completeness screen reading-dependent.)*
+
+**Why it is high, and the one thing the check must settle.** The published ranking is produced by a
+seven-layer v1.6 blend in which projection carries 29 of 100 points. On roughly three of every four
+published picks that layer is absent with `weight: 0.0`. **The desk cannot tell from the frozen
+payload alone whether the remaining six weights are renormalized or the layer simply contributes
+zero**, and the two have opposite consequences: renormalization means the published ranking is, most
+nights, a **six-layer score** that is not the documented v1.6 blend; a plain zero means every affected
+row is silently docked up to 29 points relative to the rows that do have projection, so a pick's rank
+depends on whether its projection context happened to load. Either way the ranking every
+subscriber-facing surface rests on is not the one the weights table describes, and no watchdog fires
+(PI-002's family).
+
+**Desk impact.** Q035 (H-083, setup architecture) is **DEFERRED** — `research/questions/DEFERRED.md`,
+"Q035 / H-083" — because the night's publishable choice set cannot be reconstructed under a
+completeness screen when three-quarters of it fails that screen: median `|P_t|` **5** against a floor
+of 11, reorder rate **0.2683** against 0.50, and the reconstruction limb's registered population
+**empty (0 of 41 nights)**. Q029 carries `projection` as UNEVALUABLE on two endpoints for the life of
+its window.
+
+**The platform check — repo-only, no database step (DP-49).** Everything below is satisfiable from the
+read-only platform repo by the coding agent: (i) trace the writer of `available: false` /
+`"Projection context unavailable"` in `services/super_agent_select_scoring.py` (the projection
+subscore path around `:925` and the no-projection-origin / no-projection-context branch at
+`:711-712`) back to the projection context builder and the `ai_agents/projection_expert` path, and
+state in the brief which of three it is — a missing upstream projection row, a config flag or coverage
+threshold, or an exception swallowed into the unavailable branch; (ii) `git log --follow` on the
+projection scoring path, the projection context builder and the projection agent from 2026-04-01, to
+date the step-up (the desk's own two measurements suggest it predates 2026-06-01 and worsens through
+July); (iii) resolve the renormalize-vs-zero question **from the code**, and state the answer
+explicitly; (iv) a pure-function unit test that feeds a synthetic projection context to the scorer and
+asserts `available: true` with a non-null score, plus `git show --stat` proving no other scorer file
+changed. **The coverage before/after is the Data Steward's, on the pinned parquet (`manifest_v001`)
+and the successor freeze (DP-50(c))** — the brief names that parquet as the before-snapshot and never
+asks anyone to capture one.
+
+**DP-50(b) ship timing — named, decision left to Haci.** A repair rewrites `projection_score`
+historically, and with it every setup label and `overall_score` derived from it. In-flight **locked**
+questions that read the projection subscore: **Q029** layer value ablation — `projection_score` is a
+Tier-1 layer with its own `E3_projection` endpoint and a **fixed and closed** EVALUABLE / DEAD /
+UNEVALUABLE register that its schedule note says is "never revised", decision **2027-04-12**, hard
+stop **2027-05-24**; **Q028** layer signal independence — `projection_score` is a Tier-1 column and
+part of the object of the test, decision **2026-09-28**, hard stop **2026-10-12**; **Q026**
+point-in-time integrity — `projection_score` read in its committed `eval.py`, decision **2026-09-21**,
+hard stop **2026-10-05**. Every question that reads `overall_score` or the published slate is touched
+as well (Q027 and Q031 share Q029's 2027-05-24 hard stop), because an unavailable layer changes the
+blend that produces both. **The constraint the brief should carry: flag-off until 2027-05-24**, the
+latest in-flight hard stop — or, if Haci wants it sooner, the repair ships and Q026, Q028, Q029, Q027
+and Q031 each split at the ship date under DP-06 / DP-50(a), which **Q029 cannot absorb** (its
+register is closed at `record` and would have to be re-derived, i.e. Q029 defers). The two nearest
+dates are cheap: **Q026 2026-10-05 and Q028 2026-10-12** pass within a month, after which only the
+2027-05-24 cohort binds. This is the trade-off, stated; the decision is Haci's under DP-48, and the
+desk files nothing further until `/desk-run prompt PI-015`.
+
+**Recommend: fix — the input, and then the documentation.** Restore projection coverage; and state in
+the same change which of renormalize-or-zero the scorer does today, because that is what decides
+whether the shipped ranking ever matched the documented v1.6 blend. If the answer turns out to be
+"renormalize, deliberately", the second half is a weights-table and docs correction (the PI-008
+pattern), not a scoring repair. Either way, **the behaviour change that would follow from Q035's
+hypothesis is not what is asked for here** — this is a completeness fix, and any change to how the
+slate is *ordered* still needs a research question and a full brief (rule 11).
