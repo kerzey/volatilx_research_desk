@@ -11,3 +11,6 @@ Ideas here jump the queue; nothing else does. To research something *right now* 
 waiting for the cycle: `/desk-run idea "…"`.
 
 _(nothing waiting — add a `- [ ] ` line below)_
+
+- [x] Does SAS actually have an edge? H0: SAS ranking contains no predictive information beyond simple benchmarks. Compare SAS Top 10 not only against random stocks but against embarrassingly simple alternatives — SPY / equal-weight S&P 500 / sector-adjusted random / 20-day momentum / 60-day momentum / analyst revisions / simple technical rank — on forward 1d / 3d / 7d / 14d / 30d returns after risk adjustment. → H-067 (F1), 2026-09-13
+
