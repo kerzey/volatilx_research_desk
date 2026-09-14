@@ -4,7 +4,8 @@ _Generated 2026-09-13 by `research/lib/board.py`. Do not edit; edit the source f
 
 ## 1. Waiting on you
 
-- nothing. The desk has no item that only you can move.
+- **EN-002** — run the brief in the platform repo, then tell the desk the SHA  
+  `/desk-run verify EN-002 <sha>`
 
 **Ready when you ask** (you already decided these; the desk writes the prompt on request):
 
@@ -42,10 +43,15 @@ _none yet — every question so far is NULL, INCONCLUSIVE, or still waiting for 
 | Q008 | when a pick held from the pick-night close reaches its first target within two sessions, is it more likely to go on to i | DATASET_PINNED | 2026-12-28 |
 | Q010 | does Q009's stop result repeat on nights nobody had seen when it was registered? | PREREG_LOCKED | 2027-02-22 |
 | Q016 | Q016 — two-sidedness by beta and ATR (does volatility at selection predict a round trip?) | DATASET_PINNED | 2027-02-22 |
+| Q022 | Q022 — sector cluster nights (does a concentrated slate change what the picks do?) | PREREG_LOCKED | 2027-02-22 |
 | Q012 | for a pick below 90, is it better to take the first small target and put the money into the next pick, or to hold the co | DATASET_PINNED | 2027-03-22 |
 | Q013 | does a pick whose earnings report lands within three sessions run a worse path than a pick whose report is further out? | DATASET_PINNED | 2027-03-22 |
 | Q014 | does a week of repeated unusual-options activity before the pick night make a SAS pick better, and does SAS add anything | DATASET_PINNED | 2027-04-05 |
 | Q007 | for a pick already held from the pick-night close, does a next-morning gap of more than 2% predict the rest of the trade | DATASET_PINNED | 2027-04-26 (exposure check; hard stop 2027-06-30) |
+| Q019 | when the Conviction Monitor flags a recent pick EXIT, is closing it at the next open worth more than holding to the tent | DATASET_PINNED | 2027-05-24 |
+| Q023 | do the platform's 80–90 picks do worse on nights its own regime engine calls `strongly_bullish`? | PREREG_LOCKED | 2027-06-07 (exposure check; hard stop 2027-07-19) |
+| Q018 | for the same pick, does the day, the swing or the long-term lane plan make the most money — and does the answer depend o | PREREG_LOCKED | 2027-07-12 |
+| Q021 | Q021 — GEX pin risk and two-sided paths (does a pinned pick round-trip more often?) | DATASET_PINNED | 2027-08-09 (exposure check; hard stop 2027-09-20) |
 | Q015 | do picks scoring 85–90 reach the swing target and then hand it back more often than picks scoring 80–85, and does exitin | DATASET_PINNED | 2027-08-30 |
 
 ## 4. Platform issues
@@ -67,6 +73,7 @@ _Source: `research/PLATFORM_ISSUES.md`. Statuses: OPEN → HACI_DECIDED:fix/rese
 | PI-011 | HACI_DECIDED:fix | Printed swing stop on the wrong side of the pick-night close for 67 of 382 published picks (17.5%) |
 | PI-012 | HACI_DECIDED:research | 2026-06-26: three qualified, ranked picks the night's own run audit does not record; no run-history table |
 | PI-013 | OPEN | `uoa_symbol_daily.score_swing` / `score_long` overwritten in place by the next-morning OI-confirmation pass; no point-in-time copy |
+| PI-014 | OPEN | Conviction Monitor's polarity arm silent since 2026-06-01: `polarity_unavailable_coverage_low` on 100% of in-scope rows, 0 polarity HOLD/EXI |
 
 ## 5. Enhancements to build in the platform
 
@@ -75,7 +82,7 @@ _Source: `research/ENHANCEMENTS.md`. `plumbing` items can be built now; `behavio
 | ID | status | build | enhancement |
 |---|---|---|---|
 | EN-001 | READY | — | Append-only run-history table for SAS runs. `super_agent_select_runs` is updated in place, so the 2026-06-26 unrecorded picks (PI-012) and t |
-| EN-002 | PROPOSED | — | Speed-to-target on the report card: sessions to first touch of L1/L2/L3 from the next open, shown next to the distance-matched control. Sour |
+| EN-002 | BRIEF_WRITTEN | BRIEF_WRITTEN | Speed-to-target on the report card: sessions to first touch of L1/L2/L3 from the next open, shown next to the distance-matched control. Sour |
 | EN-003 | PROPOSED | — | Actionable-basis hit rates (next-open and 10:00 ET) alongside the close-basis rate on performance surfaces; entry-timing note "L1 may be gon |
 | EN-004 | PROPOSED | — | Distance-matched control rate next to every published hit rate; ATR-scaled ladder placement (L1 ≥ ~0.75 ATR) if the deep-level pattern holds |
 | EN-005 | PROPOSED | — | Streak flag on the pick card (first-time / 2 / 3+ consecutive selections); lower default size note for first-time picks. Source: EXPLORE_001 |
@@ -125,11 +132,20 @@ _Each was a question the desk would once have asked you. It took the recommended
 - **Q014** #5b rate used — chose the pooled measured 0.4314 E1 nights/session; not taken: the fastest month
 - **Q015** #1 H-060's missing baselines — chose the adjacent traded band **80–85** as the primary comparator,
 - **Q015** #4 window, decision date and extension — chose, on the Steward's measured numbers, the **slowest**
+- **Q017** #5 Planning rate and DEFERRED trigger — chose the haircut rate 0.35 contributing nights/session, window to 2027-04-30, decision Monday 2027-08-09, DEFER below 0.32/session; not taken: unhaircut 0.457 rate, window ends 2027-01-29, decides 2027-05-03 — DP-43. Overturn = successor question.
+- **Q018** #1 Primary window start — chose **post-lock only, pick nights ≥ 2026-09-14, decision Monday 2027-07-12**; not taken: window open from 2026-06-01, sealed part descriptive, decides ~4 months sooner — DP-43. Overturn = successor question.
+- **Q019** #4 Planning rate, window end and the DEFERRED trigger — chose **0.35 matched-contributing nights per
+- **Q020** #1 Rule-14 exception for the mid-trade classifier — chose **DEFERRED: Q020 is not locked and needs
+- **Q021** #5 Planning rate and DEFERRED trigger — chose the haircut rate 0.35 contributing nights/session, window to 2027-04-30, decision Monday 2027-08-09, DEFER below 0.32/session; not taken: unhaircut 0.457 rate, window ends 2027-01-29, decides 2027-05-03 — DP-43. Overturn = successor question.
+- **Q022** #1 Window start — chose **pick nights from 2026-07-08** (measured at `record`: the first run beginning after both population-defining ships), window to **2027-01-13**, decision **Monday 2027-02-22**; not taken: 2026-06-09 start, ~18 more sealed sessions, decides sooner — DP-43. Overturn = successor question.
+- **Q023** #6 Window start — chose **prospective-only, pick nights ≥ 2026-09-14**; not taken: read the sealed nights, decides now, not blind — DP-43. Overturn = successor question.
+- **Q023** #3 E2's clock — chose **the committed plan's own lane windows on a 60-session budget**; not taken: truncate at 20 sessions, decides ~2 months sooner — DP-43. Overturn = successor question.
+- **Q023** #13 Window end and decision date — chose **114 sessions, ending 2027-02-25, decision Monday 2027-06-07**; not taken: 100 sessions, decides 4 weeks sooner on a coin-flip floor — DP-43/DP-45. Overturn = successor question.
 
 ## 8. Backlog and calendar
 
-- Open hypotheses: **16** · registered: 19 · deferred (data missing): H-055, H-062
-- Next to register (DP-47 order): H-061, H-051, H-050, H-033, H-041
+- Open hypotheses: **9** · registered: 26 · deferred (data missing): H-041, H-055, H-062
+- Next to register (DP-47 order): H-011, H-010, H-012, H-014, H-002
 
 | decides on | Q |
 |---|---|
@@ -142,9 +158,14 @@ _Each was a question the desk would once have asked you. It took the recommended
 | 2026-12-28 | Q008 |
 | 2027-02-22 | Q010 |
 | 2027-02-22 | Q016 |
+| 2027-02-22 | Q022 |
 | 2027-03-22 | Q012 |
 | 2027-03-22 | Q013 |
 | 2027-04-05 | Q014 |
 | 2027-04-26 | Q007 |
+| 2027-05-24 | Q019 |
+| 2027-06-07 | Q023 |
+| 2027-07-12 | Q018 |
+| 2027-08-09 | Q021 |
 | 2027-08-30 | Q015 |
 
