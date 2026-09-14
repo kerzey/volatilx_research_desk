@@ -845,3 +845,205 @@ reference to R1 rather than R2(iii). **Where the draft and `DECISIONS.md` disagr
 governs** (the Q025 precedent), and at `@registrar apply Q030` Corrections 1–7 plus the recomputed
 schedule are folded in **before** any lock — which is the whole reason the draft is kept rather than
 rewritten now. Under this file's preamble **nothing here may be reported, briefed or quoted.**
+
+---
+
+## H-080 — "Is 90 a real boundary or a historical artifact?" (Haci's H10, *Threshold stability*) — **the median pick night carries no candidate at all above 90**
+
+**Deferred 2026-09-14 by the registrar, autonomous run (DP-40..48), on this file's second admission
+ground (DP-43's 12-month ceiling), with a second, structural limb that does not accrue away.
+Not drafted: no PREREG, no directory, no `eval.py`, no `results/`, no Steward request issued, no
+outcome of any kind read. No question number is consumed — Q033 stays free** (the H-041 precedent,
+not the Q020 / Q025 / Q030 one, which consume a number because a draft exists).
+
+### What the question is, and why it is worth keeping
+
+The 90 line is the most consequential hand-set number in the product. It decides what is called
+elite, it is Haci's own after-hours entry trigger (DP-03(a)), and DP-42 fixes `overall_score ≥ 90` as
+the desk's standing definition of "elite" in every question that needs one. H-080 asks whether that
+line is *earned* — whether a walk-forward search for the cut `c` that maximises the within-night
+control-adjusted L3-touch excess (Q006's `E_t`) of candidates `≥ c` over candidates `< c` keeps
+landing near 90 in window after window, or whether the optimum wanders and 90 is an artifact of the
+tape it was chosen in. Both signs are consequential and neither is available anywhere else on the
+desk: a PASS defends every elite rule the platform prints, and a FAIL is the trigger for H-083's
+categorical setups and would retire the hard threshold. The hypothesis is kept, not killed.
+
+### Why it cannot be registered — limb 1, the exposure arithmetic
+
+Both of H-080's primaries live **above 90**, and every night that carries no candidate above 90 is
+silent on both. Counts only, from the two pinned Steward reports, no live query (DP-50(c)), no
+outcome column read:
+
+| quantity | measured | source |
+|---|---:|---|
+| All-candidates contributing nights, 2026-06-01..2026-09-10 (71 elapsed sessions) | **48 / 71 = 0.6761 per session** | `STEWARD_Q027_exposure.md` (a) |
+| Eligible candidate rows on those 48 nights | 2,459 | (a) |
+| — rows with `overall_score ≥ 90`, and the nights carrying ≥ 1 of them | **18 rows on 17 of 48 nights (35%)** | (d) |
+| — rows in `[85, 90)`, and the nights carrying ≥ 1 | 57 rows on 33 of 48 nights | (d) |
+| — rows in `[80, 85)` / `[70, 80)` / `< 70` | 627 / 575 / 1,182, each on 48 of 48 nights | (d) |
+| **Rows ≥ 90 per elite-present night** | **18 / 17 = 1.06** | derived |
+| **Rows ≥ 90 on the median contributing night** | **0** (17 of 48 nights carry any) | derived |
+| ATR-elite cap firing (the backlog entry's suspected cause of the thin band) | **2 of 4,020 rows (0.05%), both at 79.9, none at 84.9** | (d) — measured, and **not** the cause |
+| Published-pick basis, for comparison: band `[90, ∞)` picks / nights, 48 matured nights | **15 picks on 14 nights** | `STEWARD_Q015_exposure.md` (2), (4) |
+| — by month, published elite picks | **June 11 · July 4 · August (matured to 08-12) 0** | `STEWARD_Q015_exposure.md` (9) |
+
+**Derived rates — the registrar's arithmetic on the Steward's counts, offered to be falsified:**
+
+- **Elite-present contributing nights per elapsed session = 17 / 71 = 0.2394.**
+- **Both-arms nights** (≥ 1 row ≥ 90 **and** ≥ 1 row in `[85, 90)`, which primary 2 requires) have
+  **not** been measured. Their count cannot exceed 17, so **≤ 0.2394/session**; under independence it
+  is ≈ 17 × 33/48 ≈ 11.7 nights ≈ **0.165/session**. Every figure below uses the **upper** bound, so
+  the conclusion does not rest on the estimate.
+- The pooled 0.2394 is itself an **upper bound on the current rate**: the published-elite series runs
+  11 → 4 → 0 picks by month and PI-010's whole-history series is 8 / 13 / 12 / 8 / 3 / 2, with Q005
+  INCONCLUSIVE on the cause. Nothing in the measurement suggests the rate is recovering.
+
+**Floors (rule 6 as read by DP-21).** Primary 1 is the dispersion of `c*` across **≥ 4
+non-overlapping windows** with PASS at every `c*` inside `[87, 93]`; each window is a cell, so 20
+contributing nights per window and ≥ 80 for the endpoint. A night can discriminate cuts inside the
+PASS band only if its `≥ 90` arm is non-empty, so its contributing nights **are** elite-present
+nights. Primary 2 is the `≥ 90` vs `85–89` contrast on a **held-out** window — 80 contributing nights
+for the endpoint, each carrying both arms, on nights disjoint from the training windows, because that
+is what held-out means.
+
+| reading | elite-present nights needed | at 0.2394/session | last pick night | decision date | vs DP-43's ceiling (2027-09-14) |
+|---|---:|---:|---|---|---|
+| **As written** — 80 for primary 1 over ≥ 4 windows, plus 80 for primary 2 on a disjoint held-out window | **160** | 668 sessions | ≈ 2029-05-10 | ≈ **2029-06-18** | **~21 months past** |
+| **Most generous** — primary 2's 80 nights taken as the union of the training windows, "held-out" satisfied by the ≥ 2-window sign clause alone | **80** | 334 sessions | ≈ 2028-01-12 | ≈ **2028-02-21** | **~5.4 months past** |
+| Required rate for a lock today (≈ 220 elapsed sessions admissible inside the ceiling after maturity and margin) | — | **0.727/session** as written, **0.364/session** at the most generous reading | — | — | measured today: **≤ 0.2394** |
+
+Dates use the two-step construction every Steward exposure report uses (sessions → calendar at
+365/252, then + 20 sessions maturity + a 7-day freeze margin, rounded to the next Monday), from a
+window opening 2026-09-15. **Neither reading reaches the ceiling, and the conclusion does not depend
+on the rate assumption**: even the most generous reading, on the *upper* bound of an unmeasured joint
+rate, on a pooled rate that the monthly series says is stale, misses by five and a half months.
+
+### Limb 2 — the structural blocker: one elite row a night cannot locate a cut to ±3 points
+
+This limb is the reason the entry does not simply name an accrual date, and it is the one a
+successor must answer first. The band the PASS condition is stated in is `[87, 93]`, and the
+population supplies **1.06 rows above 90 per elite-present night and none at all on the median
+contributing night**. On a night carrying exactly one row above 90, every cut `c` between that row's
+score and the next score below it induces the **identical** partition of the night, so the objective
+function is flat across a wide interval and `c*` is decided by the tie-break rule, not by data.
+
+That is a **density** problem, not a night-count problem, and it survives any amount of waiting: a
+night rate of 0.73/session with one elite row per night still cannot distinguish `c = 87` from
+`c = 93`. The permutation baseline H-080 names (scores shuffled within night) is the right null and
+does not repair it — it would return a very wide null band for the wander of `c*`, against which
+almost any observed dispersion is "consistent with noise", so the question would return
+**INCONCLUSIVE by construction**. DP-45 forbids registering a design whose only reachable verdict is
+the one that says nothing.
+
+Two further hazards a successor must size before drafting, both unmeasured today and neither used to
+reach this deferral: the elite rows are plausibly concentrated in a handful of recurring names
+(memory / semis — Q003 §10 threat 6), so **DP-51's episode-clustered CI would be computed on very few
+symbol-episodes** and is the clause most likely to decide the verdict; and `c*` is an **argmax**, so
+its sampling distribution is not the bootstrap of a mean and the successor must state how the
+dispersion statistic's CI is formed before it sees one.
+
+### What was considered and rejected before deferring
+
+- **Merging into Q027** (DP-29). Rejected. Q027's band secondary fixes five bands **at lock**, tests
+  monotonicity and adjacent-band contrasts, and its blocking clause is an **inversion**, not an
+  optimum: it never searches over `c`, never estimates an argmax, never reports that argmax's
+  dispersion and never holds a window out. `research/BACKLOG.md`'s own H-010 line already settles
+  this — an inversion at the 90 line "routes to H-080 as evidence rather than answering it". Q027
+  cannot return a verdict on threshold stability, and its `≥ 90` band clearing 20 nights for
+  *reporting* (28.5 projected) is a different and much weaker requirement than four windows of 20
+  elite-present nights each.
+- **Merging into Q015** (85–90 vs 90+). Rejected, and Q015 says so itself: its `90+` arm was
+  **demoted to descriptive at lock and is SUPPRESSED at 14 contributing nights**, and its §1 names a
+  properly powered 85–90 vs 90+ contrast as "a separate future question", registrable on the trigger
+  reproduced below. H-080 is partly that successor; it inherits the trigger and cannot be answered
+  inside Q015.
+- **Merging into Q005.** Rejected: Q005 decomposes the elite **count** and reads no outcome column at
+  all. It explains why the band is thinning; it cannot say whether the cut is in the right place.
+- **Merging into Q031 (H-082) or Q032 (H-079).** Rejected: decay is the level of an edge over time
+  and conditionality is the level by tape. Neither locates a boundary, and neither carries a cut
+  search or a band contrast as an endpoint.
+- **Registering primary 1 alone, dropping the ≥ 90 vs 85–89 contrast.** Rejected: primary 1 is the
+  *worse* arithmetic (four cells of 20 elite-present nights) and carries limb 2 in full.
+- **Registering on published picks instead of all candidates ≥ 70.** Rejected: strictly worse —
+  15 picks on 14 of 48 nights, trending 11 → 4 → 0 by month.
+- **Truncating the cut grid to the dense region (searching 70–85, where every band appears on 48 of
+  48 nights).** Rejected under DP-25 and DP-45: a search that cannot evaluate `c = 90` cannot say
+  whether 90 is optimal, which is the entire hypothesis.
+- **Widening the PASS band from ±3 to ±8 points so it spans the populated region.** Rejected under
+  DP-25 — the ±3 is the hypothesis's own number, fixed in the backlog entry as "Haci's 'nearby
+  range', fixed at lock"; re-uniting it is a new hypothesis, not a registration of this one.
+- **Pooling candidate rows across nights instead of aggregating per night.** Rejected outright,
+  rule 6. The nights are the n.
+- **Using the sealed 2026-06-01..2026-08-12 stretch for the training windows.** Rejected on two
+  independent grounds. (a) The band-level outcomes at exactly this boundary have been read: CLAUDE.md
+  carries "the 88–90 band underperforms 90+" as a standing finding, and the weekly snapshots of
+  2026-09-10 / 09-12 printed the 90+ return series by twelve-week window (BACKLOG H-010). A `c*`
+  fitted on those nights is fitted on data whose outcomes are known, which is the exact thing rule 3
+  exists to prevent. (b) The 2026-07-08 publication-gate ship moves the common ATR distance from
+  ≈ 1.06 to ≈ 2.10 ATR mid-stretch (`STEWARD_Q027_exposure.md` (c)), so a window spanning it measures
+  the ship. Every recent F2 question (Q027, Q031, Q032) is prospective-only for the first reason; this
+  one has both.
+- **DP-13's single automatic extension as a rescue.** Rejected: DP-13 rescues a floor that is
+  *marginal* at the decision date. This one is short by 60 to 140 elite-present nights, and no
+  extension of the registered length closes it.
+- **Registering with the `≥ 90` arm demoted to descriptive** (DP-43's demotion clause). Rejected: that
+  clause demotes a secondary arm inside a question whose *primary* clears the floor. Here the `≥ 90`
+  arm **is** both primaries — the H-062 and H-041 precedent, verbatim.
+
+### What would move it back into the backlog
+
+Both counts are **measured by the Steward on a then-current freeze over a trailing quarter** — a
+quarter, so a single elite-heavy month cannot carry it — and never assumed from a projection. Both
+are required; the first alone is not enough, which is the point of limb 2.
+
+1. **Night rate.** Nights carrying ≥ 1 candidate with `overall_score ≥ 90` **and** ≥ 1 candidate in
+   `[85, 90)`, per elapsed session, over all 16:05 candidate rows (published or not) on the Q027 §2.5
+   contributing-night definition: **≥ 0.73**. Today: **≤ 0.2394** (upper bound; the joint has never
+   been measured, and measuring it is the first thing a successor asks for). At **≥ 0.36** only the
+   loosest reading of the floors clears, so that level triggers a **re-reading of this entry**, not an
+   automatic lock. This is a stricter form of Q015 §1's own trigger (≥ 0.5 elite-contributing nights
+   per session over a trailing quarter), and where the two differ this one governs for H-080, because
+   H-080 needs four windows and a held-out window where Q015 needed one comparator arm.
+2. **Density.** Median **rows per contributing night with `overall_score` in `[87, 93]`**: **≥ 3**.
+   Below that a one-point move of the cut inside the PASS band re-partitions no rows on the median
+   night and `c*` is a tie-break. Today: 18 rows ≥ 90 across 48 contributing nights, **median night
+   0**.
+
+Neither trigger is a date, because neither is an arrival-rate problem the calendar fixes on its own:
+the elite band is thinning, not filling. The realistic paths to both counts are a platform change
+that widens the candidate universe (**EN-016**, already filed on Q025's evidence — nothing new is
+filed here) or a scoring change that restores the upper tail; either would also **split the window**
+under DP-06 / DP-50(a), so a successor re-derives its schedule from the ship date, out only.
+
+### Bookkeeping while deferred
+
+**No verdict of any kind was produced.** H-080 returns no PASS, no FAIL, no NULL and no
+INCONCLUSIVE; a floor shortfall is not a verdict. **No PREREG was drafted, no directory created, no
+question number consumed — Q033 remains free.** No `eval.py` exists, no `results/` directory exists,
+and **no outcome of any kind was read**: every count above is a count of candidate rows and nights
+from `STEWARD_Q027_exposure.md` (a), (c), (d) and `STEWARD_Q015_exposure.md` (2), (4), (9), both
+measured on the pinned freeze with no live query (DP-50(c)).
+
+`research/BACKLOG.md` marks **H-080 — DEFERRED 2026-09-14**, not registered. **F2's correction set is
+unchanged at 17** — Q023 (2) + Q027 (2) + Q029's 10 companion IC endpoints + Q031 (2) + Q032 (1) — and
+H-080's two primaries do not join it while deferred (the H-062 / Q025 precedent). **No cross-question
+edit was required and none was made:** Q015, Q027, Q031 and Q032 are untouched, and no Steward request
+was routed, so none is held. **No rule-14 exception is involved** (DP-41): every input H-080 would use
+is a 16:05 ET candidate field or a pinned bar dated ≤ t.
+
+**One consequence to record, so a later question does not wait on a verdict that will not arrive.**
+BACKLOG H-083 (Haci's H13, the A/B/C setup architecture) sequences itself "after H-076 … and H-080
+(whether the threshold holds)" and routes H-080's FAIL branch into itself. H-076 is answered by Q028;
+**H-080 is not, and H-083 must not be drafted as though a threshold verdict is coming.** It either
+states in its own §1 that the threshold question is deferred and unanswered — so its setup-model
+contrast stands on its own, against the published v1.6 slate as its baseline says — or it waits for
+this entry's triggers. It may not cite a descriptive band read as a substitute.
+
+**Caveat carried forward, so no successor repeats it.** CLAUDE.md's standing finding "the 88–90 band
+underperforms 90+" and the weekly snapshots' 90+ return series are **sealed reads at exactly this
+boundary**. Any future PREREG on H-080 is **post-hoc with respect to `manifest_v001`** and must be
+built on a window whose pick nights postdate those snapshots — prospective-only, the Q027 / Q031 /
+Q032 pattern — and must say so in its §6. The exposure counts used above are not subject to that
+caveat: they count candidate rows by score band, which is knowledge available at 16:05 ET on the pick
+night and contains no outcome. Under this file's preamble **nothing here may be reported, briefed or
+quoted.**
