@@ -29,7 +29,14 @@ QDIR = ROOT / "research/questions"
 # Registration order (DP-47): Haci's INBOX items first, then this list (EXPLORE_001's ranking,
 # Haci-style F7 first, testable-soonest first), then remaining BACKLOG order. A hypothesis marked
 # "new data needed" is registered straight into DEFERRED.md with the data named.
-PRIORITY = ["H-058", "H-053", "H-066", "H-064", "H-062", "H-040", "H-060", "H-059", "H-061",
+# 2026-09-14: Haci's Master Hypothesis Program (H-069..H-084, BACKLOG F8 and the F1/F2/F6 entries
+# that cite it) goes to the front as his own items. H-069 (point-in-time integrity) leads because
+# its FAIL branch stops everything else; H-070 is DP-51 bookkeeping; then the cheap all-candidate
+# diagnostics (H-073 IC, H-076 structure) that H-075 / H-082 / H-083 / H-084 build on; H-074 needs
+# the Steward's universe price freeze first; H-077 is a synthesis after verdicts; H-078 defers.
+PRIORITY = ["H-069", "H-070", "H-073", "H-076", "H-075", "H-074", "H-082", "H-079", "H-080",
+            "H-081", "H-084", "H-083", "H-077", "H-078",
+            "H-058", "H-053", "H-066", "H-064", "H-062", "H-040", "H-060", "H-059", "H-061",
             "H-051", "H-050", "H-033", "H-041", "H-034", "H-013", "H-011", "H-010", "H-012",
             "H-014", "H-002", "H-003", "H-020", "H-021", "H-022"]
 

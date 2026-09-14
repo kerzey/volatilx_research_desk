@@ -1,6 +1,6 @@
 # Research desk — board
 
-_Generated 2026-09-13 by `research/lib/board.py`. Do not edit; edit the source files and re-run. Ask the desk for anything on this page in plain words, or use the commands shown._
+_Generated 2026-09-14 by `research/lib/board.py`. Do not edit; edit the source files and re-run. Ask the desk for anything on this page in plain words, or use the commands shown._
 
 ## 1. Waiting on you
 
@@ -98,6 +98,8 @@ _Source: `research/ENHANCEMENTS.md`. `plumbing` items can be built now; `behavio
 | EN-014 | PROPOSED | — | Earnings-within-3-sessions flag on the pick card, with a "no spread across the print" note. Source: H-064. |
 | EN-015 | READY | — | Knowledge-time stamp on every displayed number (computed at 16:05 on the pick night vs next morning), so subscribers and the desk can tell w |
 | EN-016 | PROPOSED | — | A larger per-night candidate universe retained in `sas_candidates` — the full scanned universe rather than the scored shortlist, or a per-se |
+| EN-017 | PROPOSED | — | Edge-decay monitor: a nightly job that appends, per pick night, the Spearman IC between `overall_score` and the path outcome across all 16:0 |
+| EN-018 | PROPOSED | — | Setup labels on the pick card (A flow-led / B projection-led continuation / C catalyst-driven, assigned deterministically from the 16:05 dom |
 
 ## 6. Trade ideas (yours; never subscriber-facing until prospective)
 
@@ -152,8 +154,8 @@ _Each was a question the desk would once have asked you. It took the recommended
 
 ## 8. Backlog and calendar
 
-- Open hypotheses: **9** · registered: 28 · deferred (data missing): H-041, H-055, H-062, H-067
-- Next to register (DP-47 order): H-011, H-010, H-012, H-014, H-002
+- Open hypotheses: **23** · registered: 30 · deferred (data missing): H-041, H-055, H-062, H-067
+- Next to register (DP-47 order): H-069, H-070, H-073, H-076, H-075
 
 | decides on | Q |
 |---|---|
