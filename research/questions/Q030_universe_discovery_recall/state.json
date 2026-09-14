@@ -1,6 +1,6 @@
 {
   "id": "Q030",
-  "state": "DEFERRED",
+  "state": "PREREG_DRAFT",
   "history": [
     {
       "state": "IDEA",
@@ -18,6 +18,12 @@
       "at": "2026-09-14T06:36:11.625479+00:00",
       "by": "desk",
       "note": "R2 credentials limb failed: Alpaca keys absent in the desk session, base-universe price manifest cannot be built; rate limb passed (0.6761 per session against the 0.36 gate); see DEFERRED.md and the STEWARD_Q030 report"
+    },
+    {
+      "state": "PREREG_DRAFT",
+      "at": "2026-09-14T18:38:29.866852+00:00",
+      "by": "desk",
+      "note": "deferral lifted: credentials present, coverage 97.55% vs 90%, R2(iii) dry run delivered; patch8"
     }
   ]
 }

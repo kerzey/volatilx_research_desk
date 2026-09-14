@@ -1,6 +1,6 @@
 {
   "id": "Q032",
-  "state": "DEFERRED",
+  "state": "PREREG_DRAFT",
   "history": [
     {
       "state": "IDEA",
@@ -18,6 +18,12 @@
       "at": "2026-09-14T13:20:37.986466+00:00",
       "by": "desk",
       "note": "R1 limb (g) short: SPY-from-2025-01-02 history needs Alpaca credentials absent from the desk session (H-074 trigger, shared with Q030); PREREG \u00a75.3 R1(g)"
+    },
+    {
+      "state": "PREREG_DRAFT",
+      "at": "2026-09-14T18:38:31.592423+00:00",
+      "by": "desk",
+      "note": "deferral lifted: SPY 424 bars vs 250; limbs a/b/c PASS on true partition; patch8"
     }
   ]
 }
