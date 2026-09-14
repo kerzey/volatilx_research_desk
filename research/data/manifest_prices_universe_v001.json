@@ -1,0 +1,46 @@
+{
+  "version": "001",
+  "kind": "prices_universe",
+  "as_of": "2026-09-10",
+  "window": {
+    "start": "2025-01-02",
+    "end": "2026-09-10"
+  },
+  "feed": "sip",
+  "source": "https://data.alpaca.markets/v2/stocks/bars",
+  "base_universe": {
+    "blob": "4171b1a:data/sp500_sectors.json",
+    "sha256": "c4d12610ac95a8a83a0fc2365d02b4963d6a4169a9352acf2578164111390201",
+    "mapping_entries": 2405,
+    "returned_bars": 2404,
+    "absent": [
+      "TSEOF"
+    ]
+  },
+  "symbol_counts": {
+    "base": 2405,
+    "candidates": 431,
+    "benchmarks": 5,
+    "distinct_requested": 2412
+  },
+  "tables": [
+    {
+      "name": "daily_raw",
+      "file": "research/data/pu001_daily_raw.parquet",
+      "rows": 1008092,
+      "symbols": 2411,
+      "timeframe": "1Day",
+      "adjustment": "raw",
+      "sha256": "b6dc92c98a1f4556d9478eee1460ddfb959920fdc575beb61f55f97f1d80d100"
+    },
+    {
+      "name": "daily_split",
+      "file": "research/data/pu001_daily_split.parquet",
+      "rows": 1008092,
+      "symbols": 2411,
+      "timeframe": "1Day",
+      "adjustment": "split",
+      "sha256": "2e654281d480c930d312b294a6ab7035e0d59ec7ba757353760aa0d0ce6afa95"
+    }
+  ]
+}

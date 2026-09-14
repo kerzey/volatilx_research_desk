@@ -305,3 +305,39 @@ symbols returned ≥ 60 daily bars over 2026-06-01..2026-09-11 on `feed=sip`, `a
 **97.55%**, against Q030's ≥ 90% gate. 59 symbols short or absent, named in
 `research/reports/STEWARD_Q030_universe_coverage_probe.md`. Symbols without bars are counted and
 named, never back-filled or imputed.
+
+## `manifest_prices_universe_v001` — the base-universe price freeze (2026-09-14)
+
+Built to unblock Q030 and Q032 after the Alpaca deferrals were lifted. **One fetch serves both**,
+which is what Q030 §5.3's "one selection freeze and one price fetch can serve both" anticipated.
+
+- **Scope.** Daily bars only (`1Day`), `adjustment=split` **and** `adjustment=raw`, `feed=sip`,
+  2025-01-02 .. 2026-09-10. **No hourly bars** — Q030 R2 does not require them.
+- **Symbols.** 2,405 base (the pinned blob's `mapping`) ∪ 431 candidate ∪ 5 benchmark
+  = **2,412 distinct requested**; **2,404 of 2,405 base symbols returned bars**. The one absent
+  symbol is **TSEOF**, named in the manifest's `base_universe.absent` and **never imputed**.
+- **Rows.** 1,008,092 per adjustment, 2,411 symbols present.
+- **The blob is hashed from committed bytes**, `git show 4171b1a:data/sp500_sectors.json`, verified
+  at 2,405 mapping entries and sha256 `c4d12610…0201`. A Windows checkout rewrites LF to CRLF, so
+  the working-tree copy hashes differently and **must never be hashed in its place**.
+- **The start date is 2025-01-02 deliberately**: Q032 §2.2's expanding-window volatility tercile
+  needs ≥ 250 prior SPY sessions, and 2025-01-02 puts the first calibrated session at **2026-02-02**,
+  well before the registered window opens on 2026-09-15.
+- **Tool.** `research/lib/freeze_prices_universe.py` — a sibling of `freeze_prices.py` that takes an
+  explicit symbol list instead of a base manifest, which Q030 R2 authorizes by name. It reuses
+  `freeze_prices.fetch_all`, so the sanctioned fetch path is unchanged.
+- **`--feed sip` is passed explicitly**, because `ALPACA_DATA_FEED` still holds the malformed value
+  recorded above and `freeze_prices.py:104` defaults to it.
+
+**This freeze covers history only.** Q030 R2's forward study cut — the registered window through
+2027-02-24, delivered before Monday 2027-03-08 — is still owed and is a separate, later artefact.
+
+### An operational trap worth recording: two concurrent freeze runs
+
+The first run was launched with its output piped to `tail`, which buffered everything and made it
+look dead; a second run was started against the same version. Both would have written the same
+parquet paths, and the second was killed only because the manifest appeared on disk while its log
+still showed it mid-fetch. **`freeze_prices_universe.py` checks for an existing manifest at start-up
+only**, so that check cannot catch a concurrent run — it is not a lock. Until it takes one, never
+start a second freeze at the same `--version`, and pipe freeze output to a file rather than through
+`tail`. The delivered files were verified by SHA-256 against the manifest after the kill.
