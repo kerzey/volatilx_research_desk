@@ -2,18 +2,25 @@
 
 **Rule for this file (PREREG §10.10, threat 10):** §4 is the only specification. A gap in it is
 fixed by a **dated amendment before the run, never during it**. Nothing here changes a threshold,
-a filter, an exit rule or the decision rule; A1 below is a *gap*, not a re-design, and it is
-**not resolved here** — the Researcher does not choose it.
+a filter, an exit rule or the decision rule; A1 below is a *gap*, not a re-design, and it was
+**not resolved by the Researcher** — it was settled by the decision-maker on 2026-09-14 and
+transcribed afterwards. Both entries are at the foot of this file.
+
+**Status as of 2026-09-14: A1 CLOSED (`R2_SAME_EVENING`), A2–A12 confirmed with riders on A6, A7
+and A12, A1r implemented. No amendment remains open.**
 
 Every entry is dated, names who may settle it, and says exactly what `eval.py` does with it today.
 
 ---
 
-## A1 — BLOCKING. §4.0's decision-time boundary is inconsistent with §4's own baseline B1
+## A1 — ~~BLOCKING~~ **CLOSED 2026-09-14**. §4.0's decision-time boundary is inconsistent with §4's own baseline B1
 
-> **STATUS UPDATE 2026-09-14: RESOLVED — `R2_SAME_EVENING`.** See "Amendments applied" at the foot
-> of this file. The filing below is left exactly as the Researcher wrote it, as the record of the
-> gap; it is no longer a description of the script's state.
+> **STATUS 2026-09-14: RESOLVED — `R2_SAME_EVENING`; CLOSED IN THE SCRIPT the same day.**
+> The rule was settled by the decision-maker (see "Amendments applied" at the foot of this file)
+> and transcribed into `eval.py` by the Researcher (see "A1 CLOSED in the script" at the foot of
+> this file). A1 is no longer blocking: `eval.py` no longer aborts on the amendment gate.
+> The filing below is left exactly as the Researcher wrote it, as the record of the gap; it is no
+> longer a description of the script's state.
 
 **Filed 2026-09-14 by the Researcher, before any frozen row was read. Status: OPEN. `eval.py`
 aborts in preflight and produces no register until this is settled.**
@@ -353,3 +360,99 @@ tightens an already-strict branch; no threshold, filter or decision rule moves.
 **A1 is CLOSED. No amendment to this file remains open; `eval.py` may be completed and run on the
 registered schedule.** Any further gap found in §4 before 2026-09-21 is filed here as A13+ and
 settled the same way — dated, before the run, never during it.
+
+---
+
+### 2026-09-14 — A1 CLOSED IN THE SCRIPT (Researcher)
+
+**Status of A1: CLOSED.** The Researcher transcribed the settled rule and implemented the A1r
+reporting and the A6 / A7 / A12 riders in `eval.py` on **2026-09-14**, before any frozen row was
+read: `eval.py` has still never been run, `results/` does not exist, no parquet value has been
+opened, and no number from this question exists anywhere. `PREREG.md` is not edited (it remains
+hash-locked at `c857dad6…87933`, state `DATASET_PINNED`). No threshold, filter, population,
+exit rule, split or decision rule moved; §8 is byte-for-byte the same arithmetic, computed under
+`R2_SAME_EVENING` alone. Verified with `python -m py_compile` only — a static check, not a run.
+
+**What changed in `eval.py`**
+
+1. **The constants, exactly as the amendment specifies** (and nothing else about the rule):
+
+   ```python
+   DECISION_TIME_RULE = "R2_SAME_EVENING"
+   DECISION_TIME_RULE_AMENDMENT = ("AMENDMENTS.md 2026-09-14 A1 RESOLVED: R2_SAME_EVENING "
+       "(decision-maker, autonomous, DP-40; boundary(N) = 23:59:59.999999 ET on N)")
+   ```
+
+   The preflight gate is **retained**: an unset rule, an unknown rule id, or a rule id without its
+   dated amendment citation still aborts before Gate 0, opens no parquet and writes no register.
+   `boundary_for` / `use_time` are unchanged, so §4.2's `W_row > D(N)` column, §4.3's MATERIAL
+   limb one, the INDETERMINATE test and `U(T, N)` all move together onto the amended boundary,
+   as A1 required. `D(N) = 16:05 ET` is still the decision moment and still `A(T, N)`'s clock in
+   `n_W_gt_A`; Gate 0(a) still uses DP-04's next-session-open criterion at **run** level.
+
+2. **A1r item 1 — the three-boundary census.** `_boundary_triple()` adds, per `(table, night)` in
+   Channel A and per night in `nightly.csv`: `n_W_gt_R1`, `n_W_gt_R2`, `n_W_gt_R3`,
+   `n_W_band_R1_R2` (the same-evening batch band), `n_W_band_R2_R3` (the overnight-before-open
+   band) and `n_L_gt_U_R1/R2/R3`. `boundary_band_totals()` totals them per table, per month and
+   overall (`boundary_bands_by_table.csv`, `_by_month.csv`, `_overall.csv`; register §3.1). The
+   columns that decide are still `n_W_gt_B` / `n_L_gt_U` under the in-force rule, and the
+   register says so above the table.
+
+3. **A1r item 2 — the `Boundary sensitivity` section.** `boundary_sensitivity()` re-runs
+   Channel B and the §8 arithmetic under each of R1 / R2 / R3 and prints `M`, `MM_verified`,
+   `MM_failed`, `U`, `ADVISORY`, `questions_touched` and **both** STOP-THE-DESK limbs per rule
+   (register §9, `boundary_sensitivity.csv`, and `boundary_sensitivity` in `run_summary.json`).
+   It carries the verbatim heading `DESCRIPTIVE — DOES NOT DECIDE. The verdict is computed under
+   R2_SAME_EVENING only (AMENDMENTS.md 2026-09-14, A1).` and the rule-9 sentence that a different
+   boundary after the register exists is a look and a successor question. The R1 row carries the
+   note that its `M` is **bounded below by construction** by the count of in-window feature
+   tuples on the clock-declared tables, so it is a property of the rule and not a measurement.
+   Gate 0, Channel C, Channel D, the windows and the reconstruction check are
+   boundary-independent and are computed once, under the in-force rule, and reused unchanged.
+
+4. **A1r item 3 — header and `summary.json`.** `decision_time_rule`,
+   `decision_time_rule_amendment`, `decision_time_boundary` and `a12_r3_fallback_nights` appear in
+   the register header, in `run_summary.json` (both the Gate-0-pass and the Gate-0-fail branch)
+   and in `results/SUMMARY.md`.
+
+5. **A1r item 4 — the verdict sentence names the boundary.** `boundary_phrase()` is interpolated
+   into the FAIL, INCONCLUSIVE, PASS and Gate-0-failure statements, e.g. "…was written after the
+   end of the ET calendar day on which the decision was made (`R2_SAME_EVENING`: …)".
+
+6. **A6 rider.** `OI_MULT_SET_CITATION` pins the closed divisor set to
+   `fa70688:services/uoa_screener.py:2223-2232`, and each of the four literals
+   (`oi_mult = 0.90 / 1.00 / 1.05 / 1.10`, derived from `OI_MULT_SET` itself so the two cannot
+   drift) is verified at that range at run time. If **any** is absent, `check_reconstruction()`
+   returns `verified=False` with the A6-rider failure text before it reads a single row, every
+   reconstruction column is marked `ok=False`, and Channel B's existing branch therefore makes
+   the **whole tuple MATERIAL** — decision 2's own failure branch, not "mitigated" and not
+   "skipped". The withdrawal is printed with A9's in new register section §4.4.1.
+
+7. **A7 rider.** Each `as_feature=False` read now carries `scope_class="IMMATERIAL_BY_SCOPE"` and
+   `scope_note` (the PREREG sentence that scopes it) onto every tuple it produces; register
+   §2.1.1 and `as_feature_false_scoped.csv` itemise **every such column** per question with that
+   sentence and its citation (a read declared `columns=["*"]` is expanded to every column of the
+   table); and the class-count table carries an `IMMATERIAL_BY_SCOPE` column, plus
+   `questions_immaterial_by_scope` and `scope_sentences`, so a scoped-out column keeps a row
+   rather than being absent (§4.3: no column may be omitted). It is a **sub-count of
+   `IMMATERIAL`**, not a sixth class: `CLASSES` is unchanged and no verdict input moves.
+   `sas_runs.finished_at` stays a feature everywhere, as written.
+
+8. **A12 rider.** `r3_fallback_fired()` names the condition (no next open at the last session of
+   the freeze) and the count and the dates are printed in the register header, in
+   `a12_r3_fallback.json`, in `run_summary.json` (`a12_r3_fallback_nights`, `a12_scope`) and in
+   the R3 row of the sensitivity table. With R2 in force it governs the **R3 sensitivity column
+   only** and cannot touch the §8 verdict.
+
+9. **R2's residual blind spot, per table.** New register section §10.1 states that a write
+   between 16:05 and 23:59:59.999999 ET on night `N` is not flagged by the timestamp limb, gives
+   the band size (`n_W_band_R1_R2`) per table, and marks each table with which of the three other
+   defences covers it — with `uoa_symbol`, `gex_symbol`, `projection_bull`, `projection_bear_v2`,
+   `conviction_monitor` and `market_regime` (the §10.2 no-independent-count tables) marked
+   **ATTRIBUTION ALONE**. The former §9 limitations section is renumbered §10; `RUNBOOK.md` is
+   updated to match.
+
+**Not changed, deliberately:** `PREREG.md`; §8's decision rule and both STOP-THE-DESK limbs; §4.1
+Gate 0 and every one of its targets (A5's 12h and ≥ 20 nights included); the question list; the
+pins; the A2–A5 and A8–A11 readings; the population, the windows and the exclusions. Nothing in
+this entry was decided while looking at data, because no data has been looked at.

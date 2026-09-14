@@ -25,11 +25,22 @@ Run:         see RUNBOOK.md.  Default output: research/reports/KT_REGISTER_manif
 Re-runs at every subsequent freeze with a BYTE-IDENTICAL script (sec 9, decision 3): every
 path is an argument, nothing about v001 is hard-coded in the logic.
 
-AMENDMENT GATE.  sec 4.0 leaves the decision-time boundary for same-evening batch writes
-unresolved (AMENDMENTS.md 2026-09-14, A1).  DECISION_TIME_RULE below is deliberately unset;
-the script aborts before Gate 0 until a dated amendment sets it.  The Researcher does not
-choose it (rule 9; sec 10.10 -- a gap in sec 4 is fixed by a dated amendment BEFORE the run,
-never during it).
+AMENDMENT GATE -- RESOLVED 2026-09-14.  sec 4.0 left the decision-time boundary for
+same-evening batch writes unresolved (AMENDMENTS.md 2026-09-14, A1).  The decision-maker
+settled it by dated amendment (autonomous, DP-40): DECISION_TIME_RULE = "R2_SAME_EVENING",
+boundary(N) = 23:59:59.999999 ET on N.  The Researcher transcribed the settled constant and
+added the A1r reporting on 2026-09-14; the Researcher did not choose the rule and the Steward
+does not choose it at run time (rule 9; sec 10.10 -- a gap in sec 4 is fixed by a dated
+amendment BEFORE the run, never during it).  The preflight gate stays in place: an unset rule,
+an unknown rule id, or a rule without its amendment citation still aborts before Gate 0.
+
+A1r (AMENDMENTS.md 2026-09-14) adds reporting only, and changes no threshold, filter, exit
+rule or decision rule: Channel A carries n_W_gt_R1/R2/R3, the two band columns and n_L_gt_U
+under all three rules, totalled per table / month / overall; the register carries a
+`Boundary sensitivity` section (M, MM, U, questions_touched, both STOP-THE-DESK limbs under
+each rule) headed DESCRIPTIVE -- DOES NOT DECIDE; the header, summary.json and the verdict
+sentence name the rule, its amendment and A12's R3 fallback count.  sec 8 is computed under
+R2_SAME_EVENING alone.  The sensitivity block may never select a rule after looking (rule 9).
 """
 from __future__ import annotations
 
@@ -54,20 +65,38 @@ ET = ZoneInfo("America/New_York")
 UTC = timezone.utc
 
 # --------------------------------------------------------------------------------------------
-# sec 4.0 -- the decision-time boundary.  UNRESOLVED AT WRITING (AMENDMENTS.md A1, 2026-09-14).
+# sec 4.0 -- the decision-time boundary.  RESOLVED by dated amendment (AMENDMENTS.md A1,
+# 2026-09-14; DECISIONS.md "Amendments after lock"), decision-maker, autonomous, DP-40.
 #
 #   R1_1605_LITERAL  boundary(N) = 16:05 ET on N                      -- sec 4.0 as written
 #   R2_SAME_EVENING  boundary(N) = 23:59:59.999999 ET on N            -- FREEZE_v001 sec 7's
-#                    "created_at/updated_at cluster same trading_date evening" reading
+#                    "created_at/updated_at cluster same trading_date evening" reading   <-- IN FORCE
 #   R3_NEXT_OPEN     boundary(N) = 09:30 ET on the next NYSE session  -- DP-04 / the criterion
 #                    exclusions_v001..v003 and Gate 0(a) already use
 #
-# The three readings give different verdicts (see AMENDMENTS.md A1).  The registrar sets this
-# constant by a dated amendment before the run; the Steward never sets it at run time.
-DECISION_TIME_RULE = None            # <- set to one of the three ids above by amendment only
-DECISION_TIME_RULE_AMENDMENT = None  # <- e.g. "AMENDMENTS.md 2026-09-1x A1 resolved: <text>"
+# The three readings give different verdicts (see AMENDMENTS.md A1).  The registrar /
+# decision-maker set this constant by a dated amendment before the run; neither the Researcher
+# nor the Steward chooses it, and it is never changed after the register exists (rule 9: a
+# different boundary after the fact is a look, and is a successor question).
+DECISION_TIME_RULE = "R2_SAME_EVENING"
+DECISION_TIME_RULE_AMENDMENT = ("AMENDMENTS.md 2026-09-14 A1 RESOLVED: R2_SAME_EVENING "
+    "(decision-maker, autonomous, DP-40; boundary(N) = 23:59:59.999999 ET on N)")
 
 RULE_IDS = ("R1_1605_LITERAL", "R2_SAME_EVENING", "R3_NEXT_OPEN")
+RULE_SHORT = {"R1_1605_LITERAL": "R1", "R2_SAME_EVENING": "R2", "R3_NEXT_OPEN": "R3"}
+RULE_BOUNDARY_TEXT = {
+    "R1_1605_LITERAL": "boundary(N) = 16:05 ET on N (sec 4.0 as written)",
+    "R2_SAME_EVENING": "boundary(N) = 23:59:59.999999 ET on N (a write is late when it lands "
+                       "on a later ET calendar day)",
+    "R3_NEXT_OPEN": "boundary(N) = 09:30 ET on the next NYSE session after N",
+}
+# A1r: the verbatim heading the sensitivity block must carry.
+SENSITIVITY_HEADING = ("DESCRIPTIVE -- DOES NOT DECIDE. The verdict is computed under "
+                       "R2_SAME_EVENING only (AMENDMENTS.md 2026-09-14, A1).")
+# A1r / R2 blind spot: the tables sec 10.2 records as having no independent count, i.e. no
+# Channel C corroboration.  For these the 16:05..23:59:59 ET band rests on attribution alone.
+NO_INDEPENDENT_COUNT_TABLES = ("uoa_symbol", "gex_symbol", "projection_bull",
+                               "projection_bear_v2", "conviction_monitor", "market_regime")
 
 # --------------------------------------------------------------------------------------------
 # Pins.  Every one of these is checked before anything is read (sec 2.2, decision 8).
@@ -120,6 +149,15 @@ GATE0_TABLES_EXPECTED = 11                # sec 3 B2 -- FREEZE_v001 sec 7's 11-r
 # sec 4.3 -- the documented reconstruction (Q014 sec 2.1) and its verification (decision 2).
 OI_MULT_SET = (0.90, 1.00, 1.05, 1.10)    # uoa_screener.py:2223-2232 at fa70688
 RECONSTRUCTION_RTOL = 1e-6                # decision 2, fixed here
+
+# AMENDMENTS.md 2026-09-14, A6 RIDER.  The closed divisor set above is a transcription of the
+# code at fa70688.  It is verified at run time, literal by literal, at the cited line range.
+# If ANY of the four is not there the check cannot be evaluated: by decision 2's own failure
+# branch the reconstruction tuple is MATERIAL (not mitigated, not skipped), and the withdrawal
+# is printed in the register with A9's withdrawals (sec 10.6).
+OI_MULT_SET_CITATION = dict(path="services/uoa_screener.py", lines=(2223, 2232),
+                            literals=tuple("oi_mult = %.2f" % m for m in OI_MULT_SET),
+                            key_prefix="A6_OI_MULT_SET")
 
 # --------------------------------------------------------------------------------------------
 # sec 4.3 -- ATTRIBUTED LATE-WRITE PATHS.  A (table, column) whose late-write path is
@@ -595,6 +633,13 @@ def boundary_for(d: date, cal: Calendar, rule: str) -> datetime | None:
     raise Abort("unknown DECISION_TIME_RULE: %r" % (rule,))
 
 
+def r3_fallback_fired(d: date, cal: Calendar) -> bool:
+    """AMENDMENTS.md A12, as narrowed by A1: the last session of a freeze has no next open, so
+    R3 falls back to the same-evening boundary.  With R2 in force this affects the **R3
+    sensitivity column only**; the count of nights on which it fired is printed (A1r item 3)."""
+    return cal.next_open(d) is None
+
+
 def use_time(d: date, lag: int, cal: Calendar, rule: str) -> datetime | None:
     """U(T, N) = boundary(N + lag_sessions) -- the earliest decision a row dated N may inform."""
     nd = cal.shift(d, int(lag or 0))
@@ -855,6 +900,31 @@ def write_times(df: pd.DataFrame, table: str) -> pd.DataFrame:
 # Channel A -- the write-time census (sec 4.2).  Every row, every table, every night.
 # =============================================================================================
 
+# A1r item 1 -- the per-(table, night) boundary columns, in a fixed order.
+BAND_COLUMNS = ("n_W_gt_R1", "n_W_gt_R2", "n_W_gt_R3", "n_W_band_R1_R2", "n_W_band_R2_R3",
+                "n_L_gt_U_R1", "n_L_gt_U_R2", "n_L_gt_U_R3")
+
+
+def _boundary_triple(sub: pd.DataFrame, night: date, lag: int, cal: Calendar) -> dict:
+    """n_W_gt_* and n_L_gt_U_* under each of R1 / R2 / R3, plus the two bands (A1r item 1).
+
+    DESCRIPTIVE ONLY.  The columns that decide are n_W_gt_B / n_L_gt_U, computed under the
+    in-force rule alone.  R1 is contained in R2 is contained in R3 in permissiveness, so both
+    bands are non-negative by construction: n_W_band_R1_R2 is the same-evening batch band
+    (16:05..23:59:59 ET on N) and n_W_band_R2_R3 is the overnight-before-next-open band.
+    """
+    out = {}
+    for rid in RULE_IDS:
+        sh = RULE_SHORT[rid]
+        b = boundary_for(night, cal, rid)
+        u = use_time(night, lag, cal, rid)
+        out["n_W_gt_%s" % sh] = 0 if b is None else int((sub["W"] > pd.Timestamp(b)).sum())
+        out["n_L_gt_U_%s" % sh] = 0 if u is None else int((sub["L"] > pd.Timestamp(u)).sum())
+    out["n_W_band_R1_R2"] = int(out["n_W_gt_R1"] - out["n_W_gt_R2"])
+    out["n_W_band_R2_R3"] = int(out["n_W_gt_R2"] - out["n_W_gt_R3"])
+    return out
+
+
 def channel_a(tables: dict, man: dict, cal: Calendar, rule: str) -> pd.DataFrame:
     avail = man.get("availability", {})
     rows = []
@@ -864,8 +934,10 @@ def channel_a(tables: dict, man: dict, cal: Calendar, rule: str) -> pd.DataFrame
         dec = avail.get(name, {})
         at_et, lag = dec.get("available_time_et"), int(dec.get("lag_sessions") or 0)
         if len(df) == 0:
-            rows.append(dict(table=name, night=None, n_rows=0, declared_time=at_et,
+            rows.append(dict(table=name, night=None, month=None, n_rows=0, declared_time=at_et,
                              lag_sessions=lag, n_W_gt_A="n/a", n_W_gt_B=0, n_L_gt_U=0,
+                             **{c: 0 for c in BAND_COLUMNS},
+                             r3_fallback=False,
                              median_lateness_h=None, max_lateness_h=None, spread_h=None,
                              W_heterogeneous=False,
                              note="table is empty in the freeze -- nothing to census"))
@@ -884,8 +956,11 @@ def channel_a(tables: dict, man: dict, cal: Calendar, rule: str) -> pd.DataFrame
             n_l_gt_u = 0 if u is None else int((sub["L"] > pd.Timestamp(u)).sum())
             spread = (sub["W"].max() - sub["W"].min()).total_seconds() / 3600.0 if sub["W"].notna().any() else None
             rows.append(dict(
-                table=name, night=night.isoformat(), n_rows=int(len(sub)), declared_time=at_et,
+                table=name, night=night.isoformat(), month=night.isoformat()[:7],
+                n_rows=int(len(sub)), declared_time=at_et,
                 lag_sessions=lag, n_W_gt_A=n_gt_a, n_W_gt_B=n_gt_b, n_L_gt_U=n_l_gt_u,
+                **_boundary_triple(sub, night, lag, cal),
+                r3_fallback=bool(r3_fallback_fired(night, cal)),
                 median_lateness_h=None if lateness.isna().all() else round(float(lateness.median()), 4),
                 max_lateness_h=None if lateness.isna().all() else round(float(lateness.max()), 4),
                 spread_h=None if spread is None else round(float(spread), 4),
@@ -893,6 +968,26 @@ def channel_a(tables: dict, man: dict, cal: Calendar, rule: str) -> pd.DataFrame
                 note=""))
     out = pd.DataFrame(rows).sort_values(["table", "night"], na_position="first")
     return out.reset_index(drop=True)
+
+
+def boundary_band_totals(chan_a: pd.DataFrame) -> dict:
+    """A1r item 1 -- the same triple totalled per table, per month and overall."""
+    cols = list(BAND_COLUMNS)
+    out = {}
+    if not len(chan_a):
+        empty = pd.DataFrame(columns=["n_rows"] + cols)
+        return dict(by_table=empty, by_month=empty, overall=empty)
+    d = chan_a.copy()
+    for c in cols + ["n_rows"]:
+        d[c] = pd.to_numeric(d[c], errors="coerce").fillna(0).astype(int)
+    out["by_table"] = d.groupby("table")[["n_rows"] + cols].sum().reset_index()
+    dm = d[d["month"].notna()]
+    out["by_month"] = (dm.groupby("month")[["n_rows"] + cols].sum().reset_index()
+                       if len(dm) else pd.DataFrame(columns=["month", "n_rows"] + cols))
+    tot = d[["n_rows"] + cols].sum()
+    out["overall"] = pd.DataFrame([dict(scope="overall",
+                                        **{k: int(v) for k, v in tot.items()})])
+    return out
 
 
 # =============================================================================================
@@ -1247,10 +1342,35 @@ def channel_e(man: dict, chan_a: pd.DataFrame, read_index: dict) -> tuple[pd.Dat
 # MATERIAL.  The divisor set is the closed set the code names at fa70688 (AMENDMENTS.md A6).
 # =============================================================================================
 
-def check_reconstruction(df: pd.DataFrame, nights: set, rec: dict) -> dict:
+def check_reconstruction(df: pd.DataFrame, nights: set, rec: dict,
+                         mult_set_ok: bool = True, mult_set_detail: str = "") -> dict:
     div = rec["divisor"]
     out = dict(divisor=div, rtol=RECONSTRUCTION_RTOL, columns={}, verified=True,
-               n_rows_in_window=0, failures=[])
+               n_rows_in_window=0, failures=[],
+               documented_divisor_set=list(OI_MULT_SET),
+               divisor_set_citation="%s:%s:%d-%d" % (PLATFORM_SHA_SHORT,
+                                                     OI_MULT_SET_CITATION["path"],
+                                                     OI_MULT_SET_CITATION["lines"][0],
+                                                     OI_MULT_SET_CITATION["lines"][1]),
+               divisor_set_verified_at_sha=bool(mult_set_ok),
+               divisor_set_withdrawal=("" if mult_set_ok else mult_set_detail))
+    # AMENDMENTS.md 2026-09-14, A6 RIDER.  The closed divisor set is the whole content of the
+    # A6 check; if it is not at its cited line range at the frozen SHA the check cannot be
+    # evaluated, and decision 2's own failure branch makes the TUPLE MATERIAL -- not mitigated,
+    # not skipped.  The withdrawal is printed with A9's withdrawals (sec 10.6).
+    if not mult_set_ok:
+        out["verified"] = False
+        out["failures"].append(
+            "A6 RIDER (AMENDMENTS.md 2026-09-14): the documented divisor set %s is NOT at "
+            "%s:%s:%d-%d at run time -- the reconstruction check cannot be evaluated and the "
+            "tuple is MATERIAL (decision 2 failure branch).  %s"
+            % (list(OI_MULT_SET), PLATFORM_SHA_SHORT, OI_MULT_SET_CITATION["path"],
+               OI_MULT_SET_CITATION["lines"][0], OI_MULT_SET_CITATION["lines"][1],
+               mult_set_detail))
+        for col in rec["columns"]:
+            out["columns"][col] = dict(ok=False, reason="A6 rider: divisor-set citation "
+                                                        "withdrawn at %s" % PLATFORM_SHA_SHORT)
+        return out
     if len(df) == 0:
         out["verified"] = False
         out["failures"].append("no rows to verify")
@@ -1422,6 +1542,13 @@ def channel_b(tables: dict, man: dict, cal: Calendar, rule: str, stats: dict, qw
         for r in q["reads"]:
             table = r["table"]
             as_feature = r.get("as_feature", True)
+            # AMENDMENTS.md 2026-09-14, A7 RIDER.  Convention (i) narrows the surface, so it is
+            # never silent: an as_feature=False column carries the sub-label
+            # IMMATERIAL_BY_SCOPE and the PREREG sentence that scopes it, and keeps its row in
+            # the class-count table (sec 4.3: no column may be omitted).  The sub-label is
+            # print-only -- the class stays IMMATERIAL and the sec 8 verdict is untouched.
+            scope_class = "" if as_feature else "IMMATERIAL_BY_SCOPE"
+            scope_note = "" if as_feature else r.get("note", "")
             cols = cols_of[table] if r["columns"] == ["*"] else r["columns"]
             cols = [c for c in cols if c in cols_of[table]]
             in_nights = w["per_read"][(table, tuple(r["columns"]))]
@@ -1446,7 +1573,9 @@ def channel_b(tables: dict, man: dict, cal: Calendar, rule: str, stats: dict, qw
                                          night=night.isoformat(), klass=klass, reason=why,
                                          n_rows=s["n_rows"], n_W_gt_B=s["n_W_gt_B"],
                                          n_indeterminate=s["n_indet"],
-                                         attribution=";".join(attr), as_feature=as_feature))
+                                         attribution=";".join(attr), as_feature=as_feature,
+                                         scope_class=scope_class, scope_note=scope_note,
+                                         in_window=bool(night in in_nights)))
                         continue
 
                     reasons = []
@@ -1511,7 +1640,9 @@ def channel_b(tables: dict, man: dict, cal: Calendar, rule: str, stats: dict, qw
                                      night=night.isoformat(), klass=klass, reason=why,
                                      n_rows=s["n_rows"], n_W_gt_B=s["n_W_gt_B"],
                                      n_indeterminate=s["n_indet"],
-                                     attribution=";".join(attr), as_feature=as_feature))
+                                     attribution=";".join(attr), as_feature=as_feature,
+                                     scope_class=scope_class, scope_note=scope_note,
+                                     in_window=True))
     tuples = pd.DataFrame(rows)
 
     # class counts for EVERY column of EVERY table, always (sec 4.3).  No column is omitted.
@@ -1519,6 +1650,16 @@ def channel_b(tables: dict, man: dict, cal: Calendar, rule: str, stats: dict, qw
     seen = set()
     if len(tuples):
         g = tuples.groupby(["table", "column", "klass"]).size().unstack(fill_value=0)
+        # A7 rider: the IMMATERIAL_BY_SCOPE sub-count, so a scoped-out column is visible as
+        # scoped out rather than indistinguishable from an out-of-window IMMATERIAL row.
+        scoped = tuples[tuples["scope_class"] == "IMMATERIAL_BY_SCOPE"]
+        scoped_n = scoped.groupby(["table", "column"]).size().to_dict()
+        scoped_q = {k: ";".join(sorted(set(v["question"])))
+                    for k, v in scoped.groupby(["table", "column"])}
+        scoped_why = {}
+        for k, v in scoped.groupby(["table", "column"]):
+            notes = sorted({n for n in v["scope_note"] if n})
+            scoped_why[k] = " | ".join(notes)
         for (table, column), row in g.iterrows():
             seen.add((table, column))
             readers = sorted(set(tuples[(tuples["table"] == table) &
@@ -1526,14 +1667,20 @@ def channel_b(tables: dict, man: dict, cal: Calendar, rule: str, stats: dict, qw
                                         (tuples["klass"] != "IMMATERIAL")]["question"]))
             counts.append(dict(table=table, column=column,
                                **{c: int(row.get(c, 0)) for c in CLASSES},
-                               questions_non_immaterial=";".join(readers)))
+                               IMMATERIAL_BY_SCOPE=int(scoped_n.get((table, column), 0)),
+                               questions_non_immaterial=";".join(readers),
+                               questions_immaterial_by_scope=scoped_q.get((table, column), ""),
+                               scope_sentences=scoped_why.get((table, column), "")))
     for t in man["tables"]:
         for col in t["columns"]:
             if (t["name"], col) in seen:
                 continue
             counts.append(dict(table=t["name"], column=col,
                                **{c: 0 for c in CLASSES},
+                               IMMATERIAL_BY_SCOPE=0,
                                questions_non_immaterial="",
+                               questions_immaterial_by_scope="",
+                               scope_sentences="",
                                ))
     cc = pd.DataFrame(counts).fillna(0)
     cc["read_by_any_listed_question"] = cc.apply(
@@ -1546,15 +1693,28 @@ def channel_b(tables: dict, man: dict, cal: Calendar, rule: str, stats: dict, qw
 # sec 8 -- the decision rule, numeric, written before unsealing.
 # =============================================================================================
 
-def verdict(gate: dict, tuples: pd.DataFrame, qwin: dict, chan_d: pd.DataFrame) -> dict:
+def boundary_phrase(rule: str | None = None) -> str:
+    """A1r item 4 -- the boundary, named, for every verdict sentence."""
+    r = rule or DECISION_TIME_RULE
+    return ("`%s`: %s -- %s" % (r, RULE_BOUNDARY_TEXT.get(r, "boundary undefined"),
+                                DECISION_TIME_RULE_AMENDMENT))
+
+
+def verdict(gate: dict, tuples: pd.DataFrame, qwin: dict, chan_d: pd.DataFrame,
+            rule: str | None = None) -> dict:
+    rule = rule or DECISION_TIME_RULE
+    bphrase = boundary_phrase(rule)
     if not gate["passed"]:
         return dict(verdict="INCONCLUSIVE", controller_verdict="INCONCLUSIVE",
                     label="HISTORICAL_ONLY", gate0_passed=False, M=None, MM_failed=None,
                     MM_verified=None, U=None, advisory=None, stop_the_desk=False,
-                    stop_limbs=[], statement=(
-                        "Gate 0 did not re-find every B2 item.  The rest of the register is "
+                    stop_limbs=[], decision_time_rule=rule, questions_touched=None,
+                    channel_d_material_rows=int(len(chan_d)), per_question={},
+                    statement=(
+                        "Gate 0 did not re-find every B2 item under the decision-time boundary "
+                        "%s.  The rest of the register is "
                         "not interpreted (sec 8).  At most two fix-and-re-run passes, all "
-                        "inside the hard stop 2026-10-05 (decision 7)."))
+                        "inside the hard stop 2026-10-05 (decision 7)." % bphrase))
     mat = tuples[tuples["klass"] == "MATERIAL"]
     mm = tuples[tuples["klass"] == "MATERIAL_MITIGATED"]
     unres = tuples[tuples["klass"] == "CONTAMINATION_UNRESOLVED"]
@@ -1581,23 +1741,88 @@ def verdict(gate: dict, tuples: pd.DataFrame, qwin: dict, chan_d: pd.DataFrame) 
     if M >= 1:
         v, cv = "FAIL", "HISTORICALLY_CONFIRMED"
         st = ("FAIL: M = %d material (question, table, column, night) tuples across %d of the "
-              "21 listed questions.  The failure is per-row and scoped (sec 8); the sec 9 "
-              "remedy attaches to the affected tuples, not to the desk." % (M, n_q_touched))
+              "21 listed questions -- each one a feature column a listed question reads whose "
+              "row was written after the end of the ET calendar day on which the decision was "
+              "made (%s).  The failure is per-row and scoped (sec 8); the sec 9 "
+              "remedy attaches to the affected tuples, not to the desk."
+              % (M, n_q_touched, bphrase))
     elif U > 0:
         v, cv = "INCONCLUSIVE", "INCONCLUSIVE"
-        st = ("INCONCLUSIVE: M = 0 but U = %d unresolved tuples -- the timestamps cannot "
-              "exclude contamination and the code at %s could not close the column set.  "
-              "U > 0 is never PASS (DP-45)." % (U, PLATFORM_SHA_SHORT))
+        st = ("INCONCLUSIVE: M = 0 but U = %d unresolved tuples under %s -- the timestamps "
+              "cannot exclude contamination and the code at %s could not close the column "
+              "set.  U > 0 is never PASS (DP-45)." % (U, bphrase, PLATFORM_SHA_SHORT))
     else:
         v, cv = "PASS", "NULL"
         st = ("PASS: no feature column any registered question reads was written after that "
-              "question's decision-time boundary, on any night inside its window, on this "
-              "freeze.")
+              "question's decision-time boundary (%s), on any night inside its window, on this "
+              "freeze." % bphrase)
     return dict(verdict=v, controller_verdict=cv, label="HISTORICAL_ONLY", gate0_passed=True,
                 M=M, MM_failed=mm_failed, MM_verified=int(len(mm)), U=U,
                 advisory=int(len(adv)), questions_touched=n_q_touched,
                 stop_the_desk=bool(limbs), stop_limbs=limbs, per_question=detail,
-                channel_d_material_rows=int(len(chan_d)), statement=st)
+                channel_d_material_rows=int(len(chan_d)), decision_time_rule=rule,
+                statement=st)
+
+
+# =============================================================================================
+# A1r item 2 -- BOUNDARY SENSITIVITY.  DESCRIPTIVE ONLY; IT DECIDES NOTHING.
+#
+# The sec 8 verdict is computed under the in-force rule alone (AMENDMENTS.md 2026-09-14, A1).
+# This block re-runs Channel B and the sec 8 arithmetic under each of the three enumerated
+# readings so a reader can see what any other boundary would have produced WITHOUT the verdict
+# depending on it.  Gate 0, Channel C, Channel D, the windows and the reconstruction check are
+# rule-independent and are computed once, under the in-force rule, and reused unchanged.
+#
+# RULE 9.  The block may never be used to select a rule after looking.  A different boundary
+# after this register exists is a look, and is a successor question, never a re-run of this one.
+# =============================================================================================
+
+def boundary_sensitivity(tables: dict, man: dict, cal: Calendar, gate: dict, qwin: dict,
+                         chan_c: pd.DataFrame, chan_d: pd.DataFrame, verified: dict,
+                         recon: dict, census_nights: dict, in_force_rule: str,
+                         in_force_tuples: pd.DataFrame, in_force_ver: dict) -> pd.DataFrame:
+    clock_tables = sorted(t["name"] for t in man["tables"]
+                          if declared_time(date(2026, 1, 2),
+                                           (man.get("availability", {}).get(t["name"], {}) or {})
+                                           .get("available_time_et")) is not None)
+    rows = []
+    for rid in RULE_IDS:
+        if rid == in_force_rule:
+            tp, ver = in_force_tuples, in_force_ver
+        else:
+            st_r = night_stats(tables, man, cal, rid)
+            tp, _cc = channel_b(tables, man, cal, rid, st_r, qwin, chan_c, chan_d, verified,
+                                recon, census_nights)
+            ver = verdict(gate, tp, qwin, chan_d, rid)
+        limb_a = [x for x in (ver.get("stop_limbs") or []) if x.startswith("(a)")]
+        limb_b = [x for x in (ver.get("stop_limbs") or []) if x.startswith("(b)")]
+        note = ""
+        if rid == "R1_1605_LITERAL":
+            bound = int(len(tp[(tp["in_window"] == True) & (tp["as_feature"] == True) &   # noqa: E712
+                               (tp["table"].isin(clock_tables))])) if len(tp) else 0
+            note = ("BY CONSTRUCTION, NOT A MEASUREMENT: under R1 every row of a same-evening "
+                    "batch table breaches the boundary, so M is bounded below by the %d "
+                    "in-window feature tuples on the clock-declared tables (%s).  M = 0 and "
+                    "PASS are unreachable under R1 before any data is read."
+                    % (bound, ", ".join(clock_tables)))
+        elif rid == "R3_NEXT_OPEN":
+            note = ("A12 (as narrowed by A1) governs this column only: at the last session of "
+                    "the freeze there is no next open and the same-evening boundary is used "
+                    "instead.  See a12_r3_fallback_nights in the header.")
+        elif rid == in_force_rule:
+            note = "IN FORCE -- this is the row the sec 8 verdict was computed from."
+        rows.append(dict(
+            rule=rid, in_force=bool(rid == in_force_rule),
+            boundary=RULE_BOUNDARY_TEXT[rid],
+            M=ver["M"], MM_verified=ver["MM_verified"], MM_failed=ver["MM_failed"],
+            U=ver["U"], ADVISORY=ver["advisory"],
+            questions_touched=ver["questions_touched"],
+            stop_limb_a_fired=bool(limb_a), stop_limb_a_questions=len(limb_a),
+            stop_limb_b_fired=bool(limb_b),
+            stop_the_desk=ver["stop_the_desk"],
+            verdict_if_this_rule_had_been_chosen=ver["verdict"],
+            note=note))
+    return pd.DataFrame(rows)
 
 
 # =============================================================================================
@@ -1614,7 +1839,7 @@ def nightly_frame(tuples: pd.DataFrame, chan_a: pd.DataFrame, census_nights: dic
     rows = []
     tby = tuples.groupby(["night", "klass"]).size().unstack(fill_value=0) if len(tuples) else None
     aby = chan_a[chan_a["night"].notna()].groupby("night")[
-        ["n_rows", "n_W_gt_B", "n_L_gt_U"]].sum() if len(chan_a) else None
+        ["n_rows", "n_W_gt_B", "n_L_gt_U"] + list(BAND_COLUMNS)].sum() if len(chan_a) else None
     for n in all_nights:
         key = n.isoformat()
         rec = dict(night=key, month=key[:7],
@@ -1631,8 +1856,13 @@ def nightly_frame(tuples: pd.DataFrame, chan_a: pd.DataFrame, census_nights: dic
             rec["rows_censused"] = int(aby.loc[key, "n_rows"])
             rec["rows_W_after_boundary"] = int(aby.loc[key, "n_W_gt_B"])
             rec["rows_L_after_use_time"] = int(aby.loc[key, "n_L_gt_U"])
+            # A1r item 1 -- the same night, under all three boundaries.  Descriptive.
+            for c in BAND_COLUMNS:
+                rec[c] = int(aby.loc[key, c])
         else:
             rec["rows_censused"] = rec["rows_W_after_boundary"] = rec["rows_L_after_use_time"] = 0
+            for c in BAND_COLUMNS:
+                rec[c] = 0
         rows.append(rec)
     return pd.DataFrame(rows)
 
@@ -1678,7 +1908,9 @@ def write_register(path: Path, ev: dict, gate: dict, chan_a: pd.DataFrame,
                    chan_d: pd.DataFrame, changes: pd.DataFrame, appendix: pd.DataFrame,
                    chan_e: pd.DataFrame, proposal: dict, nightly: pd.DataFrame,
                    splits: dict, ver: dict, recon: dict, verified: dict, cal: Calendar,
-                   res_rel: str) -> None:
+                   res_rel: str, bands: dict | None = None,
+                   sens: pd.DataFrame | None = None, a12: dict | None = None,
+                   scoped_reads: pd.DataFrame | None = None) -> None:
     L = []
     A = L.append
     A("# Knowledge-time register -- %s\n" % ev["manifest"]["path"])
@@ -1697,8 +1929,14 @@ def write_register(path: Path, ev: dict, gate: dict, chan_a: pd.DataFrame,
          ev["manifest_prices"]["sha256"]))
     A("- **Attribution SHA read: `%s`** (`git show %s:<path>`), never HEAD (sec 10.6, "
       "decision 8)." % (ev["platform_sha_read"], PLATFORM_SHA_SHORT))
-    A("- Decision-time rule in force: **%s** -- %s"
-      % (ev["decision_time_rule"], ev["decision_time_rule_amendment"]))
+    A("- Decision-time rule in force: **%s** -- %s.  Amendment: %s"
+      % (ev["decision_time_rule"],
+         RULE_BOUNDARY_TEXT.get(ev["decision_time_rule"], "boundary undefined"),
+         ev["decision_time_rule_amendment"]))
+    A("- A12 fallback (R3 sensitivity column only, AMENDMENTS.md 2026-09-14): fired on **%s** "
+      "night(s)%s" % ((a12 or {}).get("n_nights", "n/a"),
+                      (" -- %s" % ", ".join((a12 or {}).get("nights", [])))
+                      if (a12 or {}).get("nights") else ""))
     A("- Session calendar: %s" % cal.source_note)
     A("- %s" % ev["no_live_query"])
     A("- Every table file was checked by sha256 against its manifest entry before it was read.")
@@ -1750,6 +1988,16 @@ def write_register(path: Path, ev: dict, gate: dict, chan_a: pd.DataFrame,
     A("\nExtraction backstop (sec 10.5, sec 10.9): see `%s/extraction_review.csv` for every "
       "backticked token in each listed PREREG that names a frozen column and is NOT in the "
       "transcription above.\n" % res_rel)
+    A("#### 2.1.1 Columns scoped out of the feature surface (`as_feature=False`) -- "
+      "AMENDMENTS.md 2026-09-14, A7 rider\n")
+    A("A7 convention (i) NARROWS the feature surface, so every use of it is itemised here with "
+      "the PREREG sentence that scopes it, and each such column keeps a row in the class-count "
+      "table below under `IMMATERIAL_BY_SCOPE` rather than being absent (sec 4.3: no column may "
+      "be omitted). These columns are IMMATERIAL by sec 4.3's own wording, not by a judgment "
+      "made at run time. `sas_runs.finished_at` is a feature everywhere and is NOT in this "
+      "table.\n")
+    A(md_table(scoped_reads if scoped_reads is not None else pd.DataFrame()))
+    A("\nFull list: `%s/as_feature_false_scoped.csv`.\n" % res_rel)
     A("## 3. Channel A -- write-time census (sec 4.2)\n")
     A("One row per (table, night), all nights including the pre-April rows, no table omitted "
       "and no night summarised away. Full table in `%s/channel_a.csv`.\n" % res_rel)
@@ -1760,9 +2008,31 @@ def write_register(path: Path, ev: dict, gate: dict, chan_a: pd.DataFrame,
         max_within_night_spread_h=("spread_h", "max")).reset_index()))
     A("\n`n_W_gt_A` is `n/a` where the declaration is not a clock (`post-hoc`): "
       "AMENDMENTS.md A2.\n")
+    A("\n**The columns that decide are `n_W_gt_B` and `n_L_gt_U`, both computed under the "
+      "in-force rule `%s` alone.**\n" % ev["decision_time_rule"])
+    A("### 3.1 The same census under all three boundaries (A1r item 1) -- DESCRIPTIVE\n")
+    A("Per `(table, night)` in `%s/channel_a.csv`: `n_W_gt_R1`, `n_W_gt_R2`, `n_W_gt_R3`, the "
+      "band columns `n_W_band_R1_R2` (the same-evening batch band, 16:05..23:59:59 ET on N) and "
+      "`n_W_band_R2_R3` (the overnight-before-next-open band), and `n_L_gt_U` under each of the "
+      "three rules. R1 is contained in R2 is contained in R3, so both bands are non-negative by "
+      "construction. Totals follow.\n" % res_rel)
+    bands = bands or {}
+    A("**Per table**\n")
+    A(md_table(bands.get("by_table")))
+    A("\n**Per month**\n")
+    A(md_table(bands.get("by_month")))
+    A("\n**Overall**\n")
+    A(md_table(bands.get("overall")))
+    A("\nCSVs: `%s/boundary_bands_by_table.csv`, `%s/boundary_bands_by_month.csv`, "
+      "`%s/boundary_bands_overall.csv`.\n" % (res_rel, res_rel, res_rel))
     A("## 4. Channel B -- column-level materiality (sec 4.3)\n")
     A("### 4.1 Class counts for every column of every table (no column omitted)\n")
     A(md_table(class_counts, max_rows=400))
+    A("\n`IMMATERIAL_BY_SCOPE` (AMENDMENTS.md 2026-09-14, A7 rider) is a **sub-count of "
+      "`IMMATERIAL`**, not a sixth class: it is the number of tuples that are IMMATERIAL "
+      "because the reading question's own PREREG scopes that column to an audit / "
+      "exclusion-ledger use (`as_feature=False`, section 2.1.1 above), rather than because the "
+      "night is out of window. It enters no total and moves no verdict.\n")
     A("\nFull table: `%s/channel_b_class_counts.csv`.\n" % res_rel)
     for klass, fname in (("MATERIAL", "material"), ("MATERIAL_MITIGATED", "material_mitigated"),
                          ("CONTAMINATION_UNRESOLVED", "contamination_unresolved"),
@@ -1777,7 +2047,20 @@ def write_register(path: Path, ev: dict, gate: dict, chan_a: pd.DataFrame,
     A("### 4.3 The reconstruction check (sec 4.3, decision 2: every in-window row, rtol 1e-6)\n")
     A("```\n%s\n```\n" % json.dumps(recon, indent=1, default=str))
     A("### 4.4 Attribution literals verified at `%s`\n" % PLATFORM_SHA_SHORT)
-    A(md_table(pd.DataFrame([dict(key=k, **v) for k, v in verified.items()])))
+    vdf = pd.DataFrame([dict(key=k, **v) for k, v in verified.items()]) if verified \
+        else pd.DataFrame()
+    A(md_table(vdf))
+    A("\n#### 4.4.1 Withdrawals (sec 10.6; AMENDMENTS.md A9, and A6 by its 2026-09-14 rider)\n")
+    wdf = vdf[vdf["ok"] == False] if len(vdf) and "ok" in vdf.columns else pd.DataFrame()  # noqa: E712
+    if not len(wdf):
+        A("_(none -- every cited literal was found at its cited line range at `%s`)_\n"
+          % PLATFORM_SHA_SHORT)
+    else:
+        A("**A cited literal was not at its cited line range. The entry is WITHDRAWN: the "
+          "attribution is not applied, or -- for `%s*` -- the A6 divisor-set check cannot be "
+          "evaluated and the reconstruction tuple is MATERIAL by decision 2's own failure "
+          "branch.**\n" % OI_MULT_SET_CITATION["key_prefix"])
+        A(md_table(wdf))
     A("## 5. Channel C -- internal corroboration (sec 4.4)\n")
     A("Per night: the run's own `stats_json` count fields against the frozen candidate row "
       "set, the publication predicate against the run audit, duplicate or gap-ranked "
@@ -1809,7 +2092,19 @@ def write_register(path: Path, ev: dict, gate: dict, chan_a: pd.DataFrame,
         A(md_table(g))
     A("\nAny cell below %d nights is flagged `LOW_N` and no trend is read from it (sec 5.1).\n"
       % LOW_N_FLOOR)
-    A("## 9. What this register does not say (sec 10)\n")
+    A("## 9. Boundary sensitivity (A1r item 2)\n")
+    A("**%s**\n" % SENSITIVITY_HEADING)
+    A("`M`, `MM`, `U`, `questions_touched` and both STOP-THE-DESK limbs, recomputed under each "
+      "of the three enumerated readings of sec 4.0. Gate 0, Channel C, Channel D, the question "
+      "windows and the reconstruction check are boundary-independent and were computed once, "
+      "under the in-force rule, and reused unchanged.\n")
+    A(md_table(sens if sens is not None else pd.DataFrame()))
+    A("\n**Rule 9.** This block may never be used to select a rule after looking. A different "
+      "boundary after this register exists is a look, and is a successor question, never a "
+      "re-run of this one. The sec 8 verdict above was computed under `%s` alone.\n"
+      % ev["decision_time_rule"])
+    A("\nCSV: `%s/boundary_sensitivity.csv`.\n" % res_rel)
+    A("## 10. What this register does not say (sec 10)\n")
     A("1. A timestamp is not a per-cell write time; a PASS means no *detectable* post-boundary "
       "write on a read column, not a proof that none occurred.\n"
       "2. A traceless mutation is invisible to Channel A; Channel C only works where an "
@@ -1822,7 +2117,50 @@ def write_register(path: Path, ev: dict, gate: dict, chan_a: pd.DataFrame,
       "above lists exactly what was extracted so a miss is visible rather than silent.\n"
       "6. Reading the platform repo to attribute a write path is an interpretation; the SHA "
       "read is printed above and every cited literal was verified at it.\n")
+    if ev["decision_time_rule"] == "R2_SAME_EVENING":
+        A("\n### 10.1 The residual blind spot of the rule in force, per table "
+          "(AMENDMENTS.md 2026-09-14, A1)\n")
+        A("Under `R2_SAME_EVENING` a write between **16:05 and 23:59:59.999999 ET on night N** "
+          "is NOT flagged by the timestamp limb. That band is `n_W_band_R1_R2` in section 3.1 "
+          "and is covered -- where it is covered at all -- by three other defences: sec 4.3's "
+          "attribution limb (a documented late-write path), Channel C's internal corroboration "
+          "(the only channel that sees a traceless mutation, sec 10.2), and sec 4.2's "
+          "within-night `W_row` spread. The table below states, per table, which of the three "
+          "apply. **Where a table has no independent count, this band rests on attribution "
+          "alone for that table.**\n")
+        brows = []
+        attr_tables = {a["table"] for a in ATTRIBUTION}
+        for t in man_tables_of(ev):
+            sub = chan_a[(chan_a["table"] == t) & (chan_a["night"].notna())]
+            band = int(pd.to_numeric(sub["n_W_band_R1_R2"], errors="coerce").fillna(0).sum()) \
+                if len(sub) and "n_W_band_R1_R2" in sub.columns else 0
+            has_count = t not in NO_INDEPENDENT_COUNT_TABLES
+            brows.append(dict(
+                table=t,
+                rows_in_band_16_05_to_23_59=band,
+                channel_c_independent_count=has_count,
+                attributed_late_write_path=(t in attr_tables),
+                within_night_W_spread_reported=True,
+                band_coverage=("attribution, Channel C and the within-night spread"
+                               if has_count else
+                               "ATTRIBUTION ALONE -- no independent count exists for this "
+                               "table (sec 10.2); a clean Channel A count is not evidence that "
+                               "no 16:05..23:59 write occurred")))
+        A(md_table(pd.DataFrame(brows)))
+        A("\nThis is a limitation of the amended rule. It changes nothing in sec 10 of the "
+          "PREREG, which is not edited.\n")
     path.write_text("\n".join(L), encoding="utf-8")
+
+
+def man_tables_of(ev: dict) -> list:
+    """Table names, in manifest order, taken from the preflight evidence (no re-read)."""
+    seen, out = set(), []
+    for f in ev.get("files", []):
+        t = f.get("table")
+        if t and t not in seen and t in WRITE_TS:
+            seen.add(t)
+            out.append(t)
+    return out
 
 
 def extraction_backstop(man: dict) -> pd.DataFrame:
@@ -1920,22 +2258,39 @@ def main(argv=None) -> int:
     chan_c = channel_c(tables)
     gate = gate0(tables, man, cal, rule, chan_a, chan_c)
 
+    # ---- A1r item 1 / item 3: the boundary bands and A12's R3 fallback count.  Both are
+    # descriptive and are produced whether or not Gate 0 passes.
+    bands = boundary_band_totals(chan_a)
+    all_census_nights = sorted(set().union(*[set(v) for v in census_nights.values()])
+                               if census_nights else set())
+    a12_nights = [n.isoformat() for n in all_census_nights if r3_fallback_fired(n, cal)]
+    a12 = dict(n_nights=len(a12_nights), nights=a12_nights,
+               scope=("R3 sensitivity column only -- AMENDMENTS.md 2026-09-14, A12 as narrowed "
+                      "by A1's resolution; it cannot touch the sec 8 verdict under R2"))
+
     # ---- Gate 0 first, read first (sec 4.1).  On failure nothing else is computed (sec 8).
     if not gate["passed"]:
         ver = verdict(gate, pd.DataFrame(columns=["klass", "question", "column", "night",
                                                   "reason"]), {}, pd.DataFrame())
         (res / "gate0.json").write_text(json.dumps(gate, indent=1, default=str), encoding="utf-8")
         chan_a.to_csv(res / "channel_a.csv", index=False)
+        for k, g in bands.items():
+            g.to_csv(res / ("boundary_bands_%s.csv" % k), index=False)
         write_register(reg_path, ev, gate, chan_a, pd.DataFrame(), pd.DataFrame(), chan_c,
                        pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), {},
-                       pd.DataFrame(), {}, ver, {}, {}, cal, res_rel)
+                       pd.DataFrame(), {}, ver, {}, {}, cal, res_rel,
+                       bands=bands, sens=None, a12=a12, scoped_reads=None)
         summary = dict(question="Q026", n_nights=len(census_nights.get("sas_runs", [])),
                        n_nights_excluded=0, mean_oos=None, ci=None, p_perm=None, mpe=None,
                        verdict=ver["verdict"], controller_verdict=ver["controller_verdict"],
                        label="HISTORICAL_ONLY", gate0_passed=False,
                        gate0_failed_checks=[c["id"] for c in gate["checks"]
                                             if not c["passed"]],
+                       decision_time_rule=rule,
+                       decision_time_rule_amendment=DECISION_TIME_RULE_AMENDMENT,
+                       a12_r3_fallback_nights=a12["n_nights"],
                        register=str(reg_path.relative_to(ROOT)).replace("\\", "/"),
+                       statement=ver["statement"],
                        note="sec 4.7: no estimate, no CI, no p-value, no MPE. Every number is "
                             "NON_QUOTABLE.")
         (res / "run_summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
@@ -1953,6 +2308,20 @@ def main(argv=None) -> int:
         for e in lw["evidence"]:
             verified["%s:%s:%s" % (table, e["path"], e["lines"])] = verify_repo_literal(
                 codebase, e["path"], e["lines"], e["literal"])
+    # AMENDMENTS.md 2026-09-14, A6 RIDER -- the closed divisor set, literal by literal, at its
+    # cited line range at the frozen SHA.  If any one is absent the A6 check cannot be
+    # evaluated, the reconstruction tuple is MATERIAL (decision 2's failure branch) and the
+    # withdrawal is printed with A9's (sec 10.6).
+    _cit = OI_MULT_SET_CITATION
+    for lit in _cit["literals"]:
+        verified["%s:%s" % (_cit["key_prefix"], lit)] = verify_repo_literal(
+            codebase, _cit["path"], _cit["lines"], lit)
+    mult_set_ok = all(verified["%s:%s" % (_cit["key_prefix"], lit)]["ok"]
+                      for lit in _cit["literals"])
+    mult_set_detail = "; ".join(
+        "%s: %s" % (lit, "found" if verified["%s:%s" % (_cit["key_prefix"], lit)]["ok"]
+                    else "NOT FOUND")
+        for lit in _cit["literals"])
 
     qwin = question_windows(cal, census_nights)
     stats = night_stats(tables, man, cal, rule)
@@ -1964,7 +2333,9 @@ def main(argv=None) -> int:
             nights = qwin[q["id"]]["per_read"][
                 (rec["table"], tuple(next(r["columns"] for r in q["reads"]
                                           if r["table"] == rec["table"])))]
-            recon[q["id"]] = check_reconstruction(tables[rec["table"]], nights, rec)
+            recon[q["id"]] = check_reconstruction(tables[rec["table"]], nights, rec,
+                                                  mult_set_ok=mult_set_ok,
+                                                  mult_set_detail=mult_set_detail)
             recon[q["id"]]["cite"] = rec["cite"]
 
     chan_d, changes, appendix = channel_d(tables, manp, qwin)
@@ -1976,8 +2347,29 @@ def main(argv=None) -> int:
     chan_e, proposal = channel_e(man, chan_a, read_index)
     nightly = nightly_frame(tuples, chan_a, census_nights, qwin)
     splits = split_tables(nightly)
-    ver = verdict(gate, tuples, qwin, chan_d)
+    ver = verdict(gate, tuples, qwin, chan_d, rule)
     review = extraction_backstop(man)
+
+    # ---- A1r item 2 -- DESCRIPTIVE boundary sensitivity.  Computed after the verdict above,
+    # which is fixed under the in-force rule and is not revisited (rule 9).
+    sens = boundary_sensitivity(tables, man, cal, gate, qwin, chan_c, chan_d, verified, recon,
+                                census_nights, rule, tuples, ver)
+
+    # ---- A7 rider -- every as_feature=False column, itemised with its scoping PREREG sentence.
+    _cols_of = {t["name"]: list(t["columns"]) for t in man["tables"]}
+    scoped_rows = []
+    for q in QUESTIONS:
+        for r in q["reads"]:
+            if r.get("as_feature", True):
+                continue
+            cols = _cols_of[r["table"]] if r["columns"] == ["*"] else r["columns"]
+            for c in cols:
+                scoped_rows.append(dict(
+                    question=q["id"], table=r["table"], column=c,
+                    as_feature=False, class_count_label="IMMATERIAL_BY_SCOPE",
+                    scoping_prereg_sentence=r.get("note", ""),
+                    columns_declared=",".join(r["columns"]), citation=q["cite"]))
+    scoped_reads = pd.DataFrame(scoped_rows)
 
     # ---- outputs
     (res / "gate0.json").write_text(json.dumps(gate, indent=1, default=str), encoding="utf-8")
@@ -1995,6 +2387,11 @@ def main(argv=None) -> int:
     appendix.to_csv(res / "channel_d_correction_appendix.csv", index=False)
     nightly.to_csv(res / "nightly.csv", index=False)
     review.to_csv(res / "extraction_review.csv", index=False)
+    for k, g in bands.items():                       # A1r item 1
+        g.to_csv(res / ("boundary_bands_%s.csv" % k), index=False)
+    sens.to_csv(res / "boundary_sensitivity.csv", index=False)          # A1r item 2
+    scoped_reads.to_csv(res / "as_feature_false_scoped.csv", index=False)   # A7 rider
+    (res / "a12_r3_fallback.json").write_text(json.dumps(a12, indent=1), encoding="utf-8")
     for k, g in splits.items():
         g.to_csv(res / ("split_%s.csv" % re.sub(r"[^A-Za-z0-9_.-]", "_", k)), index=False)
     (res / "proposed_availability_block.json").write_text(
@@ -2005,7 +2402,7 @@ def main(argv=None) -> int:
 
     write_register(reg_path, ev, gate, chan_a, tuples, class_counts, chan_c, chan_d, changes,
                    appendix, chan_e, proposal, nightly, splits, ver, recon, verified, cal,
-                   res_rel)
+                   res_rel, bands=bands, sens=sens, a12=a12, scoped_reads=scoped_reads)
 
     n_nights = len(census_nights.get("sas_runs", []))
     n_excl_all = int(nightly["out_of_every_window_or_excluded"].sum()) if len(nightly) else 0
@@ -2022,6 +2419,11 @@ def main(argv=None) -> int:
         stop_the_desk=ver["stop_the_desk"], stop_limbs=ver["stop_limbs"],
         channel_d_material_rows=ver["channel_d_material_rows"],
         decision_time_rule=rule, decision_time_rule_amendment=DECISION_TIME_RULE_AMENDMENT,
+        decision_time_boundary=RULE_BOUNDARY_TEXT[rule],
+        a12_r3_fallback_nights=a12["n_nights"], a12_scope=a12["scope"],
+        oi_mult_set_verified_at_sha=bool(mult_set_ok),
+        boundary_sensitivity_heading=SENSITIVITY_HEADING,
+        boundary_sensitivity=json.loads(sens.to_json(orient="records")),
         platform_sha_read=PLATFORM_SHA,
         register=str(reg_path.relative_to(ROOT)).replace("\\", "/"),
         statement=ver["statement"],
@@ -2043,6 +2445,13 @@ def main(argv=None) -> int:
           % (ver["M"], ver["MM_verified"], ver["MM_failed"], ver["U"], ver["advisory"]),
           "- STOP-THE-DESK: %s" % ("YES -- " + " ; ".join(ver["stop_limbs"])
                                    if ver["stop_the_desk"] else "no"),
+          "- Decision-time boundary: **%s** -- %s. Amendment: %s."
+          % (rule, RULE_BOUNDARY_TEXT[rule], DECISION_TIME_RULE_AMENDMENT),
+          "- A12 R3 fallback fired on %d night(s); %s." % (a12["n_nights"], a12["scope"]),
+          "- Boundary sensitivity (%s): see `boundary_sensitivity.csv` and register section 9. "
+          "The band counts under all three rules are in `channel_a.csv`, "
+          "`boundary_bands_by_table.csv`, `boundary_bands_by_month.csv` and "
+          "`boundary_bands_overall.csv`." % SENSITIVITY_HEADING,
           "- Register: `%s`" % summary["register"],
           "- Regime breakdown: sec 6 forbids stratifying by `market_regime_daily` before "
           "2026-06-09 (it is one of the objects under audit); the calendar panel, the three "

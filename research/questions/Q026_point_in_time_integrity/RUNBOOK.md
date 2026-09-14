@@ -4,19 +4,33 @@
 
 ## Before you run
 
-1. **A1 must be closed.** `AMENDMENTS.md` A1 is OPEN as of 2026-09-14: PREREG §4.0's
-   `D(N) = 16:05 ET` is inconsistent with §4's own B1 declaration and B2 controls, and the
-   choice decides the verdict. Until the registrar / decision-maker appends a dated amendment and
-   sets, in `eval.py`,
+1. **A1 is CLOSED (2026-09-14).** The decision-maker settled the §4.0 decision-time boundary by
+   dated amendment (`AMENDMENTS.md` "Amendments applied"; `DECISIONS.md` "## Amendments after
+   lock"; autonomous, DP-40). The Researcher transcribed it into `eval.py` the same day:
 
    ```python
-   DECISION_TIME_RULE = "R1_1605_LITERAL" | "R2_SAME_EVENING" | "R3_NEXT_OPEN"
-   DECISION_TIME_RULE_AMENDMENT = "AMENDMENTS.md <date> A1 resolved: <one sentence>"
+   DECISION_TIME_RULE = "R2_SAME_EVENING"
+   DECISION_TIME_RULE_AMENDMENT = ("AMENDMENTS.md 2026-09-14 A1 RESOLVED: R2_SAME_EVENING "
+       "(decision-maker, autonomous, DP-40; boundary(N) = 23:59:59.999999 ET on N)")
    ```
 
-   the script **aborts in preflight, opens no parquet and writes no register**. That is intended.
-   Do not set it yourself (rule 9), and do not run the script to "see what happens".
-2. Nothing else is required. No live query, no new freeze, no exposure report (§5.2).
+   `boundary(N) = 23:59:59.999999 ET on N`: a write is "after the decision" when it is dated on a
+   **later ET calendar date** than the night it is attributed to. `D(N) = 16:05 ET` still stands
+   as the decision moment and as `A(T, N)`'s clock in §4.2's separate `n_W_gt_A` column, and
+   Gate 0(a) still uses DP-04's next-session-open criterion at **run** level.
+
+   **Do not change either constant** (rule 9). The preflight gate is still live and still aborts
+   before Gate 0 on an unset rule, an unknown rule id, or a rule id without its amendment
+   citation. A different boundary after the register exists is a look, and is a successor
+   question — not a re-run of this one.
+2. **The register is written under R2 only.** §9 of the register prints a `Boundary sensitivity`
+   block under R1 / R2 / R3. It is headed `DESCRIPTIVE — DOES NOT DECIDE` and it may never be
+   used to pick a rule after looking. Read it as an audit of the choice, not as an option.
+3. Nothing else is required. No live query, no new freeze, no exposure report (§5.2).
+4. **Expect a longer run than a single pass.** A1r item 2 makes the script evaluate Channel B
+   three times — once under each boundary — on the same frozen rows. Gate 0, Channel C,
+   Channel D, the question windows and the reconstruction check are boundary-independent and are
+   computed once. Nothing about this is a choice made at run time.
 
 ## The command
 
@@ -47,7 +61,8 @@ retired (decision 3).
 
 ## What it checks before it computes anything
 
-Abort, with no register and no number, on any of: the amendment gate above; Q026's own `PREREG.md`
+Abort, with no register and no number, on any of: the amendment gate above (rule id set, known,
+and carrying its dated amendment citation); Q026's own `PREREG.md`
 sha256 ≠ the pinned lock hash; the §2.2 question list not matching the script's transcription (it
 prints the diff); any listed question's `PREREG.md` sha256 ≠ the hash the column extraction was
 made from; a manifest or parquet sha256 ≠ its pin; a declared row count ≠ the file's; the platform
@@ -60,16 +75,22 @@ absent. The script opens no database connection anywhere (rule 4, DP-50(c), deci
    INCONCLUSIVE, nothing else was computed, the register is filed incomplete, the defect goes to
    the Researcher, and at most **two** fix-and-re-run passes are allowed, all inside the hard stop
    **Monday 2026-10-05** (decision 7). No Gate 0 target is ever relaxed.
-2. Register §0 verdict block, then §4 (Channel B) — the section that decides.
-3. Everything else.
+2. Register §0 verdict block, then §4 (Channel B) — the section that decides. The verdict
+   sentence names the boundary it was computed under.
+3. Everything else, in order. §9 `Boundary sensitivity` is descriptive and decides nothing;
+   §10.1 states, per table, the band `R2_SAME_EVENING` does not see (16:05–23:59:59 ET on the
+   night itself) and which of the other three defences covers it for that table.
 
 ## Outputs
 
 - `research/reports/KT_REGISTER_manifest_v001.md` — the register (ledger it with Q026).
 - `results/run_summary.json` and stdout — `verdict`, `M`, `MM_verified`, `MM_failed`, `U`,
-  `advisory`, `stop_the_desk`, `n_nights`, plus `mean_oos`/`ci`/`p_perm`/`mpe` as `null`
+  `advisory`, `stop_the_desk`, `n_nights`, `decision_time_rule`,
+  `decision_time_rule_amendment`, `decision_time_boundary`, `a12_r3_fallback_nights`,
+  `oi_mult_set_verified_at_sha`, `boundary_sensitivity`, plus
+  `mean_oos`/`ci`/`p_perm`/`mpe` as `null`
   (§4.7: no estimate, no CI, no p-value, no MPE, no BH, no episode clustering).
-- `results/nightly.csv` — one row per night (rule 6).
+- `results/nightly.csv` — one row per night (rule 6), including the three-rule band columns.
 - `results/channel_a.csv`, `channel_b_class_counts.csv` (every column of every table),
   `channel_b_tuples.csv`, `channel_b_material.csv`, `channel_b_material_mitigated.csv`,
   `channel_b_contamination_unresolved.csv`, `channel_b_advisory.csv`, `channel_c.csv`,
@@ -77,6 +98,12 @@ absent. The script opens no database connection anywhere (rule 4, DP-50(c), deci
   `channel_d_correction_appendix.csv`, `channel_e.csv`, `split_*.csv`,
   `proposed_availability_block.json`, `extraction_review.csv`, `preflight.json`,
   `reconstruction.json`, `SUMMARY.md`.
+- **A1r additions (2026-09-14):** `boundary_bands_by_table.csv`, `boundary_bands_by_month.csv`,
+  `boundary_bands_overall.csv` (`n_W_gt_R1/R2/R3`, `n_W_band_R1_R2`, `n_W_band_R2_R3`,
+  `n_L_gt_U_R1/R2/R3`), `boundary_sensitivity.csv` (M, MM, U, questions_touched and both
+  STOP-THE-DESK limbs under each rule), `a12_r3_fallback.json` (the A12 fallback nights, which
+  affect the R3 sensitivity column only), and `as_feature_false_scoped.csv` (the A7 rider: every
+  `as_feature=False` column with the PREREG sentence that scopes it).
 
 `extraction_review.csv` is the §10.5 backstop: every backticked token in a listed PREREG that
 names a frozen column and is not in the script's transcription. It changes no classification —
