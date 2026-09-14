@@ -48,12 +48,12 @@ _none yet — every question so far is NULL, INCONCLUSIVE, or still waiting for 
 | Q013 | does a pick whose earnings report lands within three sessions run a worse path than a pick whose report is further out? | DATASET_PINNED | 2027-03-22 |
 | Q014 | does a week of repeated unusual-options activity before the pick night make a SAS pick better, and does SAS add anything | DATASET_PINNED | 2027-04-05 |
 | Q007 | for a pick already held from the pick-night close, does a next-morning gap of more than 2% predict the rest of the trade | DATASET_PINNED | 2027-04-26 (exposure check; hard stop 2027-06-30) |
+| Q024 | Q024 — does SAS beat embarrassingly simple benchmarks, on the price path? | PREREG_LOCKED | 2027-05-17 (exposure check; hard stop 2027-06-28) |
 | Q019 | when the Conviction Monitor flags a recent pick EXIT, is closing it at the next open worth more than holding to the tent | DATASET_PINNED | 2027-05-24 |
 | Q023 | do the platform's 80–90 picks do worse on nights its own regime engine calls `strongly_bullish`? | PREREG_LOCKED | 2027-06-07 (exposure check; hard stop 2027-07-19) |
 | Q018 | for the same pick, does the day, the swing or the long-term lane plan make the most money — and does the answer depend o | PREREG_LOCKED | 2027-07-12 |
 | Q021 | Q021 — GEX pin risk and two-sided paths (does a pinned pick round-trip more often?) | DATASET_PINNED | 2027-08-09 (exposure check; hard stop 2027-09-20) |
 | Q015 | do picks scoring 85–90 reach the swing target and then hand it back more often than picks scoring 80–85, and does exitin | DATASET_PINNED | 2027-08-30 |
-| Q024 | Q024 — does SAS beat embarrassingly simple benchmarks, on the price path? | PREREG_DRAFT | — |
 
 ## 4. Platform issues
 
@@ -171,6 +171,7 @@ _Each was a question the desk would once have asked you. It took the recommended
 | 2027-03-22 | Q013 |
 | 2027-04-05 | Q014 |
 | 2027-04-26 | Q007 |
+| 2027-05-17 | Q024 |
 | 2027-05-24 | Q019 |
 | 2027-06-07 | Q023 |
 | 2027-07-12 | Q018 |
