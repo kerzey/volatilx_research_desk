@@ -1,0 +1,493 @@
+<title>VolatilX Answer Calendar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --paper:#F5F6F8; --card:#FFFFFF; --ink:#151922; --ink-2:#39404F; --muted:#5A6274;
+  --rule:#DBDFE6; --rule-soft:#E9ECF1;
+  --brass:#9C6B26; --brass-soft:#F0E6D6;
+  --live:#1E6B57; --live-soft:#DDEDE7;
+  --soon:#A8492A; --soon-soft:#F7E4DC;
+  --held:#6B5B8A; --held-soft:#E9E4F1;
+  --closed:#868C99; --closed-soft:#E8EAEE;
+  --shadow:0 1px 2px rgba(21,25,34,.05), 0 8px 24px -16px rgba(21,25,34,.25);
+  --maxw:1080px;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0F1219; --card:#161B24; --ink:#E4E8EF; --ink-2:#BAC2D0; --muted:#8B94A6;
+    --rule:#242A36; --rule-soft:#1D232E;
+    --brass:#D0964B; --brass-soft:#2E2417;
+    --live:#5FBFA2; --live-soft:#14281F;
+    --soon:#E08A63; --soon-soft:#2E1D14;
+    --held:#A996C9; --held-soft:#221D2E;
+    --closed:#7C8494; --closed-soft:#1C212B;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0F1219; --card:#161B24; --ink:#E4E8EF; --ink-2:#BAC2D0; --muted:#8B94A6;
+  --rule:#242A36; --rule-soft:#1D232E;
+  --brass:#D0964B; --brass-soft:#2E2417;
+  --live:#5FBFA2; --live-soft:#14281F;
+  --soon:#E08A63; --soon-soft:#2E1D14;
+  --held:#A996C9; --held-soft:#221D2E;
+  --closed:#7C8494; --closed-soft:#1C212B;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:15px; line-height:1.55; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:var(--maxw); margin:0 auto; padding-inline:20px; padding-block:40px 64px}
+.mono{font-family:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace; font-variant-numeric:tabular-nums}
+
+.mast{border-bottom:2px solid var(--ink); padding-bottom:18px; margin-bottom:28px}
+.eyebrow{
+  font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--brass); font-weight:500; margin:0 0 10px
+}
+h1{
+  font-family:Spectral,Georgia,serif; font-weight:600; font-size:clamp(30px,5vw,44px);
+  line-height:1.08; margin:0 0 12px; text-wrap:balance; letter-spacing:-.015em
+}
+.dek{margin:0; max-width:64ch; color:var(--ink-2); font-size:16.5px}
+.dek b{color:var(--ink); font-weight:600}
+
+.headline{
+  margin:24px 0 32px; background:var(--card); border:1px solid var(--rule);
+  border-left:4px solid var(--brass); border-radius:3px; padding:18px 20px; box-shadow:var(--shadow)
+}
+.headline p{margin:0; font-family:Spectral,Georgia,serif; font-size:18px; line-height:1.5}
+.headline p + p{margin-top:10px; font-family:"Public Sans",sans-serif; font-size:14.5px; color:var(--muted)}
+
+.stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(128px,1fr)); gap:1px;
+  background:var(--rule); border:1px solid var(--rule); border-radius:3px; overflow:hidden; margin-bottom:36px}
+.stat{background:var(--card); padding:14px 16px}
+.stat .n{font-family:"JetBrains Mono",monospace; font-size:26px; font-weight:700; line-height:1; font-variant-numeric:tabular-nums}
+.stat .l{font-size:12px; color:var(--muted); margin-top:6px; line-height:1.35}
+.stat.is-live .n{color:var(--live)} .stat.is-soon .n{color:var(--soon)}
+.stat.is-held .n{color:var(--held)} .stat.is-closed .n{color:var(--closed)}
+
+h2{
+  font-family:Spectral,Georgia,serif; font-weight:600; font-size:23px; margin:0 0 4px;
+  letter-spacing:-.01em; text-wrap:balance
+}
+.sub{margin:0 0 18px; color:var(--muted); font-size:14px; max-width:68ch}
+section{margin-bottom:44px}
+
+.chart{background:var(--card); border:1px solid var(--rule); border-radius:3px; padding:20px 20px 14px; box-shadow:var(--shadow); margin:0}
+.bars{display:grid; grid-template-columns:repeat(12,1fr); gap:6px; align-items:end; height:104px}
+.bar{display:flex; flex-direction:column; justify-content:flex-end; height:100%; gap:5px}
+.bar i{display:block; background:var(--live); border-radius:2px 2px 0 0; min-height:3px}
+.bar.zero i{background:var(--rule); min-height:3px}
+.bar.near i{background:var(--soon)}
+.bar b{font-family:"JetBrains Mono",monospace; font-size:12px; font-weight:700; text-align:center; font-variant-numeric:tabular-nums}
+.xaxis{display:grid; grid-template-columns:repeat(12,1fr); gap:6px; margin-top:8px; border-top:1px solid var(--rule); padding-top:7px}
+.xaxis span{font-family:"JetBrains Mono",monospace; font-size:10px; color:var(--muted); text-align:center; letter-spacing:.02em}
+.chart figcaption{margin-top:12px; font-size:12.5px; color:var(--muted); line-height:1.5}
+
+.month{margin-top:26px}
+.month:first-of-type{margin-top:0}
+.month > h3{
+  font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--muted); font-weight:500; margin:0 0 8px; padding-bottom:6px; border-bottom:1px solid var(--rule)
+}
+.row{
+  display:grid; grid-template-columns:78px 1fr auto; gap:6px 16px; align-items:baseline;
+  padding:11px 0; border-bottom:1px solid var(--rule-soft)
+}
+.row:last-child{border-bottom:0}
+.qid{font-family:"JetBrains Mono",monospace; font-size:13.5px; font-weight:700; color:var(--brass)}
+.qtext{font-size:14.5px; line-height:1.45; color:var(--ink)}
+.qmeta{margin-top:3px; font-size:12.5px; color:var(--muted)}
+.qmeta .fam{font-family:"JetBrains Mono",monospace; font-size:11.5px}
+.when{text-align:right; white-space:nowrap}
+.when .d{font-family:"JetBrains Mono",monospace; font-size:13.5px; font-weight:500; font-variant-numeric:tabular-nums}
+.when .e{display:block; font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--muted); margin-top:2px}
+
+.chip{
+  display:inline-block; font-family:"JetBrains Mono",monospace; font-size:10.5px; font-weight:500;
+  letter-spacing:.06em; text-transform:uppercase; padding:2px 7px; border-radius:2px; vertical-align:1px
+}
+.chip.live{background:var(--live-soft); color:var(--live)}
+.chip.soon{background:var(--soon-soft); color:var(--soon)}
+.chip.held{background:var(--held-soft); color:var(--held)}
+.chip.closed{background:var(--closed-soft); color:var(--closed)}
+.chip.brass{background:var(--brass-soft); color:var(--brass)}
+
+.panel{background:var(--card); border:1px solid var(--rule); border-radius:3px; box-shadow:var(--shadow)}
+.panel .item{padding:14px 18px; border-bottom:1px solid var(--rule-soft)}
+.panel .item:last-child{border-bottom:0}
+.item h4{margin:0 0 4px; font-size:14.5px; font-weight:600; display:flex; gap:9px; align-items:baseline; flex-wrap:wrap}
+.item h4 .qid{font-size:13px}
+.item p{margin:0; font-size:13.5px; color:var(--muted); line-height:1.5}
+.item p code, .qmeta code{
+  font-family:"JetBrains Mono",monospace; font-size:12px; background:var(--rule-soft);
+  padding:1px 4px; border-radius:2px; color:var(--ink-2)
+}
+
+.tablewrap{overflow-x:auto; background:var(--card); border:1px solid var(--rule); border-radius:3px; box-shadow:var(--shadow)}
+table{border-collapse:collapse; width:100%; font-size:13.5px; min-width:520px}
+th{
+  text-align:left; font-family:"JetBrains Mono",monospace; font-size:10.5px; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--muted); font-weight:500; padding:11px 14px; border-bottom:1px solid var(--rule)
+}
+td{padding:12px 14px; border-bottom:1px solid var(--rule-soft); vertical-align:top}
+tr:last-child td{border-bottom:0}
+
+footer{margin-top:52px; padding-top:18px; border-top:1px solid var(--rule); color:var(--muted); font-size:12.5px}
+footer p{margin:0 0 6px; max-width:72ch}
+@media (max-width:560px){
+  .row{grid-template-columns:1fr; gap:4px}
+  .when{text-align:left}
+  .bars{height:80px}
+  .xaxis span{font-size:9px}
+}
+</style>
+
+<div class="wrap">
+
+<header class="mast">
+  <p class="eyebrow">VolatilX Research Desk &middot; 14 September 2026</p>
+  <h1>The answer calendar</h1>
+  <p class="dek">Thirty-six pre-registered questions. <b>One has an answer.</b> The first new one lands in a week, and the bulk of the programme reports between February and August 2027 &mdash; because a question cannot be answered before its own pre-registered decision date, and most of them are waiting on trading nights that have not happened yet.</p>
+</header>
+
+<div class="headline">
+  <p>No edge has been confirmed, and none has been ruled out. That is the design working, not a delay.</p>
+  <p>Every question is locked before its data is unsealed, so the desk cannot report early and cannot tune while looking. What you have today is a full pipeline with one verdict on record: Q005, <span class="mono">INCONCLUSIVE</span>.</p>
+</div>
+
+<div class="stats">
+  <div class="stat is-closed"><div class="n">1</div><div class="l">verdict on record</div></div>
+  <div class="stat is-soon"><div class="n">5</div><div class="l">report by 26 Oct 2026</div></div>
+  <div class="stat is-live"><div class="n">27</div><div class="l">locked and running</div></div>
+  <div class="stat is-held"><div class="n">7</div><div class="l">held, blocker named</div></div>
+  <div class="stat"><div class="n">2</div><div class="l">unblocked today</div></div>
+</div>
+
+<section>
+  <h2>When the answers arrive</h2>
+  <p class="sub">Questions reaching their decision date each month. A dated question reports on that date unless its single registered extension fires, which pushes it about six weeks. January 2027 is empty because no window closes there.</p>
+  <figure class="chart">
+    <div class="bars">
+      <div class="bar near"><b>2</b><i style="height:66%"></i></div>
+      <div class="bar near"><b>3</b><i style="height:100%"></i></div>
+      <div class="bar"><b>1</b><i style="height:33%"></i></div>
+      <div class="bar"><b>3</b><i style="height:100%"></i></div>
+      <div class="bar zero"><b>0</b><i></i></div>
+      <div class="bar"><b>3</b><i style="height:100%"></i></div>
+      <div class="bar"><b>2</b><i style="height:66%"></i></div>
+      <div class="bar"><b>3</b><i style="height:100%"></i></div>
+      <div class="bar"><b>2</b><i style="height:66%"></i></div>
+      <div class="bar"><b>2</b><i style="height:66%"></i></div>
+      <div class="bar"><b>2</b><i style="height:66%"></i></div>
+      <div class="bar"><b>3</b><i style="height:100%"></i></div>
+    </div>
+    <div class="xaxis">
+      <span>SEP<br>26</span><span>OCT</span><span>NOV</span><span>DEC</span>
+      <span>JAN<br>27</span><span>FEB</span><span>MAR</span><span>APR</span>
+      <span>MAY</span><span>JUN</span><span>JUL</span><span>AUG</span>
+    </div>
+    <figcaption>Twenty-six dated questions. Q007 is not on this chart: its decision date is set by exposure, not by the calendar &mdash; the Data Steward starts counting on 26 April 2027 and the hard stop is 30 June 2027.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>The next five</h2>
+  <p class="sub">These are the first real reads on whether the platform has an edge at all. The two September questions are diagnostics that check the data and the architecture; the October three are the first outcome questions.</p>
+
+  <div class="month">
+    <h3>September 2026</h3>
+    <div class="row">
+      <div class="qid">Q026</div>
+      <div>
+        <div class="qtext">Did every input actually exist when SAS made the prediction?</div>
+        <div class="qmeta"><span class="fam">F8</span> &middot; pass / fail, no effect size &middot; <b>runs first: a fail stops everything downstream</b></div>
+      </div>
+      <div class="when"><span class="d">21 Sep</span> <span class="chip soon">7 days</span></div>
+    </div>
+    <div class="row">
+      <div class="qid">Q028</div>
+      <div>
+        <div class="qtext">Are the seven scoring layers seven signals, or really three or four?</div>
+        <div class="qmeta"><span class="fam">F8</span> &middot; reads no outcome column, so it cannot contaminate anything</div>
+      </div>
+      <div class="when"><span class="d">28 Sep</span> <span class="chip soon">14 days</span></div>
+    </div>
+  </div>
+
+  <div class="month">
+    <h3>October 2026</h3>
+    <div class="row">
+      <div class="qid">Q006</div>
+      <div>
+        <div class="qtext">Does SAS selection beat a distance-matched control drawn from its own universe, on the price path?</div>
+        <div class="qmeta"><span class="fam">F1</span> &middot; <b>the central question of the desk</b> &middot; first live use of the episode-clustered check</div>
+      </div>
+      <div class="when"><span class="d">5 Oct</span></div>
+    </div>
+    <div class="row">
+      <div class="qid">Q002</div>
+      <div>
+        <div class="qtext">Do SAS picks reach the near targets sooner than matched candidates?</div>
+        <div class="qmeta"><span class="fam">F7</span> &middot; tests your speed thesis directly</div>
+      </div>
+      <div class="when"><span class="d">12 Oct</span></div>
+    </div>
+    <div class="row">
+      <div class="qid">Q004</div>
+      <div>
+        <div class="qtext">Does it matter whether you buy after hours, at the open, or at 10:00?</div>
+        <div class="qmeta"><span class="fam">F7</span> &middot; decides TI-001, the partial after-hours fill on elite picks</div>
+      </div>
+      <div class="when"><span class="d">26 Oct</span></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>The rest of the pipeline</h2>
+  <p class="sub">All locked, all running. The smaller date under each is the one registered extension, which fires only if the question has not accrued enough contributing nights.</p>
+
+  <div class="month">
+    <h3>November &ndash; December 2026</h3>
+    <div class="row">
+      <div class="qid">Q009</div>
+      <div><div class="qtext">Does the printed stop shake you out of trades that would have reached the target?</div>
+      <div class="qmeta"><span class="fam">F6</span></div></div>
+      <div class="when"><span class="d">9 Nov</span><span class="e">ext 21 Dec</span></div>
+    </div>
+    <div class="row">
+      <div class="qid">Q011</div>
+      <div><div class="qtext">Rest a limit below the close and buy the day-1 dip, or just buy the open?</div>
+      <div class="qmeta"><span class="fam">F7</span></div></div>
+      <div class="when"><span class="d">14 Dec</span><span class="e">ext 1 Feb 27</span></div>
+    </div>
+    <div class="row">
+      <div class="qid">Q003</div>
+      <div><div class="qtext">Are first-time picks weaker than picks SAS keeps re-selecting?</div>
+      <div class="qmeta"><span class="fam">F6</span></div></div>
+      <div class="when"><span class="d">15 Dec</span></div>
+    </div>
+    <div class="row">
+      <div class="qid">Q008</div>
+      <div><div class="qtext">When a pick hits its first target within two sessions, does it go on to the fourth?</div>
+      <div class="qmeta"><span class="fam">F4</span></div></div>
+      <div class="when"><span class="d">28 Dec</span><span class="e">ext 3 Feb 27</span></div>
+    </div>
+  </div>
+
+  <div class="month">
+    <h3>February &ndash; April 2027</h3>
+    <div class="row">
+      <div class="qid">Q010</div>
+      <div><div class="qtext">Does Q009's stop result repeat on nights nobody had seen when it was registered?</div>
+      <div class="qmeta"><span class="fam">F6</span> &middot; the prospective replication</div></div>
+      <div class="when"><span class="d">22 Feb</span></div>
+    </div>
+    <div class="row">
+      <div class="qid">Q016</div>
+      <div><div class="qtext">Does volatility at selection predict a round trip?</div>
+      <div class="qmeta"><span class="fam">F7</span> &middot; registered although the in-sample read went the other way</div></div>
+      <div class="when"><span class="d">22 Feb</span><span class="e">ext 5 Apr</span></div>
+    </div>
+    <div class="row">
+      <div class="qid">Q022</div>
+      <div><div class="qtext">Does a concentrated slate change what the picks do?</div>
+      <div class="qmeta"><span class="fam">F4</span></div></div>
+      <div class="when"><span class="d">22 Feb</span><span class="e">ext 5 Apr</span></div>
+    </div>
+    <div class="row">
+      <div class="qid">Q012</div>
+      <div><div class="qtext">Below 90, take the first small target and recycle the capital, or hold?</div>
+      <div class="qmeta"><span class="fam">F6</span></div></div>
+      <div class="when"><span class="d">22 Mar</span><span class="e">ext 3 May</span></div>
+    </div>
+    <div class="row">
+      <div class="qid">Q013</div>
+      <div><div class="qtext">Does a pick whose earnings land within three sessions run a worse path?</div>
+      <div class="qmeta"><span class="fam">F4</span></div></div>
+      <div class="when"><span class="d">22 Mar</span><span class="e">ext 10 May</span></div>
+    </div>
+    <div class="row">
+      <div class="qid">Q014</div>
+      <div><div class="qtext">Does a week of repeated unusual options activity make a pick better?</div>
+      <div class="qmeta"><span class="fam">F5</span></div></div>
+      <div class="when"><span class="d">5 Apr</span><span class="e">ext 17 May</span></div>
+    </div>
+    <div class="row">
+      <div class="qid">Q027</div>
+      <div><div class="qtext">Does a higher SAS score actually mean a better price path?</div>
+      <div class="qmeta"><span class="fam">F2</span> &middot; your H3, ranking validity</div></div>
+      <div class="when"><span class="d">12 Apr</span><span class="e">ext 24 May</span></div>
+    </div>
+    <div class="row">
+      <div class="qid">Q029</div>
+      <div><div class="qtext">Which of the seven scoring layers actually earns its weight?</div>
+      <div class="qmeta"><span class="fam">F1</span> &middot; your H5, ingredient value</div></div>
+      <div class="when"><span class="d">12 Apr</span><span class="e">ext 24 May</span></div>
+    </div>
+  </div>
+
+  <div class="month">
+    <h3>May &ndash; August 2027</h3>
+    <div class="row">
+      <div class="qid">Q024</div>
+      <div><div class="qtext">Does SAS beat embarrassingly simple benchmarks &mdash; SPY, equal weight, momentum, a technical rank?</div>
+      <div class="qmeta"><span class="fam">F1</span> &middot; your H1, the project null</div></div>
+      <div class="when"><span class="d">17 May</span><span class="e">ext 28 Jun</span></div>
+    </div>
+    <div class="row">
+      <div class="qid">Q019</div>
+      <div><div class="qtext">When the Conviction Monitor flags EXIT, is closing at the next open worth it?</div>
+      <div class="qmeta"><span class="fam">F6</span></div></div>
+      <div class="when"><span class="d">24 May</span><span class="e">ext 12 Jul</span></div>
+    </div>
+    <div class="row">
+      <div class="qid">Q023</div>
+      <div><div class="qtext">Do 80&ndash;90 picks do worse on nights the regime engine calls strongly bullish?</div>
+      <div class="qmeta"><span class="fam">F2</span></div></div>
+      <div class="when"><span class="d">7 Jun</span><span class="e">ext 19 Jul</span></div>
+    </div>
+    <div class="row">
+      <div class="qid">Q031</div>
+      <div><div class="qtext">Is the edge deteriorating, or is a weak stretch normal variation?</div>
+      <div class="qmeta"><span class="fam">F2</span> &middot; your H12, edge decay</div></div>
+      <div class="when"><span class="d">7 Jun</span><span class="e">ext 19 Jul</span></div>
+    </div>
+    <div class="row">
+      <div class="qid">Q018</div>
+      <div><div class="qtext">For the same pick, does the day, swing or long lane plan make the most?</div>
+      <div class="qmeta"><span class="fam">F6</span></div></div>
+      <div class="when"><span class="d">12 Jul</span><span class="e">ext 16 Aug</span></div>
+    </div>
+    <div class="row">
+      <div class="qid">Q033</div>
+      <div><div class="qtext">Does VolatilX get direction right more reliably than distance?</div>
+      <div class="qmeta"><span class="fam">F8</span> &middot; your H11 &middot; second primary rejoins now the tape arm is unblocked</div></div>
+      <div class="when"><span class="d">12 Jul</span><span class="e">ext 23 Aug</span></div>
+    </div>
+    <div class="row">
+      <div class="qid">Q021</div>
+      <div><div class="qtext">Does a pick with GEX pin risk round-trip more often?</div>
+      <div class="qmeta"><span class="fam">F3</span></div></div>
+      <div class="when"><span class="d">9 Aug</span><span class="e">ext 20 Sep</span></div>
+    </div>
+    <div class="row">
+      <div class="qid">Q034</div>
+      <div><div class="qtext">Of the nine ways to measure a pick, which one does VolatilX predict best?</div>
+      <div class="qmeta"><span class="fam">F8</span> &middot; your H14, economic objective</div></div>
+      <div class="when"><span class="d">9 Aug</span><span class="e">ext 20 Sep</span></div>
+    </div>
+    <div class="row">
+      <div class="qid">Q015</div>
+      <div><div class="qtext">Do 85&ndash;90 picks reach the swing target and then hand it back?</div>
+      <div class="qmeta"><span class="fam">F7</span></div></div>
+      <div class="when"><span class="d">30 Aug</span><span class="e">ext 11 Oct</span></div>
+    </div>
+    <div class="row">
+      <div class="qid">Q007</div>
+      <div><div class="qtext">For a pick already held, does a next-morning gap against it change the trade?</div>
+      <div class="qmeta"><span class="fam">F4</span> &middot; no fixed date &mdash; the Steward counts exposure from 26 Apr 2027</div></div>
+      <div class="when"><span class="chip brass">exposure</span><span class="e">stop 30 Jun 27</span></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Unblocked today</h2>
+  <p class="sub">Both were held on &ldquo;no Alpaca credentials in the desk&rsquo;s session&rdquo;. The credentials were in the environment file all along and the headless runs always loaded them &mdash; the interactive session that measured the blocker had not. Both triggers have now been measured and cleared.</p>
+  <div class="panel">
+    <div class="item">
+      <h4><span class="qid">Q030</span> Does the candidate universe find the big movers before they move? <span class="chip live">cleared</span></h4>
+      <p>Coverage measured at <b>97.55%</b> against a 90% gate &mdash; 2,346 of the 2,405 symbols in the pinned sector map returned at least 60 daily bars. The map re-verified at 2,405 entries and its pinned hash. Next: pin the universe price freeze, then re-register. This is the step before every other selection question, because Q006, Q024 and Q027 all draw from the pool and none of them can see what the pool never contained.</p>
+    </div>
+    <div class="item">
+      <h4><span class="qid">Q032</span> Does the selection edge exist only in identifiable tape states? <span class="chip live">cleared</span></h4>
+      <p>SPY returned <b>424</b> split-adjusted daily sessions from 2 January 2025, against the 250 the expanding volatility tercile needs. The old finding that no session ever has 250 priors described the existing freeze&rsquo;s 153 bars, not what the vendor supplies. The same limb unblocks Q033&rsquo;s second primary.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Still held, and why</h2>
+  <p class="sub">Each names the exact measurement that would lift it. None is waiting on a date alone.</p>
+  <div class="panel">
+    <div class="item">
+      <h4><span class="qid">Q025</span> Is the edge inherited sector, size and momentum exposure? <span class="chip held">held</span></h4>
+      <p>The exposure-matched control does not exist on any night. No night in 46 ever carried three picks with three same-sector twins inside the caliper. The platform fix is a larger retained candidate universe, filed as EN-016.</p>
+    </div>
+    <div class="item">
+      <h4><span class="qid">Q035</span> Would a setup-specific ranker pick a better eight? <span class="chip held">held</span></h4>
+      <p>The projection layer is unscored on roughly three of every four published rows, so the night&rsquo;s publishable choice set cannot be reconstructed. Filed as PI-015.</p>
+    </div>
+    <div class="item">
+      <h4><span class="qid">Q036</span> Does the high / medium / low label mark a better path? <span class="chip held">held</span></h4>
+      <p>The comparison arm cannot exist on the running configuration: a medium label above score 82 is unreachable. Filed as PI-016.</p>
+    </div>
+    <div class="item">
+      <h4><span class="qid">Q020</span> After a run to the fourth target and a pullback, does it re-advance? <span class="chip brass">your call</span></h4>
+      <p>Needs a knowledge-time exception the desk may not grant itself &mdash; the classifier reads bars from 40 sessions after the pick, on both arms. You lift it by adding that scope to DP-05 as clause (c), and the question re-enters at the front.</p>
+    </div>
+    <div class="item">
+      <h4><span class="qid">Q017</span> GEX pin risk <span class="chip closed">superseded</span></h4>
+      <p>Bookkeeping only. Re-registered as Q021 before lock, with every amendment folded in. No research was lost and no outcome was read.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>The one answer on record</h2>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Question</th><th>Verdict</th><th>The number</th><th>Nights</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="qid mono">Q005</span><br>Why does SAS publish fewer 90+ picks every month?</td>
+          <td><span class="chip closed">Inconclusive</span></td>
+          <td>Elite-candidate rate fell from 0.50 to 0.245 per night, p&nbsp;=&nbsp;0.016. The fall is real; the cause is not pinned. Research-only, not quotable.</td>
+          <td class="mono">107</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="sub" style="margin-top:12px">The red team overturned the script&rsquo;s own attribution here. It had blamed four configuration changes; none of them can move a score, so the verdict on record is inconclusive rather than confirmed. That disagreement sits in the ledger rather than being smoothed away.</p>
+</section>
+
+<section>
+  <h2>Waiting on you</h2>
+  <div class="panel">
+    <div class="item">
+      <h4>Merge and deploy the PI-001 fix <span class="chip soon">blocking</span></h4>
+      <p>The commit still sits on its branch and production runs the pre-fix script, so the forward-return hole is not repairing. After the deploy, one nightly, then the read-only coverage check.</p>
+    </div>
+    <div class="item">
+      <h4>Re-run the corrected charter patch</h4>
+      <p><code>python docs/admin_pass/patch7.py --apply</code> &mdash; the earlier version carried the wrong reason for keeping database steps out of briefs.</p>
+    </div>
+    <div class="item">
+      <h4>Fix one typo in the environment file</h4>
+      <p>The Alpaca feed variable holds a four-letter misspelling of <code>sip</code>, so every price fetch that does not pass the feed explicitly fails with a 400. The desk cannot read or edit that file.</p>
+    </div>
+    <div class="item">
+      <h4>Six platform fixes are decided and waiting for a prompt</h4>
+      <p>PI-002, PI-003, PI-004, PI-006, PI-007 and PI-011. Asking for the prompt is the decision: <code>/desk-run prompt PI-011</code>.</p>
+    </div>
+    <div class="item">
+      <h4>Verify EN-002</h4>
+      <p>Run the brief in the platform repo, then <code>/desk-run verify EN-002 &lt;sha&gt;</code>.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p><b>How to read a date here.</b> A question reports on its decision date because that is when its window closes and enough trading nights have accrued &mdash; 80 contributing nights and 20 per cell, with at least 30 of them after the lock. The extension fires only if that floor has not been reached; it never pulls a date forward.</p>
+  <p>Generated from the desk&rsquo;s own state files on 14 September 2026. The live source is <span class="mono">research/BOARD.md</span>.</p>
+</footer>
+
+</div>
