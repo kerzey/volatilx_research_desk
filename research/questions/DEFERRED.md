@@ -431,3 +431,234 @@ direction; those outcome figures play no part in this deferral, but any future P
 relies on the streak-bin structure is **post-hoc with respect to `manifest_v001`** and must say so in
 its §6 or be built on a freeze whose nights postdate those reads. Under this file's preamble nothing
 here may be reported, briefed or quoted.
+
+---
+
+## H-067 (arm only) — "analyst revisions" as a benchmark arm of Q024 — **the desk holds no point-in-time analyst data of any kind**
+
+**Deferred 2026-09-13 by the registrar, autonomous run, on this file's first admission ground (the
+objective cannot be measured from the frozen manifests). This is an *arm-level* deferral, not a
+question-level one: `research/questions/Q024_sas_vs_simple_benchmarks/PREREG.md` is drafted with the
+six arms that can be built legally and names this one as missing (Q024 §1, §7). No question number is
+consumed and no F1 slot is spent.**
+
+### What the arm would have been
+
+Haci's INBOX line of 2026-09-13 lists seven "embarrassingly simple alternatives" the SAS slate should
+have to beat, one of which is **analyst revisions**: rank the same night's candidate pool by recent
+upward revisions to consensus estimates or price targets, take the top `k_t`, and grade that portfolio
+on the identical price-path objective — first touch of a target at the pick's own ATR distance, within
+20 sessions of the session t+1 open. It is a good benchmark precisely because it is the one simple
+alternative that is *not* a price transform: B4–B6 (momentum-20, momentum-60, a technical rank) are all
+functions of the same bars, so they can be correlated with one another and with the picks, while a
+revisions rank is an independent information source and is the sternest of the seven.
+
+### Why it cannot be built
+
+**There is no analyst, estimate-revision, rating-change or price-target field anywhere the desk can
+reach, in any freeze or any platform table.** Checked at platform SHA `fa70688…`, read-only:
+
+- `models.py` — no column matching `analyst|price_target|estimate` anywhere in the ORM.
+- `services/symbol_context_builder.py` — the FMP enrichment path writes profile fields (including the
+  `industry` column that is 12% populated, PI-007); it requests no estimates, no ratings and no targets.
+- `services/super_agent_select_scoring.py` — the fundamental layer (weight 5) scores balance-sheet and
+  growth quantities; no layer of the seven reads a revision of any kind.
+- `manifest_v001`'s `sas_candidates` column list carries no such field, and no other frozen table
+  (`uoa_symbol`, `gex_symbol`, `projection_bull`, `projection_bear_v2`, `conviction_monitor`,
+  `market_regime`, `whale_ledger` — empty) holds one either.
+- The only occurrence of the string "analyst" in `volatilx/services` is a prompt instruction —
+  `services/market_intelligence_summary.py:38`, "Write like a professional market analyst…" — which is
+  an LLM style directive, not data.
+
+Substituting something else for it was rejected. A rank built on the fundamental layer would be a SAS
+subscore, which makes the "simple alternative" a piece of SAS (Q024 §11.2 rejects the same move for the
+technical arm); a rank built from a *current* vendor snapshot would be the future read backwards, a
+rule-14 violation the desk cannot grant itself in autonomous mode (DP-41); and running a
+revisions-flavoured proxy off price data would produce a number that looks like a benchmark and is not
+one, which is the failure mode this file exists to prevent.
+
+### What would move it back into the backlog
+
+A **point-in-time** analyst feed the Data Steward can pin with a sha256, covering every SAS candidate
+symbol (not only the published picks) over the question's window, with:
+
+1. an **as-of timestamp per row** so rule 14 can be enforced — the revision must be shown to have been
+   public at or before 16:05 ET on the pick night, and a vendor file that restates history without
+   timestamps is not usable at any price;
+2. **consensus EPS / revenue estimates and their revision history**, or rating changes and price-target
+   changes with their publication datetimes, at daily granularity;
+3. coverage broad enough that a night's pool yields at least `k_t` ranked names — the candidate universe
+   runs ≈ 50–60 symbols a night, and a feed covering only large caps would silently change the arm into
+   a size screen.
+Candidate sources: an FMP estimates/upgrades-downgrades historical endpoint on the platform's existing
+subscription tier, or a paid IBES / Zacks revisions history. Procurement is Haci's call; the desk asks
+for nothing here and files nothing against the platform.
+
+**Bookkeeping while deferred.** `research/BACKLOG.md` marks H-067 as **registered as Q024** with this
+arm deferred. Q024 registers **six** primary endpoints, not seven, and F1's correction set is
+**Q006 (2) + Q024 (6) = 8** primaries (Q024 §7). If the feed later exists, the revisions arm is a
+**successor question** with its own PREREG — it is never added to Q024, whose lock fixes `m` (rule 3).
+Under this file's preamble nothing here may be reported, briefed or quoted.
+
+---
+
+## Q025 / H-068 — "Is the SAS path edge a residual, or inherited sector / size / momentum / volatility exposure?" — **the exposure-matched control does not exist on any night**
+
+**Deferred 2026-09-13 by the registrar, autonomous run, on this file's second admission ground
+(DP-43's 12-month ceiling) — in its strongest form: the earliest honest decision date is not merely
+beyond the ceiling, it is _undefined_.** Drafted at
+`research/questions/Q025_exposure_attribution/PREREG.md` (never locked: no `PREREG_LOCKED`, **no
+`schedule.json`** — the Q020 precedent; the controller carries `state.json` to `DEFERRED`); decisions
+and the full record at
+`research/questions/Q025_exposure_attribution/DECISIONS.md` ("## Record — 2026-09-13", item 16);
+the measurement at `research/reports/STEWARD_Q025_exposure.md`. The question number **Q025 is
+consumed by this entry and is not reused**. This is **not** the first admission ground: the
+objective *is* measurable from the frozen manifests. What is unreachable is the night floor under
+this question's own control construction.
+
+### What the question is, and why it is worth keeping
+
+Haci's attribution null. When SAS publishes a pick, does the stock reach the pick's own target more
+often than same-night candidates the engine looked at and did not publish that are its **twins on
+everything already known about them** — same sector, similar market beta, similar size, similar
+20- and 60-session momentum, similar volatility — or does the apparent edge disappear once the twins
+are chosen properly? Two primaries, both two-sided: **E1**, the residual after the full exposure
+match (MPE ±5.0 pp, DP-20); **E2**, the attribution gap between the full match and Q006's
+three-feature match (CONFIRMED `|E2| > 10.0 pp`, NULL CI-includes-0 **and** `|E2| < 5.0 pp`,
+between the two INCONCLUSIVE). Both signs are tradeable and both were registered. The design is
+complete and stands as the historical record; nothing about it is unanswerable in principle — only
+unpopulated.
+
+### Why it cannot be registered — the measured rate, and the mechanism
+
+**Reason in one line: the measured binding (E2) contributing-night rate is 0.000 per elapsed
+session, below the PREREG §5 gate of 0.35, so DP-21's 80-contributing-night floor is unreachable
+inside DP-43's 12-month ceiling and no floor date is defined.**
+
+Counts only, on `manifest_v001` + `manifest_prices_v001` against `exclusions_v003.json`, no live
+query (DP-50(c)); no outcome of any kind was read and no post-match balance was measured
+(`STEWARD_Q025_exposure.md`):
+
+| quantity | measured | source |
+|---|---:|---|
+| **E2 (binding) contributing nights / matured elapsed sessions**, 2026-07-08..2026-08-11 | **0 / 25 = 0.000 per session** | §(h) |
+| E1 contributing nights, same window | 0 / 25 = 0.000 | §(h) |
+| Full-window cross-check on the pre-maturity quasi-eligible proxy | **0 of 46 nights** | §(h) |
+| By month (matured) | July **0 / 18** · August **0 / 7** · September not yet measurable | §(h) |
+| **Maximum simultaneously B1-valid picks on any single night, all 46 nights** | **2 — never 3** | §(h) |
+| Picks carrying a valid B1 set (≥ 3 same-sector controls inside the 1.5-MAD five-feature caliper) | **15 of 197 matured = 7.6%**, scattered over 13 nights | §(d), §(f) |
+| B1 drop share (< 3 controls) | **92.4%** overall; 85.7% (XLF, XLI) to **100%** (XLB, XLC, XLRE, XLU, XLY); **XLK 94.4%** on n = 71 | §(d) |
+| **B4 (Q006's three-feature construction, verbatim) validity on the identical population** | **100% (199 of 199)** | §(e) |
+| Projected floor date at the one-sided 90% lower bound of the measured rate | **undefined** (a 0.000 point estimate has a 0.000 lower bound) | §(h) |
+| Even at the 90% Clopper–Pearson **upper** bound, ≈ 0.088/session | ≈ **909 elapsed sessions ≈ 3.6 years** to 80 nights, **for one endpoint alone** | §(h) |
+
+**The mechanism, stated so no successor rediscovers it: the caliper inside the sector block is the
+entire constraint.** The hard sector block (DECISIONS item 3) shrinks the same-night unpublished
+pool to a median of **~5–7 names**; the five-feature 1.5-MAD caliper on `beta60`, `atr_pct`,
+`mom20`, `mom60`, `log10(adv20)` then passes **7.6%** of picks, scattered so thinly that **no night
+in 46 ever carried 3 B1-valid picks** (the observed maximum is 2). It is **not** sector thinness on
+its own and **not** maturity: the matured and full-window proxy measurements agree (0/25 and 0/46),
+and **XLK — the deepest sector in the book, 71 matured picks — drops 94.4%**, so the loss tracks the
+caliper, not the size of the sector. It is **not** feature coverage (100% of published and 99.4% of
+unpublished candidate rows carry ≥ 60 prior bars and all five features, §(c)). It is **not** the
+sector artifact (sha256 `c4d12610…0201` re-verified against the git blob at `fa70688`, byte-identical
+at HEAD `d19c9a9`). It is **not** a mid-window platform ship (the DP-50(a)/(b) sweep is clean:
+`2d5776c` and `22a2e1b` touch neither the selection/publication path, the lane-plan writer, which
+picks are published, nor any historical row). **B4 passes 100% on exactly the same picks** — the
+crude match has controls everywhere the strict one has none.
+
+**Waiting does not fix this.** Unlike H-062, this is not an arrival-rate problem that accrues away.
+The constraint is a **per-night structural property of the match** — how many same-sector twins
+inside 1.5 MAD on five features exist in a ~5–7-name pool — so nights arriving at ~21 a month add
+nights at a rate of 0.000. **There is therefore no date-based re-check trigger in this entry and
+none is invented.**
+
+### What was considered and rejected before deferring
+
+Each would have bought a floor by weakening the question, which DP-45 forbids.
+
+- **The Steward's §(d) sensitivity** — reading "standardised units" as the conventional
+  1.4826-scaled robust z, i.e. a ≈ 2.22 raw-MAD caliper (pick-level validity 4.0% → 16.8%; nights
+  with ≥ 3 valid picks 0 → **12 of 46**). **Rejected.** It still measures ≈ 0.26/session, short of
+  the 0.35 gate — but it is rejected **on principle, not on arithmetic**: the primary reading
+  (literal, unscaled median/MAD) was fixed at `decide` with no scaling constant named in §2.3, §3 or
+  the Q006 language it borrows, and adopting the looser reading *after* seeing that it is the one
+  which produces nights is exactly the tuning rule 9 and DP-45 exist to stop. It is a **printed
+  sensitivity here, never a promotion**.
+- **Relaxing the hard sector block to a soft distance penalty** (the option DECISIONS item 3
+  rejected). **Rejected, and it may never be done inside this question.** A residual measured
+  against partly-same-sector twins is a weaker claim wearing the stronger claim's name; item 3 chose
+  the block knowing its cost, and a gate shortfall is not licence to revisit a decision made before
+  the counts existed.
+- **DP-13's single automatic extension as a rescue.** **Rejected.** DP-13 rescues a floor that is
+  *marginal* at the decision date; this one is short by **80 nights out of 80**, and no extension of
+  any length reaches a floor at a rate of 0.000.
+
+### What would move it back into the backlog — three conditions, none of them taken by the desk
+
+**(a) A wider caliper, or a soft sector penalty in place of the hard block — a *different, weaker*
+question, and therefore a successor PREREG, never a relaxation of Q025.** This is the only option
+that makes the arithmetic work quickly (the §(d) sensitivity moves 0 nights to 12 of 46), and it is
+precisely the one the desk **may not choose for itself**: DP-45 forbids loosening a match to reach a
+floor, and the loosened question does not answer H-068 — it answers a nearby question about a
+*partly*-matched residual, which must state in its own §1 that it is **not** "SAS's residual after
+sector and exposure are held fixed" and must carry its own §10 disclosure that the control is
+partial. If Haci wants it, it is registered **from scratch, with its own id, its own MPEs and its
+own §10** — **Q025's file is not edited into it**. The desk's own view, stated once: the weaker
+control is already on the desk and it is called **Q006**, which is the thing this question was built
+to test.
+
+**(b) A larger candidate universe per night from the platform — an ENHANCEMENT, not a desk action.**
+The binding scarcity is pool size: ~50–60 candidates a night spread across eleven sectors leaves a
+median of 5–7 same-sector names, and **no matching method recovers twins that do not exist**. A
+platform change that widens the nightly candidate universe — a larger pre-screen, a lower
+candidate-admission bar, or retention of the full scanned universe in `sas_candidates` rather than
+the scored shortlist, or a per-sector floor on candidates retained — would raise the B1 pass rate
+mechanically. Filed as **`research/ENHANCEMENTS.md` EN-016** with this measurement as its evidence;
+Haci's call under DP-48. It is **never** a reason to change the study.
+
+**(c) The re-check trigger, stated as a measured B1 pass rate — not a date.** Two counts, measured by
+the Steward **on a then-current freeze over a trailing quarter**, never assumed from a projection:
+**(i)** the share of matured published picks carrying a valid B1 set — ≥ 3 same-sector controls
+inside **1.5 standardised (unscaled median/MAD) units** on `beta60`, `atr_pct`, `mom20`, `mom60`,
+`log10(adv20)` — **today 7.6%**; and **(ii)** the count of nights carrying **≥ 3 such picks, per
+elapsed session** — **today 0.000**. **The trigger is (ii) reaching ≥ 0.35 per elapsed session,
+measured directly. (ii) is the count that overturns this entry, not (i).** For orientation only, and
+offered to be falsified: at the window's ~8.1 published picks per night, a pick-level B1 pass rate of
+roughly **26%** — about **3.4× today's 7.6%** — is what (ii) ≥ 0.35 implies under a binomial reading;
+that arithmetic is the **decision-maker's, not the Steward's**. A necessary precondition, never once
+observed in 46 nights, is that the **maximum simultaneously B1-valid picks on a single night reach
+3** (today: 2). Re-check **at the first freeze after any platform change of type (b) ships, and not
+on a calendar** — the blocker is structural, so no accrual date exists to name.
+
+### Bookkeeping while deferred
+
+**No verdict of any kind was produced.** Q025 returns **no NULL, no INCONCLUSIVE, no E1 number and
+no E2 number**; a gate shortfall is not a verdict (DECISIONS item 14). **No `eval.py` was written and
+no `results/` directory exists**, and no outcome — touch, first-touch date, return, excess or arm
+difference — was read for this question at any point. All **54** direction × band × lane × sector
+sub-cells are **SUPPRESSED with certainty**, not by projection (§(i)): no cell can reach 20
+contributing nights while the endpoint rate is 0. **F1's correction set is unchanged at
+Q006 (2) + Q024 (6) = 8 primaries** — Q025's two primaries **leave** F1 while deferred (the H-062
+precedent), which is already what `research/questions/Q024_sas_vs_simple_benchmarks/PREREG.md` §7 and
+the "H-067 (arm only)" entry above record, so **no cross-question edit is required and none was
+made**. `research/BACKLOG.md` marks **H-068 — DEFERRED 2026-09-13**, not registered. The Steward's
+successor-freeze rider (R2) is **withdrawn**: Q022's `manifest_v002` / `manifest_prices_v002` pair is
+built to **Q022's own window end (2027-01-13)** and is not extended for this question. The
+provisional dates the draft carried over from Q022 (window 2027-01-13, decision 2027-02-22, extension
+2027-02-26 / 2027-04-05) and the 0.696 planning stand-in are **struck** — they were derived from a
+looser eligibility rule, they are never inherited by a successor, and DP-43's 2027-09-14 ceiling is
+recorded only as the line the undefined floor date fails to meet.
+
+**One correction the desk could not make, recorded here instead.** `DECISIONS.md` asked the registrar
+to fold six bookkeeping corrections into the draft (the `Q024` → `Q025` self-references, E2's
+`10.0 / 5.0 pp` MPE band, the binding-endpoint rate, R1's three additions and its
+no-post-match-balance prohibition, §8 clause 7's B1-only scope, and §10.9's Q006-dependence sentence),
+and to strike the provisional dates and the 0.696 stand-in. **The draft was committed
+(`4725303`) before `apply` could run, so the write guard treats it as locked and the desk does not
+untrack the file or rewrite history** — the Q017 precedent, here without a re-registration, because
+the question is deferred rather than live. **The PREREG therefore still reads under the old id in its
+body (§5–§7, §10) and still carries the struck dates, the 0.696 stand-in and the pre-correction §7 and
+§8 text; where it and this entry or `DECISIONS.md` disagree, `DECISIONS.md` "## Record — 2026-09-13"
+governs, and any successor question builds from that record, not from the draft's body.** Under this
+file's preamble **nothing here may be reported, briefed or quoted.**

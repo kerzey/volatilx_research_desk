@@ -42,6 +42,7 @@ Build statuses: `—` · `HACI_DECIDED:build` · `BRIEF_WRITTEN` · `IMPLEMENTED
 | EN-013 | behaviour | PROPOSED | H-062 (to register) | — | Bear-pick handling in strong tapes: skip, size down, or label bear picks when the point-in-time regime is `strongly_bullish`. Source: H-062, weekly 2026-09-12. |
 | EN-014 | behaviour | PROPOSED | H-064 (to register) | — | Earnings-within-3-sessions flag on the pick card, with a "no spread across the print" note. Source: H-064. |
 | EN-015 | plumbing | READY | — | — | Knowledge-time stamp on every displayed number (computed at 16:05 on the pick night vs next morning), so subscribers and the desk can tell what was knowable at publication. Source: rule 14, KT_AUDIT_manifest_v001. |
+| EN-016 | plumbing | PROPOSED | — | — | A larger per-night candidate universe retained in `sas_candidates` — the full scanned universe rather than the scored shortlist, or a per-sector floor on candidates retained — so exposure-matched controls exist: ~50–60 candidates a night across eleven sectors leaves a median of 5–7 same-sector names, and only 7.6% of picks find ≥ 3 same-sector twins inside a five-feature caliper (0 of 46 nights carried 3). No subscriber-visible number changes; lowering the *admission* bar instead would be a behaviour change. Source: `research/questions/DEFERRED.md` Q025/H-068 re-try condition (b), `research/reports/STEWARD_Q025_exposure.md` §(d)/§(h). |
 
 ## Detail
 

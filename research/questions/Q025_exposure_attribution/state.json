@@ -1,6 +1,6 @@
 {
   "id": "Q025",
-  "state": "PREREG_DRAFT",
+  "state": "DEFERRED",
   "history": [
     {
       "state": "IDEA",
@@ -12,6 +12,12 @@
       "at": "2026-09-14T03:24:59.718079+00:00",
       "by": "registrar",
       "note": ""
+    },
+    {
+      "state": "DEFERRED",
+      "at": "2026-09-14T04:00:00.833574+00:00",
+      "by": "desk",
+      "note": "PREREG section 5 gate: measured E2 contributing-night rate 0.000 per elapsed session, below 0.35; 80-night floor unreachable inside DP-43 ceiling (STEWARD_Q025_exposure.md)"
     }
   ]
 }
