@@ -1,0 +1,9 @@
+{
+  "decision_date": "2027-08-09",
+  "extension_date": "2027-09-20",
+  "hard_stop": "2027-09-20",
+  "rule": "exposure-driven",
+  "extended": false,
+  "pin_at_decision": true,
+  "note": "§5.2: window 2026-09-15..2027-04-30 = 158 sessions at the measured scheduling rate min(0.9091, 0.6620) = 0.6620; + 60-session maturity = 2027-07-28 + one week, first Monday; single DP-13 extension to session 188 = 2027-06-14 decided 2027-09-20 = hard stop, then DEFERRED."
+}
