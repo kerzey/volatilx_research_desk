@@ -1,0 +1,10 @@
+{
+  "decision_date": "2027-04-12",
+  "extension_date": "2027-05-24",
+  "hard_stop": "2027-05-24",
+  "rule": "exposure-driven",
+  "extended": false,
+  "pin_at_decision": true,
+  "check_from": "2027-04-12",
+  "note": "PREREG §5.2: prospective-only window pick nights 2026-09-15..2027-03-05 (119 elapsed sessions) sized on R1's measured 0.6761 contributing nights/elapsed session (48/71, STEWARD_Q027_exposure.md) under §2.5's complete contributing-night definition — not the drafted borrowed 0.9538 and not the 0.9577 eligible-night proxy, which extrapolates past the price freeze's own forward-bar horizon and would have pulled the decision in to ~2027-02-22 (DP-45). Floor A (≥80 contributing nights per primary, DP-21) binds at ceil(80/0.6761) = session 119; Floor B (DP-24's 30 post-lock nights) at session 45 and is non-binding, satisfied by construction. Window end +20 sessions maturity (2027-04-05) +1wk freeze margin, first Monday on/after = 2027-04-12; single DP-13 extension to window end 2027-04-19 (session 149) decided Monday 2027-05-24 (hard stop), then DEFERRED — 6.9 and 8.3 months from lock, inside DP-43's 12-month ceiling (2027-09-14). Lock-or-DEFER gate ≥0.36/session CLEARED by 88%. Gates at the decision pass run on eval.py's measured counts only: ≥80 contributing nights per primary, ≥30 post-lock, ≥30 eligible rows with both terciles non-empty per contributing night, ≥20 measured contributing nights per sub-cell on §4.3's closed reporting list. Pin at decision: the population enters only through the successor freezes named in §5.3 R2 (manifest_v00N / manifest_prices_v00N, pick nights 2026-09-15..2027-03-05, bars through 2027-04-05), so the DATASET_PINNED step runs at the decision date on those manifests — the Q024 pattern; the two v001 manifests in the header cover only the sealed post-hoc panel and R1's counts."
+}
