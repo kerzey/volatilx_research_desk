@@ -1,0 +1,8 @@
+{
+  "decision_date": "2026-09-21",
+  "extension_date": null,
+  "hard_stop": "2026-10-05",
+  "rule": "fixed",
+  "extended": false,
+  "note": "Sec 5.4: census of a closed freeze, 0 contributing nights accrue post-lock, so DP-13 has nothing to extend; hard stop bounds Sec 8's two Gate 0 fix-and-re-run passes."
+}
