@@ -1,0 +1,17 @@
+{
+  "id": "Q028",
+  "state": "PREREG_DRAFT",
+  "history": [
+    {
+      "state": "IDEA",
+      "at": "2026-09-14T05:49:42.541515+00:00",
+      "by": "agent"
+    },
+    {
+      "state": "PREREG_DRAFT",
+      "at": "2026-09-14T05:49:45.823833+00:00",
+      "by": "registrar",
+      "note": ""
+    }
+  ]
+}

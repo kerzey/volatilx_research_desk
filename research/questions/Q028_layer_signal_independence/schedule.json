@@ -1,0 +1,8 @@
+{
+  "decision_date": "2026-09-28",
+  "extension_date": null,
+  "hard_stop": "2026-10-12",
+  "rule": "fixed",
+  "extended": false,
+  "note": "PREREG §5.4: population closed at manifest_v001 (2026-09-10), post-lock projection 0 contributing nights, so the schedule is fixed; DP-13 extension and DP-43 exposure rule have no input. Hard stop bounds §4.1/§8's two-pass Gate 0 fix-and-re-run loop; still failing there = INCONCLUSIVE."
+}
