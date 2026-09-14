@@ -263,3 +263,171 @@ Q007 4 + Q008 3 + Q013 2) and **E2 is not** in F6 (F6 is 15, Q019 §7's figure).
 unsealed:** no `eval.py` exists, no `results/` directory exists, no exposure count was run, and no
 outcome of any kind — touch, re-advance, plan result or arm difference — was read for Q020. Under this
 file's preamble nothing here may be reported, briefed or quoted until the grant exists.
+
+---
+
+## H-041 — "Repeat selection in the 10 days before earnings → the post-earnings path" (Haci's example 3)
+
+**Deferred 2026-09-13 by the registrar, autonomous run, on this file's second admission ground
+(DP-43's 12-month ceiling). Blocker: the treatment arm's unit is the (symbol, print) event, not the
+pick row, and on that unit the earnings-proximate book is too thin to reach 80 contributing nights
+inside 12 months. Would have been Q022; no question number is consumed and Q022 stays free.**
+A second, independent blocker sits on the endpoint itself and is named below (locating the print to
+the session). Not registered, not locked, no `eval.py`, no `results/` directory, no exposure count
+run and **no outcome of any kind read**.
+
+### What the question is, and why it is worth keeping
+
+Haci's example 3. SAS publishes a name, and then keeps publishing it, in the ten days running into
+its earnings report. Does that persistence say anything about how the stock trades *after* the
+print — is the repeatedly-selected name the one to hold across the report, while the one-off pick is
+the one to flatten before it? It is a real trading decision and it is adjacent to two things the desk
+already believes: the standing finding that re-qualification after a favourable move is continuation,
+and Q013's registered claim that an imminent print changes the path. Neither answers it. A confirmed
+answer in either sign is tradeable (hold through / flatten before), which is why the hypothesis is
+kept rather than killed.
+
+**The backlog's own first step is done.** H-041 reads "expected n very small; broaden to all picks
+with earnings in window first". That broadening is **Q013** (`research/questions/Q013_earnings_proximity/PREREG.md`,
+locked 2026-09-13): all published picks with a scheduled report inside 20 sessions, arms 0–3 vs 4–20
+sessions, L3 within 20 sessions of the next open against a distance-matched control. H-041 is the
+residue the broadening was supposed to make tractable — and it is Q013's own measured funnel, below,
+that shows the residue is not tractable.
+
+### Why it cannot be registered — the unit, then the exposure arithmetic
+
+**Step 1 — the unit is the print, not the night.** The outcome H-041 names is the *post-earnings*
+path: one realization per (symbol, scheduled print). A symbol selected on four nights in the run-up
+window has **one** post-print path, not four. Counting each selection night as an observation enters
+the same forward bars into the estimator two to four times, and does so **hardest in the treatment
+arm** — repeat selection is the treatment — so the inflation runs in the hypothesis's direction. That
+is precisely what rule 6's "stock rows are aggregated per night first" exists to stop, one level up.
+The honest population is therefore **one row per (symbol, print): the last selection before the
+report**, classified repeat (≥ 2 published selections inside the 10-day run-up) vs single (exactly 1),
+with the night of that last selection as the clustering unit and the same-night single-selection
+events as the baseline (rule 5's "Y's rate when X did not happen, in the same regime").
+
+**Step 2 — how thin the earnings-proximate book is** (counts only, frozen `manifest_v001` +
+`manifest_prices_v001` against `exclusions_v003.json`; every figure below is a count of picks or
+nights, never an outcome):
+
+| quantity | measured | source |
+|---|---:|---|
+| Eligible published picks, pick nights 2026-06-01..2026-08-12 (48 matured non-excluded nights, 51 sessions) | 371 | `STEWARD_Q013_exposure.md` §1 |
+| — report ≤ 3 sessions out (k = 0/1/2/3) | 44 picks, on 11 / 10 / 8 / 8 distinct nights | §2 |
+| — report 4–7 sessions out | 42 picks, on 23 distinct nights | §2 |
+| **— earnings-proximate, k ≤ 7 sessions** (the measured proxy for H-041's "within 10 days") | **86 picks = 23.2% of the book, 1.79 per window night** | §2, derived |
+| Seasonal shape of that sub-book (arm-A picks per month) | **June 3 in 20 nights · July 30 in 20 · August 11 in 8** | §4 |
+| Q013's both-arms contributing nights (the closest measured anchor for "a night carrying two earnings-proximate picks") | **23 of 48 = 0.4510/session**, monthly 10.0% → 70.0% → 87.5% | §3, §4 |
+| Selection-history split, the only measured streak coverage the desk holds (April–May, picks with a full 10-session history) | 208 picks / 25 nights: **new (0 prior) 85 = 41%**, 1–2: 71 = 34%, **3+: 52 = 25%** | EXPLORE_001 §G (coverage counts) |
+
+Two things follow. First, the earnings-proximate sub-book is **1–3 picks on a night that carries any
+at all**, and it is nearly empty outside the six-week reporting bursts (3 arm-A picks in the whole of
+June). Second, the 86 pick rows are **not** 86 events: with re-selections at roughly 59% of the book
+and an in-sample multiplicity of 2–4 for the repeated names (EXPLORE_001 §B: SNDK ×4, WDC ×2, MU ×2,
+QCOM ×2), they correspond to roughly **50–56 distinct (symbol, print) events** over 48 nights, i.e.
+**≈ 1.1 events per window night**.
+
+**Step 3 — the contributing-night rate.** A contributing night carries ≥ 1 repeat event **and** ≥ 1
+single event, both earnings-proximate, each with ≥ 3 distance-matched controls (the B2 gate never
+binds in this window — 0 of 181 picks fell below it, §3 — so matching is not the constraint; arrival
+is). Taking the measured monthly arrival shape and the measured selection-history split, three
+readings:
+
+| reading | contributing nights / session | projected decision date | vs DP-43's ceiling (2027-09-13) |
+|---|---:|---|---|
+| **Event unit (the honest one)** — one row per (symbol, print), repeat vs single | **≈ 0.185** | ≈ **2028-04-03** | **~6.7 months past** |
+| Q003's cells on pick rows — new (0 prior) vs 3+ streak, middle cell dropped | ≈ 0.20 | ≈ 2028-02-21 | ~5.3 months past |
+| Most generous — repeat = ≥ 1 prior appearance, **pick rows, duplicates kept** | ≈ 0.32 | ≈ 2027-07-19 | inside, by counting one print up to four times |
+
+Required rate, for reference: a window starting 2026-06-01 (DP-06) whose decision date lands on the
+ceiling has ≈ 290 sessions of pick nights after the 27-session maturity (up to 7 sessions to the
+print plus 20 graded sessions) and the 7-day freeze margin — so **≈ 0.28 contributing nights per
+session** is the bar. **Only the reading that inflates n with duplicate outcomes clears it.** Dates
+use the same two-step construction every Steward exposure report uses (sessions → calendar at
+365/252, then + maturity + a 7-day margin, rounded to the next Monday).
+
+**Step 4 — even the floor understates the problem.** Eighty contributing nights spread over ~14
+months would carry perhaps six reporting seasons and, in the treatment arm, a handful of distinct
+prints belonging to the small set of names SAS keeps re-picking (memory/semis, all reporting in the
+same week of each season). Q003 §10 threat 2's leave-one-symbol-out sensitivity would very likely
+decide such a verdict, and Q013 §8 clause 6's 20-night reporting-season cells would be unreachable.
+The April–May streak share (25% at 3+) is also an **upper** bound for the post-June book: elite
+repeats were a large part of that cell and elite publication has thinned to 12 / 8 / 3 / 2 picks per
+month since June (DATA_NOTES; Q003 §10 threat 6), which pushes every rate above further down.
+
+### The second blocker — the desk cannot locate the print to the session
+
+The endpoint is *post*-earnings, so the entry basis is defined by the print. The desk holds the
+scheduled report **date** and nothing else: no before-open / after-close flag (Q013 §10 threat 4) and
+no as-reported source after 2026-05-30 to check the scheduled date against (Q013 §10 threat 8). For
+Q013 that ambiguity merely dilutes — the print sits somewhere inside a 20-session window. For H-041 it
+sits on the entry: a BMO print on session k has already gapped at the open of k, an AMC print on k
+gaps at the open of k+1, and the only entry safe under both conventions is the open of session
+**k+2**, which throws away the first post-print session — the session that carries the move the
+hypothesis is about. Rows whose report moved after 16:05 ET on the pick night would be entered
+*before* the print they are supposed to follow, and the desk cannot quantify how often that happens.
+This blocker is not the reason for the deferral, but it does not disappear when the sample does, and
+a future PREREG must answer it in §4 rather than inherit it as a threat.
+
+### What was considered and rejected before deferring
+
+- **Merging into Q013** (DP-29): rejected. Q013's arms are `k ≤ 3` vs `k = 4–20` with **no selection-history
+  dimension anywhere** — neither its per-`k` cells nor its §5 sub-cells split by prior publications —
+  and its §7 already declares H-041 "a different decision (selection persistence), overlapping
+  population". Q013 cannot return a verdict on persistence into a print.
+- **Merging into Q003** (repeat selection): rejected. Q003 contrasts first-time vs 3+ streak across
+  **all** published picks, grades L3 within 40 sessions from the next open, and never measures a
+  post-print stretch or conditions on a report date. An earnings-proximate cut of Q003 would be a
+  sub-cell of a sub-cell, below the 20-contributing-night SUPPRESSION floor by construction.
+- **Registering with the repeat arm demoted to descriptive** (DP-43's demotion clause): rejected. That
+  clause demotes a secondary arm inside a question whose primary clears the floor; here the repeat arm
+  **is** the primary (the H-062 precedent, verbatim).
+- **Registering on pick rows rather than events** — the one reading that reaches the ceiling: rejected
+  under DP-45 and the registrar's own charter. It buys the date by counting the same post-print path
+  once per selection night, most often in the treatment arm.
+- **Dropping the within-night pairing** (treatment events vs distance-matched controls only, with the
+  single-selection comparison made across nights): rejected under DP-45. It lands at ≈ 0.30/session —
+  marginally inside — but it gives up H-041's own baseline as a primary and confounds the contrast
+  with the reporting season in a population that is *defined* by the reporting season. Every locked
+  arm contrast on this desk pairs within night; this one would be the exception that bought a date.
+- **Waiting under DP-13's single automatic extension**: rejected. DP-13 rescues a floor that is
+  *marginal* at the decision date; this one is short by roughly 40–50 contributing nights.
+
+### What would move it back into the backlog
+
+All three are **measured by the Steward on a then-current freeze**, never assumed from the projection
+above. The first two are alternatives; the third removes the second blocker and is needed either way
+before a PREREG can state its §4.
+
+1. **Accrual.** At the event-unit rate estimated here (≈ 0.20/session), a lock at date `D` has
+   `A(D) + 0.20 × 220` contributing nights available inside a 12-month ceiling (220 = 252 sessions
+   less maturity and margin), so the floor comes inside the ceiling once ≈ 36 contributing nights have
+   accrued from 2026-06-01 — around **2027-03-01**. Re-check at the first freeze on or after that date.
+2. **A higher measured rate, sooner.** Any freeze in which the Steward measures **≥ 0.28 event-unit
+   contributing nights per session over a trailing quarter** — a quarter spanning both a reporting
+   burst and a trough, so the seasonality is not averaged away — puts H-041 back at the front of the
+   queue. The measurement to request, counts only: per pick night, the number of distinct
+   (symbol, scheduled print) events whose print is within 10 calendar days, split by whether the symbol
+   had ≥ 2 or exactly 1 published selections inside that run-up window, plus the count of nights
+   carrying ≥ 1 of each with ≥ 3 valid matched controls. **That count is what overturns this entry**;
+   the rates above are the registrar's arithmetic on Q013's funnel, not a Steward measurement, and they
+   are offered to be falsified.
+3. **A print-timing source.** A BMO/AMC field on the platform's earnings context, plus an as-reported
+   earnings-date table covering the window (the existing post-hoc file ends 2026-05-30). With it the
+   post-print entry is the open of the first session after the actual print and the scheduled-vs-actual
+   drift is measurable; without it the entry must be the blunter `k+2` open, and that choice belongs in
+   the PREREG's §4, stated, not discovered later.
+
+**Bookkeeping while deferred.** `research/BACKLOG.md` marks **H-041 — DEFERRED 2026-09-13**, not
+registered. **No F5 slot is consumed:** F5 holds H-040 (→ **Q014**, 2 primaries) and H-041, and the
+family correction set stays **Q014 only, 2 primary endpoints**, exactly as Q014 §7 records it. H-041
+is **not merged** into Q013, Q003 or Q014 (DP-29) — the overlaps each question declares stand as
+written and none of them tests this hypothesis. **No data was unsealed:** the counts above come from
+`STEWARD_Q013_exposure.md` (counts only, no outcome) and from EXPLORE_001 §G's *coverage* row
+(picks / nights per streak bin). **Caveat carried forward, so no successor repeats it:** EXPLORE_001 §G
+also prints an in-sample matched-control excess per streak bin, and BACKLOG H-052 summarises its
+direction; those outcome figures play no part in this deferral, but any future PREREG on H-041 that
+relies on the streak-bin structure is **post-hoc with respect to `manifest_v001`** and must say so in
+its §6 or be built on a freeze whose nights postdate those reads. Under this file's preamble nothing
+here may be reported, briefed or quoted.
