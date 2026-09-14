@@ -1,0 +1,23 @@
+{
+  "id": "Q032",
+  "state": "DEFERRED",
+  "history": [
+    {
+      "state": "IDEA",
+      "at": "2026-09-14T12:37:29.278513+00:00",
+      "by": "agent"
+    },
+    {
+      "state": "PREREG_DRAFT",
+      "at": "2026-09-14T12:37:32.379662+00:00",
+      "by": "registrar",
+      "note": ""
+    },
+    {
+      "state": "DEFERRED",
+      "at": "2026-09-14T13:20:37.986466+00:00",
+      "by": "desk",
+      "note": "R1 limb (g) short: SPY-from-2025-01-02 history needs Alpaca credentials absent from the desk session (H-074 trigger, shared with Q030); PREREG \u00a75.3 R1(g)"
+    }
+  ]
+}

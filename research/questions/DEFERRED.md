@@ -1047,3 +1047,220 @@ Q032 pattern — and must say so in its §6. The exposure counts used above are 
 caveat: they count candidate rows by score band, which is knowledge available at 16:05 ET on the pick
 night and contains no outcome. Under this file's preamble **nothing here may be reported, briefed or
 quoted.**
+
+---
+
+## Q032 / H-079 — "Does the SAS selection edge exist only in identifiable tape states?" — **§2.2's arm cannot be assigned: the SPY history the partition needs exists in no pinned freeze and cannot be fetched without Alpaca credentials**
+
+**Deferred 2026-09-14 by the registrar, autonomous run (DP-40..48), on this file's first admission
+ground: the objective cannot be measured with the artefacts the desk holds.** The blocker is
+**provisioning — not procurement, not accrual, not a grant and not the DP-43 ceiling**. It is the
+**same blocker, the same pair of environment variables and the same desk session as Q030 / H-074**
+(deferred earlier the same day), and this entry **cites that trigger by id rather than restating it**
+(see "What would move it back", below). Drafted at
+`research/questions/Q032_regime_conditionality/PREREG.md` (state `PREREG_DRAFT` → `DEFERRED`;
+**never locked: no `PREREG_LOCKED`, no `schedule.json`** — the Q020 / Q025 / Q030 precedent);
+decisions and the governing record at
+`research/questions/Q032_regime_conditionality/DECISIONS.md` (decision-maker, 2026-09-14, 16 items +
+5 corrections, "## Record — 2026-09-14" and "## Schedule"); the measurement at
+`research/reports/STEWARD_Q032_exposure.md` (R1, counts only). **Both files are preserved exactly as
+drafted and decided** — nothing in either was edited or deleted for this deferral — and the question
+**resumes at `@registrar apply Q032`** when the trigger below is met. **The question number Q032 is
+consumed by this entry and is not reused.**
+
+### What the question is, and why it is worth keeping
+
+Haci's H9, *Regime conditionality*. Does SAS's selection edge exist only in identifiable tape
+states — does the within-night, control-adjusted L3-touch excess that Q006 measures show up in calm
+uptrends and vanish (or invert) everywhere else? One primary, night-level, two-sided: **`G`** =
+Q006's `E_t` (each published pick's own printed swing L3, 20 sessions from the session t+1 open,
+against the ten nearest same-night unpublished candidates matched on `beta60` / `atr_pct` / `runup20`
+with a synthetic target at the identical ATR distance — Q006 §3 verbatim) averaged over **BENIGN**
+nights minus the same over **HOSTILE** nights, **MPE ±10.0 pp** (H-079's own number; DP-20's
+larger-MPE clause for a difference of differences), `m = 1`.
+
+**Its NULL branch is as consequential as its positive one**, which is why the hypothesis is kept
+rather than killed: a NULL retires "it was a difficult tape" as an explanation for weak stretches,
+re-labels the weekly's regime panels as composition rather than signal, and replaces the phrase with
+a measured HOSTILE-arm band. The design is complete and stands: the bar-only partition, the
+`NO_EDGE_TO_CONDITION` / `WORKS_IN_BENIGN` / `HOSTILE_ONLY` clauses, the 80% composition guard, the
+three separately-named units (contributing night, tape-episode, symbol-episode), the DP-51 two-CI
+gate, C1 as a blocking companion that can confirm nothing. **Nothing about it is unanswerable in
+principle — only unassignable.**
+
+### Why it cannot be registered — the failing limb, named exactly
+
+The lock-or-DEFER gate (PREREG §5.3 R1, DECISIONS items 12 and 15) has four limbs: contributing
+nights **≥ 0.40** per elapsed session, rarer-arm contributing nights **≥ 0.10**, rarer-arm
+gate-counting tape-episodes **≥ 0.025**, **and limb (g) — the SPY-history feasibility probe**.
+
+**The failing limb is (g), and it failed before it could be run: `ALPACA_API_KEY` and
+`ALPACA_SECRET_KEY` are both unset in the desk session**, confirmed by a direct presence test in the
+Steward's shell and stated rather than inferred (`STEWARD_Q032_exposure.md` §(g); the Q024 R1(d) /
+Q030 §(i) precedent). **No SPY retrieval was attempted** — there is nothing to attempt without
+credentials, and rule 1 forbids looking for or requesting any other. Under PREREG §5.3 R1(g) / R2(i)
+and DECISIONS items 12 and 15, **a failed probe with no pinned alternative is a DEFERRED-at-lock
+ground on its own**, independent of every counted limb.
+
+**What the arm needs, exactly.** §2.2's partition is bar-only and therefore immune to a platform
+relabelling — that is its whole point — but it is built from SPY's own history: `trend_t` needs
+`SMA50_t` **and `SMA200_t`** (UP iff `close > SMA50 > SMA200`, DOWN iff `close < SMA50 < SMA200`,
+else MIXED), and `vol_t` is an **expanding-window tercile of SPY's 20-session realised volatility
+over every SPY session ≤ t, requiring ≥ 250 such sessions** — below 250 the night is excluded
+(§2.2, §2.5). A window opening 2026-09-15 therefore needs **SPY split-adjusted daily bars from
+2025-01-02**, which is exactly what R2(i) was sized to deliver and what limb (g) exists to probe.
+
+**The blocker is confirmed a second time, from the opposite direction, by the counts themselves.**
+Under the **literal §2.2 rule** the contributing-night rate in this freeze is **0/71 in all three
+forms**: `manifest_prices_v001` holds **153** SPY daily bars (2026-02-02..2026-09-10) and the
+expanding count of computable rvol20 observations reaches only **133** at the freeze's last date, so
+the first session with ≥ 250 prior SPY sessions is **never** — not in this freeze and not in any
+freeze the desk holds (`STEWARD_Q032_exposure.md` §(a), §(c); the freeze would have to reach roughly
+117 sessions further back, to about mid-2025). **That is not evidence against H-079 and not a
+screening failure**; it is the same missing SPY history, measured from inside the data instead of at
+the credential. `SMA200` likewise exists nowhere in the freeze, which is why the Steward's
+composition table is a **six-cell** proxy where §2.2 registers nine (§(c)), and why it cannot revise
+the §4.3 suppression list in either direction.
+
+### The counted limbs, recorded for the re-check and for nothing else
+
+Limbs (a)–(f) were measured because R1 asks for them unconditionally. **Every count below is on the
+SMA50-only one-sided bound, which is explicitly *not* §2.2-legal** (DECISIONS item 12), so none of it
+is exposure evidence for the registered question. The Steward re-solved the thresholds from the
+trading calendar as Correction 3 requires and got **0.39 / 0.097 / 0.0243** against the file's
+rounded-up **0.40 / 0.10 / 0.025**; the file's numbers are the stricter and are the ones read here,
+and every limb clears or fails identically on both.
+
+| limb | floor (re-solved / as filed) | measured, SMA50-only proxy | strict §2.2 | read |
+|---|---:|---:|---:|---|
+| (a) contributing nights / elapsed session | 0.39 / **0.40** | **0.6620** (item 3's cap binds: min(0.8710, 0.6620)) | **0.0000** | proxy clears; strict short |
+| (b) rarer-arm (HOSTILE) contributing nights / session | 0.097 / **0.10** | **0.3099** (22 of 68 nights HOSTILE) | **0.0000** | proxy clears; strict short |
+| (b) rarer-arm gate-counting tape-episodes / session | 0.0243 / **0.025** | **0.0563** unmatured · **0.0141** t+40-matured | **0.0000** | proxy clears unmatured; **short on the t+40-matured basis** |
+| (g) SPY-history feasibility probe | must succeed | — | — | **FAIL — credentials absent, probe not attempted** |
+
+Three readings are recorded so a re-attempt does not rediscover them, and **none of them changes the
+branch**: (1) the episode limb is **short on the t+40-matured basis** that DECISIONS item 2 requires,
+but that is freeze-horizon censoring — no night after 2026-07-15 can reach t+40 inside
+`manifest_prices_v001` — and it is a measurement the re-check must make again on a freeze carrying
+t+40 bars, not exposure evidence; (2) the rarer arm is **much richer than §5.1's 0.20 placeholder**
+(0.3099 measured against ≈ 0.132 assumed), so **floor A, not floor B, would bind** — recorded, and
+**no schedule is built on it**, because item 14's method is re-run from scratch on a re-attempt and
+never inherited; (3) **C1 carries more independent information than §10 threat 2 assumed** —
+night-level agreement between the proxy arm and the legal platform label is **49/63 = 77.8%** with
+the HOSTILE nights split exactly 11 STRONG / 11 NOTSTRONG, and §2.3 legality fails on 5 of 68 nights,
+all on the `created_at` timestamp test (§(d)) — and item 1's disposition of C1 (blocking companion,
+corrected jointly with Q023's E1, confirming nothing) is **not** promoted on the strength of it.
+
+**Nothing else measured moves anything.** §(e) **confirms** the control-pool depth (min 37 / median
+53 / max 60; **0** nights below 3) and the CTRA truncated-history signature (last bar 2026-05-06, 19
+in-window appearances, the 5 pre-2026-08-12 ones matching Q027 exactly) — a confirmation, not a
+correction, so **no DP-50(a) finding**. §(f) returns **NONE**: HEAD unchanged at `d19c9a9`, no commit
+since `fa70688` touches the scoring path, the lane-plan writer or `services/market_regime/scorer.py`,
+and **no v1.7 promotion is scheduled** — an absence of a schedule, to be re-checked at every future
+freeze, never a permanent clearance. The `publication_floor` (2026-07-08) and
+`bear_publish_threshold` (2026-06-29) config dates are already in `DATA_NOTES.md` and gate
+publication, not scoring (item 9) — **no new `DATA_NOTES.md` entry is owed**.
+
+### What was considered and rejected before deferring
+
+- **Re-specifying the partition to SMA50-only** — the one move that would let Q032 lock today, on a
+  split the desk has already measured. **Rejected, and it may never be made inside this question**
+  (PREREG §5.3 R2(i), DECISIONS item 12): that is a different arm, chosen *after* the data existed
+  and after its counts were seen, which is the exact thing rule 3 and DP-45 exist to stop. A
+  SMA50-only partition is **a different question with its own id, its own MPE and its own §10**;
+  Q032's file is not edited into it.
+- **Locking now and probing at the decision pass.** Rejected in advance — that is what item 12's
+  added limb exists to prevent. Discovering the missing history in June 2027 would have cost the
+  whole window; discovering it today cost one afternoon.
+- **Waiting under DP-13's single automatic extension.** Rejected. DP-13 rescues a floor that is
+  *marginal at a decision date*; this question has no decision date, and waiting 30 sessions produces
+  no SPY bars.
+- **Deferring on DP-43's 12-month ceiling instead.** Rejected as a mis-filing: the proxy rates sit
+  comfortably inside the ceiling, and the deferral would stand even if they were faster still. The
+  ground is the first, not the second.
+- **Merging into Q023** (DP-29). Rejected, and it is the tempting one, because Q023's locked E1 *is*
+  the platform-label contrast this question carries as C1. Q023 runs it on the 80–90 band under the
+  *other* regime definition; Q032's primary is the bar-only partition on the whole published slate,
+  and item 1 registers C1 as a blocking companion corrected jointly with Q023's E1 precisely so the
+  desk does not get a second bite at a locked question's statistic.
+- **Merging into Q031** (H-082, decay). Rejected: decay is the level of an edge over time,
+  conditionality is the level by tape. Q031 §8 clause 7 routes its `TAPE_COMPOSITION` case **to this
+  question**, which it cannot do if this question is the same one.
+
+### What would move it back into the backlog — the trigger is a measurement, not a date
+
+**The H-074 trigger, cited by id and shared verbatim with Q030** (`DEFERRED.md`, "Q030 / H-074",
+2026-09-14): **`ALPACA_API_KEY` and `ALPACA_SECRET_KEY` present in a desk session, stated by the
+Steward with a direct presence test, AND a market-data coverage probe that returns the bars** — for
+Q032 that probe is **SPY split-adjusted daily bars from 2025-01-02**, coverage and first/last bar
+date only, feed `sip`, no values beyond that, market-data endpoints only. **Both limbs, measured,
+never assumed:** credentials present but SPY history unretrievable is the same deferral. Q032's probe
+is a strict sub-case of the freeze Q030 cannot build, so **satisfying that one trigger re-opens both
+questions, in registration order** — Q030 first. **No calendar re-check date is named**, because no
+amount of waiting produces the bars. Provisioning two environment variables the desk is already
+licensed to use is **Haci's call**; it is neither a purchase nor a platform change, no
+`IMPLEMENTATION_BRIEF.md` follows, and **DP-49 is not engaged**.
+
+**What a re-attempt must re-measure before it may lock — six things, none of them inherited from the
+record above:**
+
+1. **Limb (a)** — the §2.5 / §2.6 contributing-night rate on a freeze carrying **t+40** bars, with
+   numerator and denominator counted over the **same** period and item 3's cap applied.
+2. **Limb (b)** — the §2.2 arm split on the **true** `close > SMA50 > SMA200` trend and the **true
+   ≥ 250-session** volatility tercile. The SMA50-only proxy recorded above is a one-sided bound
+   (HOSTILE lower, BENIGN upper) and is **never** the registered partition.
+3. **The rarer-arm gate-counting tape-episode rate on the t+40-matured basis** — the limb that read
+   **0.0141 < 0.0243** here, and the one this freeze could not measure honestly.
+4. **The nine-cell `trend_t` × `vol_t` composition** (only six cells were observable here, because
+   `SMA200` exists nowhere in the freeze) and, with it, item 7's **single permitted suppression
+   revision — cells added only, never removed**.
+5. **Limb (f)'s DP-50(a)/(b) commit sweep and the v1.7 schedule check**, re-run on the new freeze:
+   today's "NONE" is an absence of a schedule, not a permanent clearance.
+6. **Correction 3's three inequalities, re-solved from the trading calendar** against DP-43's
+   12-month ceiling **measured from the new lock date** — they tighten as that date moves later.
+
+**What does not change on re-entry.** **The partition is never re-specified to SMA50-only** (PREREG
+§5.3 R2(i), DECISIONS item 12) — stated twice in this entry because it is the one shortcut the
+measured proxy makes attractive. DECISIONS items 1–11 bind as written; items 13 and 14's **method**
+binds and their **dates do not** — item 13's prospective-only window start applies to the new lock
+commit, item 14's "window end = the latest of floors A, B, C, D at the measured rates; decision date
+= window end + 40 sessions + one calendar week, first Monday on or after" is re-run from scratch, and
+**every date may move out only** (DP-43, DP-45; the Q020 / Q025 / Q030 precedent). Q032's R2 rider is
+**withdrawn and HELD**: the SPY-from-2025-01-02 history (i) and the t+40 bar horizon (ii) are not
+built while the question is deferred, and **Q027's and Q031's own successor-freeze requests and pins
+are unaffected and are not edited** (rule 3, DP-22).
+
+### Bookkeeping while deferred
+
+**No verdict of any kind was produced.** Q032 returns **no CONFIRMED, no NULL, no INCONCLUSIVE, no
+`G` and no C1 number**; a gate shortfall is not a verdict (DECISIONS item 6, item 14 of the Q025
+precedent). **No `eval.py` was written and no `results/` directory exists**, and **no outcome of any
+kind was read** for this question at any point — no touch, no first-touch date, no return, no
+excursion, no `outcome_*` column, no `sas_selection_excursion`, no `uoa_symbol_daily.fwd_return_*`
+and no arm-versus-outcome cross-tab of any shape; the Steward's report is counts of nights, picks,
+controls and bars on the pinned freeze with **no live query** (DP-50(c)), reading a forward bar only
+to establish that a bar exists. **Item 7's suppression list is not revised** (the one permitted
+revision runs on a locked question) and **item 6 is not exercised** (there is no lock at which to
+demote an arm).
+
+`research/BACKLOG.md` marks **H-079 — DEFERRED (Q032 drafted; SPY-from-2025-01-02 history needs
+Alpaca credentials in the desk session)**, not registered. **Q032's one primary (`G`) leaves the
+`F2` correction set while deferred** (the H-062 / Q025 precedent): **F2 falls from 17 to 16** —
+Q023 (2) + Q027 (2) + Q029's 10 companion IC endpoints + Q031 (2) — and **`G` leaves the `F1`
+companion set, which falls from 28 to 27** (Q006 2 + Q024 6 + Q025 2 + Q029 16 + Q031's `D1ᴮ` 1),
+exactly Q031 DECISIONS #14's figure. **No locked PREREG records Q032 in its correction set, so no
+locked file is edited and none was**; the two unlocked drafts that counted `G` — Q033's §7 (F1 29 →
+28, F2 18 → 17) — are corrected, and Q034 registers no primary and no BH set, so nothing there
+changes. **C1 is withdrawn as a blocking companion to Q023's E1; Q023 is unaffected and is not
+edited.** The `research/BOARD.md` line moves with this entry.
+
+**Caveat carried forward, so no successor repeats it.** The sealed 2026-06-01..2026-08-12 stretch has
+been read for this hypothesis — the weekly snapshots of 2026-09-10 and 2026-09-12 printed
+regime-stratified cells, and they are what put H-079 on the backlog — so any future PREREG on this
+hypothesis is **post-hoc with respect to `manifest_v001`** and must run **prospective-only**, with
+the sealed stretch as a labelled panel split at 2026-07-06, exactly as the draft registers it. The
+exposure counts used above are not subject to that caveat: they count nights, picks and bars, which
+is knowledge available at 16:05 ET on the pick night and contains no outcome. **That binds the proxy
+counts in this entry as firmly as anything else — they are planning numbers on a partition that was
+never legally assignable.** Under this file's preamble **nothing here may be reported, briefed or
+quoted** until the trigger is met.
