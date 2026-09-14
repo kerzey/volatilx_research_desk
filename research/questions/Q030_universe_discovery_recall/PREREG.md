@@ -7,7 +7,9 @@ Q030` on 2026-09-14; the last section records what is still routed.
 (`research/questions/DEFERRED.md`, Q030 TRIGGER MET, direct presence test); base-universe coverage
 **97.55%** (2,346 of 2,405 symbols with ≥ 60 daily bars, `research/reports/STEWARD_Q030_universe_coverage_probe.md`)
 against ≥ 90%; all-candidates contributing-night rate **0.6761/elapsed session**
-(`research/reports/STEWARD_Q027_exposure.md`) against ≥ 0.36. None is re-measured at lock.
+(`research/reports/STEWARD_Q027_exposure.md`) against ≥ 0.36, PASS. None is re-measured at lock.
+**The planning rate is 0.9107 (DECISIONS item 14), not the gate value**: 0.6761 is kept only as limb
+(iii)'s gate value and sets no date (§5.1, §5.2).
 **Family:** **F8 System validity** (hypothesis **H-074**, Haci's H4 *Discovery*). DP-29 places it
 there without argument: the primary endpoint's subject is neither the path after selection (F4) nor
 the score's calibration (F2) — it is whether the step **before** selection, candidate generation,
@@ -142,7 +144,7 @@ SELECT DISTINCT c.symbol
 FROM   sas_candidates c
 JOIN   sas_runs run ON run.trading_date = c.trading_date
 WHERE  c.trading_date >= DATE '2026-09-15'        -- §6 window start   (input, illustrative)
-  AND  c.trading_date <= DATE '2027-03-05'        -- §5.2 window end   (input, illustrative)
+  AND  c.trading_date <= DATE '2027-01-20'        -- §5.2 window end   (input, illustrative)
   AND  c.trading_date NOT IN (<exclusions_v003 ∪ the add-only successor file:
                                manual_runs ∪ non_session_runs
                                ∪ uncorroborated_publication_runs, read from the JSONs>)
@@ -425,7 +427,9 @@ blocker.
 permitted revision is exercised at this apply from **R2(iii)'s** counts-only dry run
 (`research/reports/STEWARD_Q030_counts_dryrun.md`, pick nights 2026-06-01..2026-08-12) and the
 night-level stratum counts of `research/reports/STEWARD_Q027_exposure.md` (the same 48 matured,
-non-excluded nights, projected to 119 sessions), and not from R1(a), which measures nothing about `B`.
+non-excluded nights, projected to 88 sessions at 0.9107 (≈ 80.1 contributing nights); DECISIONS item
+14), and not from R1(a), which measures nothing about `B`. **The list is unchanged by item 14 and still
+closed**; only the projection basis is restated.
 **R1(b)/(c), when delivered, may only add a cell to the SUPPRESSED list, never remove one.** A cell
 suppressed here stays suppressed even if it clears 20 measured nights at the decision pass; a cell not
 suppressed here still needs **≥ 20 measured contributing nights** to be reported, and below that is
@@ -435,10 +439,10 @@ list and block at whatever count they have.
 
 | stratifier | cells | status at lock | basis |
 |---|---|---|---|
-| SPY `tape_t` (§6) | `up_low`, `down_high`, `up_high`, `down_mid`, `down_low` | **SUPPRESSED** | projected 16.8 / 13.4 / 8.4 / 6.7 / 5.0 nights at 119 sessions (Q027 report) |
-| SPY `tape_t` (§6) | `up_mid` | reportable at ≥ 20 measured | projected 30.2 |
+| SPY `tape_t` (§6) | `up_low`, `down_high`, `up_high`, `down_mid`, `down_low` | **SUPPRESSED** | projected 16.7 / 13.4 / 8.3 / 6.7 / 5.0 nights at 88 sessions, 0.9107 (Q027 report shares) |
+| SPY `tape_t` (§6) | `up_mid` | reportable at ≥ 20 measured | projected 30.1 |
 | `market_regime` v1.2 (rule 7, §6) | `bearish`, `neutral`, `risk_off` | **SUPPRESSED** | 0 of 48 nights observed |
-| `market_regime` v1.2 | `strongly_bullish`, `bullish` | reportable at ≥ 20 measured | projected 48.6 / 23.5 |
+| `market_regime` v1.2 | `strongly_bullish`, `bullish` | reportable at ≥ 20 measured | projected 48.4 / 23.4 |
 | `market_regime` v1.2 | `unlabelled` | counts only, never a tested cell | informational |
 | terciles of `m_t` (breadth), terciles of `n_t` | 3 + 3 | reportable at ≥ 20 measured | a tercile holds ≈ ⅓ of ≈ 80 nights by construction; `m_t` 332 / 886 / 1,328 and `n_t` 45 / 61 / 68 (min / median / max) on R2(iii) |
 | direction | bull (primary), bear (secondary) | reportable at ≥ 20 measured | bear movers not counted by R2(iii) |
@@ -505,69 +509,107 @@ Every row is a count from a pinned freeze; no touch rate, recall, lift, return o
 | night statistic defined | 48 (`n_t ≥ 1`, `m_t ≥ 1`) — `m_t = 0` on **0 of 51**; `b_t` **2,342 / 2,355 / 2,375**, `n_t` **45 / 61 / 68**, `m_t` **332 / 886 / 1,328** (min / median / max, all 51) | 48 (≥ 30 eligible rows and a defined `d*_t`) |
 | contributing | **48 → 48/51 = 0.9412 / elapsed session** | **48 → 48/71 = 0.6761 / elapsed session** |
 | post-lock contributing | 0 (sealed cohort; every window night is post-lock by construction) | 0 |
-| **not measured** | §2.6 corroboration gate (R1(b)); DP-04 `finished_at` test | — |
+| **§2.6 corroboration / DP-04** | §2.6 corroboration (R1(b)) — **unmeasured**; DP-04 `finished_at` — **measured on the identical nights** (`STEWARD_Q027_exposure.md`): 1 failure (2026-07-06), already excluded, **0 incremental** | DP-04: 1 of 71 runs fails, already on `manual_runs` |
+| **planning rate** | **0.9107 = 102/112**, full-history exclusion incidence (`exclusions_v003.json`, "all": 102 of `manifest_v001`'s 112 sessions), which **replaces** the cohort's 3/51 (DECISIONS item 14) | not used for dates (gate value only) |
 
 The base-universe funnel that was "never measured" at drafting is now measured: base coverage
 **97.55%** (2,346 of 2,405 with ≥ 60 daily bars, `STEWARD_Q030_universe_coverage_probe.md`), and the
 R2(iii) rows above. Q030's night rule imposes **no per-row screen on candidates**, but it adds night
 gates Q027's does not have (`B_t` coverage, ungradeable share, §2.6 corroboration); the first two
-never bound on the cohort, the third is unmeasured.
+never bound on the cohort, the third is unmeasured. The earlier reading that Q030's night rule is
+"strictly broader" than Q027's, so that 0.6761 is a lower bound on Q030's rate, is **withdrawn**
+(DECISIONS item 14): Q030 adds night gates, and the gap between 0.6761 and 0.9412 is maturity, not
+screening.
 
 **Planning scenarios, shown separately (DP-53).**
 
 | scenario | rate | Floor A reached | window end | decision date |
 |---|---|---|---|---|
-| **registered** — DECISIONS item 9 | **0.6761** (Q027's all-candidates rate, borrowed) | session **119** | **2027-03-05** | **Monday 2027-04-12** |
-| cohort reading, recorded and **not used for dates** | 0.9412 (Q030's own R2(iii) cohort) | session 85 | 2027-01-14 | Monday 2027-02-22 |
+| **registered** — DECISIONS item 14 | **0.9107** (cohort 48/51 with full-history exclusion incidence 102/112) | session **88** | **2027-01-20** | **Monday 2027-03-01** |
+| bare cohort, recorded and **not used** | 0.9412 (Q030's own R2(iii) cohort) | session 85 | 2027-01-14 | Monday 2027-02-22 |
+| borrowed, **struck** — maturity counted twice | 0.6761 (Q027's all-candidates rate) | session 119 | 2027-03-05 | Monday 2027-04-12 |
 
-**Why the registered schedule is not set on 0.9412.** Q030's own 0.9412 is measured on the fully
-observable cohort with exclusions retained, which is the DP-53 construction, but it is **not yet a
-complete Q030 funnel**: the §2.6 corroboration gate — the one gate built to fire on an incompletely
-persisted universe — and DP-04's `finished_at` test were not in the R2(iii) script, and R1(b) is still
-open. Against the cohort's 0.9412, the registered plan still reaches Floor A inside the primary window
-if those gates remove up to 28% of otherwise-contributing nights; a plan set on 0.9412 reaches it only
-if they remove none. **Disclosed without softening:** 0.6761's own denominator carries 20 nights that could
-not mature inside the freeze horizon (`STEWARD_Q027_exposure.md` Headline: *"entirely a maturity
-artifact"*), so as a pure attrition estimate it charges maturity once in the rate and again in the
-20-session lag — the construction LEARNING_POLICY warns against. It is registered as the planning
-scenario with room for the unmeasured gates, not as an attrition estimate, and the registered dates
-are DECISIONS item 9's. The 8-session cushion of the draft is struck (Correction 1): the window end is
-the Floor A projection at the registered rate, nothing added.
+**Why the registered rate is 0.9107 (DECISIONS item 14; arithmetic on delivered counts, no new
+measurement).** 0.6761 is 48 matured nights over 71 sessions of which 20 could not mature inside the
+freeze horizon (`STEWARD_Q027_exposure.md` Headline: *"entirely a maturity artifact"*); a schedule set
+on it charges maturity once in the rate and again in the 20-session lag, the construction DP-53 and
+LEARNING_POLICY retire for unlocked drafts. It is struck as a planning rate and kept only as the lock
+gate's limb (iii), which passes on either number. Q030's own cohort (2026-06-01..2026-08-12, 51
+sessions, all matured) has contributing = non-excluded: no Q030 gate bound on any of the 51 nights, so
+48/51 = 0.9412. Two checks were not in the R2(iii) script, and each is sized from counts the desk holds:
+
+- **DP-04 is measured, not open:** over all 71 in-window runs exactly one `finished_at` fails
+  (2026-07-06), already on `manual_runs` — **0 incremental nights**. `manual_runs`' criterion contains
+  the DP-04 test, so its recurrence is priced in the exclusion incidence below.
+- **§2.6 is unmeasured (R1(b) still owed) but its failure classes have a measured incidence.** The
+  only `stats_json`-versus-frozen-rows comparison the desk holds (`qualified_count`, all 113 run
+  nights, `STEWARD_Q009_exposure.md` §R3 ruling 1) disagrees on **1 night, 2026-06-26**, already an
+  exclusion. At the platform code, `universe_count` is `len(ranked_scorecards)` (volatilx
+  `services/super_agent_select_service.py:938`, `:445` via `:930`); candidate rows come from that same
+  list in one `add_all` (`:735-750`); the `:745` membership guard is always satisfied because every
+  universe entry gets a context in an unguarded loop (`:622-628`), and a context failure raises and
+  fails the run rather than silently dropping a symbol. A count divergence therefore needs a post-write
+  row mutation (the 06-26 class) or a re-run (the `manual_runs` class) — both exclusion classes with a
+  measured incidence.
+- **The haircut.** `manifest_v001`'s full frozen history is 112 sessions (2026-04-01..2026-09-10) with
+  10 session exclusions: 9 `manual_runs` (DP-04 / re-run) and 1 `uncorroborated_publication_runs` (the
+  corroboration class); the `non_session_runs` night 04-03 is not a session. **102/112 = 0.9107.**
+  Against the cohort's 3/51 it charges 8.9% loss instead of 5.9%, which covers a recurrence of a
+  development-era re-run cluster like 2026-05-11..15 (which the 51-session cohort cannot rule out) and
+  §2.6 firing at its sibling's measured rate. **It does not double-count**: it replaces the cohort's
+  exclusion incidence rather than multiplying on top of it. The 10% in `SCHEDULE_AUDIT.md` is labelled
+  illustrative and is not used. Maturity is added **once**, in §5.2.
+- **Tolerance.** At the primary window (88 sessions) the plan absorbs 3.4% loss beyond the cohort rate
+  (1.6% beyond 0.9107); at the extension (118 sessions) it absorbs **28.0%** beyond the cohort (25.6%
+  beyond 0.9107), the same margin the struck 119-session plan offered. A shortfall only fires the
+  extension on `eval.py`'s measured counts; it is never a lowered floor and never INCONCLUSIVE.
+- **Why not the bare 0.9412:** 85 × 0.9412 = 80.0 leaves zero margin, charges nothing for the two
+  unapplied checks, and rests on a 51-session cohort too short to rule out a multi-night re-run cluster.
+  **R1(b) is not made a lock precondition**: the measured sibling and the mechanism leave no ground to
+  expect material incremental loss, and a surprise costs the extension, not a floor.
+
+The 8-session cushion of the original draft stays struck (Correction 1): the window end is the Floor A
+projection at the registered rate, nothing added.
 
 **Sample size against the MPE and dependence (DP-57).** The floors are necessary, not sufficient.
 Per-night `recall_t` is computed over hundreds of movers (`m_t` median 886 on the cohort), so within-
 night noise is small; the binding uncertainty is **across nights**, because each night's mover set
 spans the next 20 sessions and one symbol's run recurs on up to twenty consecutive nights (§2.5, §10
 threat 2). CI 2 is in effect symbol-clustered, and the information it draws on grows with the number of
-**non-overlapping 20-session mover windows** in the tape — about **6** at 119 sessions against about
-**4** at 85. That, together with the rule-7 cells (only `tape_t: up_mid` projects above 20 nights even
-at 119 sessions, §4.3), is what the longer registered window buys. No power calculation is registered;
-the compound MPE (`E1 ≥ 2.00` **and** `D ≥ +1.0 pp`) is large relative to the null base `e_t`, and
-DP-51's CI rule decides whether the realised precision was enough.
+**non-overlapping 20-session mover windows** in the tape — about **4.4** at 88 sessions against about
+**6** at 119. That is a **≈ 16% wider interval on a √n reading** (width scales as 1/√n). **No power
+calculation is registered and none can be done counts-only**, because recall dispersion is an outcome;
+CI 2's symbol clusters number ≈ 2,400 at either length. An under-precise run returns **INCONCLUSIVE**
+under §8 clauses 4–5, never a false CONFIRMED, so buying 31 more sessions for an uncomputed precision
+gain is the "later is more valid" preference DP-53 retires; the cost is disclosed here and in §10
+threats 2 and 11. The projected contributing total is ≈ 80 at either length, so every §4.3 cell
+projection moves by ≤ 0.4 nights (only `tape_t: up_mid` projects above 20) and the closed suppression
+list is unchanged. The compound MPE (`E1 ≥ 2.00` **and** `D ≥ +1.0 pp`) is large relative to the null
+base `e_t`, and DP-51's CI rule decides whether the realised precision was enough.
 
 ### 5.2 Window, decision date, extension, DEFERRED fallback (DP-43, DP-13, DP-53; no outcome is looked at)
 
-**Window: pick nights 2026-09-15 .. 2027-03-05 inclusive = 119 elapsed sessions.**
-**Decision date: Monday 2027-04-12.** Single DP-13 extension to pick nights **.. 2027-04-19**
-(149 sessions), decided **Monday 2027-05-24**, which is also the **hard stop**: still short there,
-Q030 goes to DEFERRED. Planning rate **0.6761** contributing nights per elapsed session (§5.1,
-DECISIONS item 9); Q030's own measured **0.9412** is recorded in §5.1 and **not used for any date**.
-Rule: **exposure-driven**. `extended: false`.
+**Window: pick nights 2026-09-15 .. 2027-01-20 inclusive = 88 elapsed sessions.**
+**Decision date: Monday 2027-03-01.** Single DP-13 extension to pick nights **.. 2027-03-04**
+(session 118), decided **Monday 2027-04-12**, which is also the **hard stop**: still short there,
+Q030 goes to DEFERRED. Planning rate **0.9107** contributing nights per elapsed session (§5.1,
+DECISIONS item 14); the bare cohort 0.9412 and the struck 0.6761 are recorded in §5.1 and **not used
+for any date**. Maturity is added **once**. Rule: **exposure-driven**. `extended: false`.
 
-| floor | planning rate | sessions needed | projected at 119 sessions |
+| floor | planning rate | sessions needed | projected at 88 sessions |
 |---|---|---|---|
-| **A:** ≥ 80 contributing nights (DP-21) | 0.6761/session | `ceil(80 / 0.6761)` = **119** (2027-03-05) — **binds** | **80.5 nights** |
-| **B:** ≥ 30 contributing nights dated after the lock commit (DP-24) | 0.6761/session | `ceil(30 / 0.6761)` = 45 (2026-11-16) — non-binding | **80.5** (all post-lock by construction) |
+| **A:** ≥ 80 contributing nights (DP-21) | 0.9107/session | `ceil(80 / 0.9107)` = **88** (2027-01-20) — **binds** | **80.1 nights** (82.8 at the unhaircut 0.9412) |
+| **B:** ≥ 30 contributing nights dated after the lock commit (DP-24) | 0.9107/session | `ceil(30 / 0.9107)` = 33 (2026-10-29) — non-binding | **80.1** (all post-lock by construction) |
 | **C:** ≥ 20 contributing nights per *reported* sub-cell | — | — | decided cell by cell at the decision pass on measured counts; suppression list §4.3 |
 
-**Arithmetic, session by session** (holidays 2026-11-26, 2026-12-25, 2027-01-01, 2027-01-18,
-2027-02-15, 2027-03-26 Good Friday — Easter 2027 is 03-28; Memorial Day 2027 is 05-31, so 2027-05-24
-is a session): 2026-09-15 is session 1; Sep 12 + Oct 22 + Nov 20 + Dec 22 = 76 at 2026-12-31; Jan
-4–8, 11–15, 19–22, 25–29 = 95 at 2027-01-29; Feb 1–5, 8–12, 16–19, 22–26 = 114 at 2027-02-26; Mar 1–5
-= **119 at 2027-03-05** (Friday). **Decision date:** 2027-03-05 **+ 20 sessions** maturity =
-**2027-04-05**; **+ one calendar week** freeze margin = 2027-04-12; first Monday on or after =
-**Monday 2027-04-12** — **6.9 months from a 2026-09-14 lock**, inside DP-43's 12-month ceiling
-(2027-09-14). `eval.py` is written once (rule 9) and run **once**, then.
+**Arithmetic, session by session** (NYSE holidays 2026-11-26, 2026-12-25, 2027-01-01, 2027-01-18,
+2027-02-15, 2027-03-26 Good Friday — Easter 2027 is 03-28; Memorial Day 2027 is 05-31, after every
+date here): 2026-09-15 is session 1; Sep 12 + Oct 22 + Nov 20 + Dec 22 = 76 at 2026-12-31; Jan 4–8 →
+81, Jan 11–15 → 86, Jan 19 → 87, **Jan 20 → 88** (Wednesday). **Decision date:** t+20 of 2027-01-20 =
+Jan 21, 22, 25–29, Feb 1–5, 8–12, 16, 17, 18 → **2027-02-18** (Thursday); **+ one calendar week**
+freeze margin = 2027-02-25; first Monday on or after = **Monday 2027-03-01** — **5.5 months from a
+2026-09-14 lock**, inside DP-43's 12-month ceiling (2027-09-14). Floor B: session 33 = 2026-10-29.
+`eval.py` is written once (rule 9) and run **once**, then.
 **No interim look is registered (DP-58). The primary is a ratio endpoint, outside DP-58's touch-rate /
 per-trade-ATR scope, and its compound MPE has no defined boundary under that entry; `eval.py` is run
 once, at the decision pass.**
@@ -575,23 +617,24 @@ once, at the decision pass.**
 **Every date above is conditional on the actual lock commit date** (DECISIONS Correction 5). The window
 opens on the **first trading session after the lock commit** (2026-09-15 only if that commit is dated
 2026-09-14); if the lock is dated later, this whole arithmetic is re-derived session by session from
-the real start and the dates move **out, never in**. §2.1's SQL takes the window start as an input, so
-the re-derivation is mechanical.
+the real start **at the same 0.9107 rate and method**, and the dates move **out, never in**. §2.1's
+SQL takes the window start as an input, so the re-derivation is mechanical.
 
-**This is deliberately the identical window, maturity and schedule as Q027** (Q027 DECISIONS #8), so
-that one successor selection freeze and one price fetch can serve both: R2's forward cut of the
-universe price freeze is a strict superset of Q027's R2 price freeze (it covers `B` ∪ every in-window
-candidate symbol), and the add-only successor exclusions file is the same file. The alignment is an
-efficiency for the Steward, not a statistical link — §7 states that the two questions share no
-endpoint and may not be read as confirming each other.
+**The schedules of Q030 and Q027 now differ** (DECISIONS item 14; the earlier alignment with Q027
+DECISIONS #8 is withdrawn). The add-only successor exclusions file is still **one shared file**, and
+Q030's extension decision date (2027-04-12) coincides with Q027's decision date, so an extended Q030
+can share Q027's freeze. The alignment was only ever an efficiency for the Steward, not a statistical
+link, and losing it is not a reason to wait — §7 states that the two questions share no endpoint and
+may not be read as confirming each other.
 
-- **Extension (DP-13; DP-43's +30 sessions).** If a floor is short at 2027-04-12 on `eval.py`'s
+- **Extension (DP-13; DP-43's +30 sessions).** If a floor is short at 2027-03-01 on `eval.py`'s
   **own measured counts** (never on a projection or a run-rate), the window extends **once**,
-  automatically and with no new question, to pick nights **2026-09-15 .. 2027-04-19** (session 149:
-  Mar 8–12, 15–19, 22–25, 29–Apr 2, Apr 5–9, 12–16, 19), decision **Monday 2027-05-24**
-  (2027-04-19 + 20 sessions = 2027-05-17; + one week = 2027-05-24; first Monday on or after). The
-  extended run uses the **byte-identical, unmodified `eval.py`** and the same floors. 8.3 months from
-  a 2026-09-14 lock, inside the ceiling.
+  automatically and with no new question, to pick nights **2026-09-15 .. 2027-03-04** (session 118:
+  Jan 21–22 → 90, Jan 25–29 → 95, Feb 1–5 → 100, Feb 8–12 → 105, Feb 16–19 → 109, Feb 22–26 → 114,
+  Mar 1–4 → 118), decision **Monday 2027-04-12** (t+20 of 2027-03-04 = Mar 5, 8–12, 15–19, 22–25,
+  29–31, Apr 1, 2 → 2027-04-02; + one week = 2027-04-09; first Monday on or after). The extended run
+  uses the **byte-identical, unmodified `eval.py`** and the same floors. 6.9 months from a 2026-09-14
+  lock, inside the ceiling. At 118 sessions the plan absorbs 28.0% loss beyond the cohort rate (§5.1).
 - **DEFERRED fallback (the hard stop).** If a floor is still short after that single extension, Q030
   goes to `research/questions/DEFERRED.md` with the measured counts rather than running
   under-powered. **No second extension, no reduced floor, and a floor shortfall is never an
@@ -622,9 +665,10 @@ endpoint and may not be read as confirming each other.
 - **R1 → data-steward (counts only). (a) CLOSED; (b)–(d) OPEN, not blocking for the lock.**
   **(a) is answered:** 0.6761 all-candidates contributing nights per elapsed session (48/71) over
   2026-06-01..2026-09-10, `research/reports/STEWARD_Q027_exposure.md`, denominators in elapsed
-  sessions with exclusions not pre-removed (the Q019 / Q022 / Q023 convention), borrowed as §5.2's
-  planning rate; **no second count of the same nights is requested**. Still owed, due before the
-  decision date:
+  sessions with exclusions not pre-removed (the Q019 / Q022 / Q023 convention). It is **no longer
+  §5.2's planning rate** (struck by DECISIONS item 14, maturity counted twice) and serves **only as the
+  lock gate's limb (iii)**; **no second count of the same nights is requested**. Still owed, due before
+  **Monday 2027-03-01**:
   (b) the distinct-symbol count of `sas_candidates` per night **against `sas_runs.stats_json.universe_count`**,
   with the count of nights exceeding the 2% tolerance (§2.6) and the per-night `source_counts`;
   (c) the share of each night's candidate symbols present in the pinned blob's `mapping`, and the
@@ -638,8 +682,9 @@ endpoint and may not be read as confirming each other.
   from that report's HEAD; the Steward states directly whether any touches the **universe-side**
   files above.
   No outcome of any kind is read; no live query (DP-50(c)). **R1(b) is the one open count that bears
-  on the schedule**: §2.6's corroboration gate is not in §5.1's funnel (§5.1). R1(b)/(c) may add a cell
-  to §4.3's SUPPRESSED list and may not remove one.
+  on §5.1's funnel**: §2.6's corroboration gate is sized there from its measured sibling and exclusion
+  classes, not measured. R1(b) is **not a lock precondition** and moves no date after the lock
+  (DECISIONS item 14). R1(b)/(c) may add a cell to §4.3's SUPPRESSED list and may not remove one.
 - **R2 → data-steward (the universe price freeze). DELIVERED IN PART; the lock gate is CLOSED —
   PASS on all three limbs.**
   **Delivered:** **`research/data/manifest_prices_universe_v001.json`** — daily bars,
@@ -652,7 +697,7 @@ endpoint and may not be read as confirming each other.
   Q030 TRIGGER MET); **(ii) coverage — PASS**, **97.55%** (2,346 of 2,405 with ≥ 60 daily bars over
   2026-06-01..2026-09-11; 59 short or absent, named in `STEWARD_Q030_universe_coverage_probe.md`)
   against ≥ 90%; **(iii) rate — PASS**, measured at 0.6761/elapsed session via R1(a) and **not
-  re-measured**. The rate limb is the **inequality** 80 contributing nights ÷ the elapsed sessions
+  re-measured** (the gate value only; it would pass equally on the 0.9107 planning rate). The rate limb is the **inequality** 80 contributing nights ÷ the elapsed sessions
   still admissible under DP-43's 12-month ceiling **measured from the actual lock commit**, rounded
   up: ≈ 225 sessions and **≥ 0.36** at a 2026-09-14 lock, **re-solved if the lock date moves** — the
   gate tightens as the lock slips and never loosens. The counts-only dry run R2(iii)/(iv) is
@@ -661,18 +706,20 @@ endpoint and may not be read as confirming each other.
   rule (all 2,405 base symbols plus every in-window candidate symbol and the benchmarks), same
   adjustments and feed, **no hourly bars**, symbols lacking bars **excluded and counted, never
   back-filled or imputed**, covering **≥ 60 sessions before the window start** through
-  **2027-04-05** (t+20 of the last in-window pick night), delivered before **Monday 2027-04-12**; the
-  extension cut, **only if** DP-13 fires, through **2027-05-17**, delivered before **Monday
-  2027-05-24**, built then and not before (Correction 2). `research/lib/freeze_prices.py` taking an
+  **2027-02-18** (t+20 of the last in-window pick night), delivered before **Monday 2027-03-01**; the
+  extension cut, **only if** DP-13 fires, through **2027-04-02**, delivered before **Monday
+  2027-04-12**, built then and not before (Correction 2; dates per DECISIONS item 14). `research/lib/freeze_prices.py` taking an
   explicit symbol list is a change under `research/`, not an enforcement file under rule 15.
 - **R3 → data-steward (due before the decision date; not a blocker for lock; DP-23).** The successor
   **selection** freeze `manifest_v00N` (same SQL, same exclusion criteria, **`sas_candidates` for
   every candidate row, published and unpublished**, plus `sas_runs` and `market_regime_daily`) covering
-  pick nights **2026-09-15..2027-03-05** (and ..**2027-04-19** only if the extension fires), delivered
-  before **Monday 2027-04-12** (extension pair before **Monday 2027-05-24**), with the **add-only
-  successor exclusions file** — the identical file Q027's R2 requires, built once. Where a successor freeze
-  overlaps an earlier one on `sas_candidates`, the rows are compared and `eval.py` **fails loudly** on
-  any disagreement in the symbol set of a night (a repair that changed which symbols were candidates
+  pick nights **2026-09-15..2027-01-20** (and ..**2027-03-04** only if the extension fires), delivered
+  before **Monday 2027-03-01** (extension pair before **Monday 2027-04-12**), with the **add-only
+  successor exclusions file** — the identical, shared file Q027's R2 requires. The selection freeze
+  itself is no longer built once for both questions (DECISIONS item 14): Q030's freeze precedes Q027's,
+  and where a successor freeze — including Q027's later one — overlaps an earlier one on
+  `sas_candidates`, the rows are compared and `eval.py` **fails loudly** on any disagreement in the
+  symbol set of a night (a repair that changed which symbols were candidates
   would silently re-run this experiment — DP-50(a)). R1(d)'s commit sweep is **repeated for the
   period between the freezes**. Every §5.2 date is re-confirmed session by session from the trading
   calendar when the freeze is built; a correction may move a date **out, never in**.
@@ -685,8 +732,8 @@ endpoint and may not be read as confirming each other.
 
 ## 6. Test window, split and stratification
 
-- **Test window: prospective only — pick nights 2026-09-15 .. 2027-03-05** (119 elapsed sessions;
-  extension .. 2027-04-19), opening on the **first trading session after the lock commit** — 2026-09-15
+- **Test window: prospective only — pick nights 2026-09-15 .. 2027-01-20** (88 elapsed sessions;
+  extension .. 2027-03-04, session 118; DECISIONS item 14), opening on the **first trading session after the lock commit** — 2026-09-15
   only if that commit is dated 2026-09-14, and otherwise the whole §5.2 arithmetic is re-derived from
   the real start, out only (DECISIONS item 8, Correction 5; the window starts after the lock day so
   that no night whose 16:05 ET run may precede the lock commit can enter), through §5.2's end.
@@ -712,10 +759,10 @@ endpoint and may not be read as confirming each other.
   **stability clause, not a reported stratum**, and block at whatever count they have.
 - **Monthly blocks:** calendar months of the window with ≥ 10 contributing nights; the share with the
   same side of 1.00 as the full-sample estimate is §8 clause 11. At the registered length (September
-  2026 through early March 2027) that is five to six blocks, so the clause reads as "at least 3 of 5"
-  or "at least 4 of 6" — stated
-  numerically at the decision pass from the measured block count, with the rule (≥ 60%, rounded up)
-  fixed here.
+  2026 through January 2027) October–December are certain blocks and September and January each carry
+  ≈ 11 expected nights and are borderline, so three to five blocks and the clause reads "at least 2 of
+  3", "3 of 4" or "3 of 5"; five to six blocks on the extension — stated numerically at the decision
+  pass from the measured block count, with the rule (≥ 60%, rounded up) fixed here and unchanged.
 - **Regime stratification (rule 7).** Two stratifiers, both reported, both subject to §4.3's
   ≥ 20-night rule, both constructed exactly as in Q027 §6:
   - `market_regime_daily.market_regime`, **v1.2 only**, the row with `trading_date = t`, legal only
@@ -760,7 +807,7 @@ endpoint and may not be read as confirming each other.
   H-077 and H-084 are diagnostics or syntheses with no primary and enter no correction set. At this
   lock the F8 set is **Q030 `E1` (1) + Q033 `A` (1, H-081, locked) = 2**, and it **never shrinks below
   2**; H-083 was drafted as Q035 and is DEFERRED, so its primary is outside the set while deferred (the
-  H-062 / Q025 precedent). If any further F8 primary locks before 2027-04-12 (2027-05-24 on the
+  H-062 / Q025 precedent). If any further F8 primary locks before 2027-03-01 (2027-04-12 on the
   extension) it joins the set and the q's are recomputed on the larger m at the decision pass.
   Threshold **q ≤ 0.10**, alongside raw p (rule 8).
 - **Overlaps, stated so nothing is double-counted as independent evidence:**
@@ -774,7 +821,8 @@ endpoint and may not be read as confirming each other.
     questions. A Q024 confirmation does not imply discovery, and a Q030 confirmation does not imply
     the slate beats SPY.
   - **Q027 (F2)** ranks candidates inside `U_t` by score. Q030's population is `B`. The two questions
-    share the successor freeze and the schedule and **no endpoint**: the universe could contain every
+    share the add-only successor exclusions file and **no endpoint**, and since DECISIONS item 14 no
+    longer share a schedule: the universe could contain every
     mover and rank them backwards, or contain few and rank those few perfectly.
   - **Q022 (F4)** uses the same pinned sector blob for a same-night concentration arm; the shared
     artifact is not a shared test.
@@ -903,8 +951,8 @@ PROSPECTIVELY_CONFIRMED (rule 10):
   the meantime.** There is one database, and a change to universe construction rewrites what this
   question reads. Any platform change to `services/candidate_universe_builder.py`, to
   `uoa_screener.max_symbols`, to the bulletin list sizes, to the insider-watch parameters or to which
-  projection tables feed the universe is **flag-off until Q030's decision date, 2027-04-12**
-  (2027-05-24 if the single DP-13 extension fires; DECISIONS item 13, Correction 4) — the PI-011 /
+  projection tables feed the universe is **flag-off until Q030's decision date, 2027-03-01**
+  (2027-04-12 if the single DP-13 extension fires; DECISIONS item 13, Correction 4, dates per item 14) — the PI-011 /
   Q010 pattern, checked before any
   fix brief is written. If such a change ships anyway it takes a dated `DATA_NOTES.md` entry naming
   the file, the date range and the ship SHA, and §5.2's window split applies (DP-06, DP-50(a)).
@@ -920,8 +968,8 @@ PROSPECTIVELY_CONFIRMED (rule 10):
 ## 10. Known threats to validity (registrar's own list)
 
 1. **The base universe is a stale snapshot, and the staleness only grows.** `sp500_sectors.json` was
-   synced once, on 2026-05-17, and the window runs to 2027-03-05 (2027-04-19 on the extension) —
-   nearly ten months of index additions,
+   synced once, on 2026-05-17, and the window runs to 2027-01-20 (2027-03-04 on the extension) —
+   eight months, nine and a half on the extension, of index additions,
    IPOs and delistings missing. The bias is **one-directional and structural**: names that listed or
    joined the indices after May 2026 are absent from `B` entirely, and those are disproportionately
    the high-momentum names a flow-led universe would find. They are excluded from `M_t` **and** from
@@ -936,7 +984,10 @@ PROSPECTIVELY_CONFIRMED (rule 10):
    treat one move as up to twenty observations. DP-51's episode-clustered CI is the answer and it is a
    **decision** clause (§8 clause 5), not a footnote; because most base symbols are continuously
    listed it is effectively a symbol-clustered bootstrap, and it is expected to be materially wider
-   than CI 1. If it is not, that itself is worth reporting.
+   than CI 1. If it is not, that itself is worth reporting. The 88-session window gives ≈ 4.4
+   non-overlapping 20-session mover windows against ≈ 6 at 119, so this interval is expected to be
+   ≈ 16% wider on a √n reading than a longer window would give — a precision cost disclosed, not
+   hidden (§5.1, DECISIONS item 14), and one that can only push the verdict toward INCONCLUSIVE.
 3. **ATR normalization is the match, and it is also the mechanism.** Every symbol is asked for 3 of
    its own ATRs, which is what makes candidates and non-candidates comparable — but ATR14 is
    backward-looking, so a name whose volatility is compressed at t has a mechanically nearer target.
@@ -951,7 +1002,10 @@ PROSPECTIVELY_CONFIRMED (rule 10):
 5. **`sas_candidates` may not be exactly the universe.** A universe entry whose context build fails
    can drop out before persistence (`services/super_agent_select_service.py:735-746` guards on
    `candidates_by_symbol` and `contexts_by_symbol` membership), and such a drop would be scored as
-   "the platform never found it". §2.6's `stats_json` corroboration gate at 2% is the defence; if it
+   "the platform never found it". DECISIONS item 14's reading of the same code (`:622-628`, `:938`)
+   finds that guard always satisfied and a context failure failing the whole run, so a divergence
+   should need a post-write mutation or a re-run, both exclusion classes (§5.1); that is a reading, not
+   a measurement, and R1(b) remains owed. §2.6's `stats_json` corroboration gate at 2% is the defence; if it
    fires often, the question has a measurement problem and the gate will say so loudly rather than
    quietly deflating recall.
 6. **Right-censoring is exactly where the best movers are.** Acquisitions pop and then delist. §2.2's
@@ -973,8 +1027,9 @@ PROSPECTIVELY_CONFIRMED (rule 10):
 10. **One database (DP-50).** A platform repair between freezes can rewrite which symbols were
     candidates on a past night. Rule 4's pinned manifests are what stands between that and a locked
     question, and R3's loud symbol-set comparison is what detects it.
-11. **The prospective window may not be representative.** A hundred and nineteen sessions is one stretch of tape,
-    and rule 7's cells are expected to be thin (five of six `tape_t` cells suppressed at lock; three
+11. **The prospective window may not be representative.** Eighty-eight sessions is one stretch of tape,
+    and the shorter span covers fewer tape regimes than a longer one would — disclosed, not a reason to
+    wait (DP-53). Rule 7's cells are expected to be thin (five of six `tape_t` cells suppressed at lock; three
     `market_regime` labels never observed on the measured history). Discovery is
     plausibly regime-dependent — a narrow tape has few movers and they are news-driven, which is
     where flow should shine — so a lift measured over one stretch is a real but narrow finding, and
@@ -993,9 +1048,10 @@ PROSPECTIVELY_CONFIRMED (rule 10):
 evidence can say now:* the question is measurable as registered — base-universe bar coverage is
 97.55% against a 90% gate; on the 51 sealed nights the night statistic is defined every night (`m_t`
 never 0, `n_t` 45–68, `b_t` 2,342–2,375), the coverage and ungradeable gates never bind, and 48 of 51
-nights would contribute before the unmeasured §2.6 gate. *Limits:* nothing about discovery is known or
-may be computed before the decision pass — no recall, no `e_t` series, no lift and no intersection
-`|M_t ∩ U_t^B|` has been produced; §2.6 corroboration (R1(b)) and DP-04 are unmeasured; the sealed
+nights would contribute before the unmeasured §2.6 gate; DP-04 on the same nights is 0 incremental.
+*Limits:* nothing about discovery is known or may be computed before the decision pass — no recall, no
+`e_t` series, no lift and no intersection `|M_t ∩ U_t^B|` has been produced; §2.6 corroboration
+(R1(b)) is unmeasured and is sized in the 0.9107 planning rate from its exclusion classes (§5.1); the sealed
 panel is post-hoc only and prints at the decision pass. *Internal decision it supports:* lock and
 accrue; it supports no statement about the universe. *Next review:* on delivery of R1(b)–(d), or at
 the weekly card review, whichever is first.
@@ -1007,9 +1063,11 @@ panel or any window night, and it cannot promote a verdict or a subscriber claim
 ---
 
 ## Decisions before lock
-Recorded in DECISIONS.md (2026-09-14). Routed items still open: R1(b)–(d) to data-steward (counts
-only, not blocking for the lock; R1(b) is the §2.6 corroboration count, the one open input to the
-schedule); R2's forward cut to data-steward (through 2027-04-05, before Monday 2027-04-12; extension
-cut through 2027-05-17, before Monday 2027-05-24, only if DP-13 fires); R3 successor selection freeze
-and add-only successor exclusions file to data-steward (same due dates). R2's lock-or-DEFER gate is
+Recorded in DECISIONS.md (2026-09-14; re-entry item 14 and its Corrections, same date). Routed items
+still open: R1(b)–(d) to data-steward (counts only, not blocking for the lock, due before Monday
+2027-03-01; R1(b) is the §2.6 corroboration count, sized but unmeasured in §5.1's funnel, and moves no
+date after the lock); R2's forward cut to data-steward (through 2027-02-18, before Monday 2027-03-01;
+extension cut through 2027-04-02, before Monday 2027-04-12, only if DP-13 fires); R3 successor
+selection freeze (pick nights ..2027-01-20; ..2027-03-04 on the extension) and the shared add-only
+successor exclusions file to data-steward (same due dates). R2's lock-or-DEFER gate is
 closed, PASS on all three limbs; R4's bars are contained in `manifest_prices_universe_v001`.
