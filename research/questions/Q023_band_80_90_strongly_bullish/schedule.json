@@ -1,0 +1,10 @@
+{
+  "decision_date": "2027-06-07",
+  "extension_date": "2027-07-19",
+  "hard_stop": "2027-07-19",
+  "rule": "exposure-driven",
+  "extended": false,
+  "check_from": "2027-06-07",
+  "note": "PREREG §5.2: window pick nights 2026-09-14..2027-02-25 (114 elapsed sessions), sized in whole rarer-arm episodes at R1's measured 0.0615 episodes/session and 3.25 contributing nights/episode (7 episodes for the 20-night floor), not at the flat 0.2000 night rate that would have ended 2027-02-04 and expected the extension to fire; +60-session maturity, +1wk margin, first Monday on/after = 2027-05-31 (Memorial Day) so the date moves out to Monday 2027-06-07; single DP-13 extension to window end 2027-04-09 decided Monday 2027-07-19 (hard stop), then DEFERRED; gates ≥80 contributing nights per primary endpoint, ≥20 per arm, ≥5 episodes per arm, ≥30 post-lock nights (DP-21/DP-24/§8 clause 2) on eval.py's measured counts. Pin at decision (Q010 pattern): the primary window is prospective from 2026-09-14 and the population enters only through the successor freezes named in §5; the DATASET_PINNED step runs at the decision date on those manifests.",
+  "pin_at_decision": true
+}
