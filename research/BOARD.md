@@ -57,6 +57,9 @@ _none yet — every question so far is NULL, INCONCLUSIVE, or still waiting for 
 | Q018 | for the same pick, does the day, the swing or the long-term lane plan make the most money — and does the answer depend o | PREREG_LOCKED | 2027-07-12 |
 | Q021 | Q021 — GEX pin risk and two-sided paths (does a pinned pick round-trip more often?) | DATASET_PINNED | 2027-08-09 (exposure check; hard stop 2027-09-20) |
 | Q015 | do picks scoring 85–90 reach the swing target and then hand it back more often than picks scoring 80–85, and does exitin | DATASET_PINNED | 2027-08-30 |
+| Q031 | is the SAS edge deteriorating over time, or is a weak stretch normal variation? | DATASET_PINNED | ? (exposure check; hard stop 2027-07-19) |
+| Q033 | does VolatilX get the direction right more reliably than it gets the distance right? | DATASET_PINNED | ? (exposure check; hard stop 2027-08-23) |
+| Q034 | of the nine ways the desk can measure a pick, which one does VolatilX actually predict best? | PREREG_LOCKED | ? (exposure check; hard stop 2027-09-20) |
 | Q028 | are the seven scoring layers seven signals, or three or four? | PREREG_LOCKED | — |
 
 ## 4. Platform issues
@@ -79,6 +82,8 @@ _Source: `research/PLATFORM_ISSUES.md`. Statuses: OPEN → HACI_DECIDED:fix/rese
 | PI-012 | HACI_DECIDED:research | 2026-06-26: three qualified, ranked picks the night's own run audit does not record; no run-history table |
 | PI-013 | OPEN | `uoa_symbol_daily.score_swing` / `score_long` overwritten in place by the next-morning OI-confirmation pass; no point-in-time copy |
 | PI-014 | OPEN | Conviction Monitor's polarity arm silent since 2026-06-01: `polarity_unavailable_coverage_low` on 100% of in-scope rows, 0 polarity HOLD/EXI |
+| PI-015 | OPEN | Projection layer (v1.6 weight 29, the largest) unscored — `available: false` — on 72.2% of published and 74.3% of capped main-lane rows; `ov |
+| PI-016 | OPEN | Conviction label degenerate on the published slate: `completeness_score` never below 65.37 (min 65.3686 of 4,195 scored rows), so `_confiden |
 
 ## 5. Enhancements to build in the platform
 
@@ -161,11 +166,26 @@ _Each was a question the desk would once have asked you. It took the recommended
 - **Q029** #10 Window end, decision date, extension — chose **2026-09-15..2027-03-05, decided Monday 2027-04-12,
 - **Q030** #8 Window start — chose **prospective-only, pick nights after the lock commit**; not taken: read the
 - **Q030** #9 Window end and decision date — chose **window end 2027-03-05, decision Monday 2027-04-12**
+- **Q031** #5 Lock now vs wait for Q006/Q027 — chose **lock now, prospectively, carrying the
+- **Q031** #6 Window start — chose **prospective-only, pick nights ≥ 2026-09-15, sealed stretch as a labelled
+- **Q031** #7 Window end and decision date — chose **window end 2027-04-23 (153 sessions), decision Monday
+- **Q032** #12 SPY's missing 200-session history at the lock gate — chose **the SMA50-only one-sided bound,
+- **Q032** #13 Window start — chose **prospective-only, pick nights ≥ 2026-09-15, sealed stretch as a labelled
+- **Q032** #14 Window end and decision date — chose **the window that reaches every floor at R1's measured
+- **Q033** #16 The SPY history the arm needs, and when its absence is discovered — chose **probe it at the lock
+- **Q033** #17 Window start — chose **prospective-only, pick nights ≥ 2026-09-15, sealed stretch as a labelled
+- **Q033** #18 Window end, decision date and hard stop — chose **2026-09-15 .. 2027-04-30, decision Monday
+- **Q033** #22 The branch, on R1's measured limbs — chose **defer P2 (`V`) at the lock on the absent SPY
+- **Q033** #24 The final window and dates — chose **158 sessions to 2027-04-30, decision Monday 2027-07-12,
+- **Q034** #18 Window end, decision date and hard stop — chose **2026-09-15 .. 2027-04-30, decision Monday
+- **Q035** #4 The uniform target level — chose **2.0 × the row's own ATR14 decides, 1.0 and 3.0 printed and
+- **Q035** #24 Window end, decision date and hard stop — chose **2026-09-15 .. 2027-03-31, decision Monday
+- **Q036** #8 Window end, decision date and hard stop — chose **2026-09-15 .. 2027-06-11, decision Monday
 
 ## 8. Backlog and calendar
 
-- Open hypotheses: **14** · registered: 39 · deferred (data missing): H-041, H-055, H-062, H-067
-- Next to register (DP-47 order): H-082, H-079, H-080, H-081, H-084
+- Open hypotheses: **5** · registered: 48 · deferred (data missing): H-041, H-055, H-062, H-067, H-078, H-080
+- Next to register (DP-47 order): H-014, H-002, H-021, H-022
 
 | decides on | Q |
 |---|---|
