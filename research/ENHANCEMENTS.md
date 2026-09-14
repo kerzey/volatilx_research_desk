@@ -28,7 +28,7 @@ Build statuses: `—` · `HACI_DECIDED:build` · `BRIEF_WRITTEN` · `IMPLEMENTED
 | ID | Kind | Status | Gate | Build | Enhancement |
 |---|---|---|---|---|---|
 | EN-001 | plumbing | READY | — | — | Append-only run-history table for SAS runs. `super_agent_select_runs` is updated in place, so the 2026-06-26 unrecorded picks (PI-012) and the KT-audit re-run nights cannot be reconstructed, only detected. Source: STEWARD_Q009 §R3, KT_AUDIT. |
-| EN-002 | behaviour | PROPOSED | Q002 (2026-10-12) | — | Speed-to-target on the report card: sessions to first touch of L1/L2/L3 from the next open, shown next to the distance-matched control. Source: EXPLORE_001 §E, H-065. |
+| EN-002 | behaviour | BRIEF_WRITTEN | Q002 (2026-10-12) | HACI_DECIDED:build | Speed-to-target on the report card: sessions to first touch of L1/L2/L3 from the next open, shown next to the distance-matched control. Source: EXPLORE_001 §E, H-065. |
 | EN-003 | behaviour | PROPOSED | Q004 (2026-10-26) | — | Actionable-basis hit rates (next-open and 10:00 ET) alongside the close-basis rate on performance surfaces; entry-timing note "L1 may be gone by the open". Source: EXPLORE_001 #4. |
 | EN-004 | behaviour | PROPOSED | Q006 (2026-10-05) | — | Distance-matched control rate next to every published hit rate; ATR-scaled ladder placement (L1 ≥ ~0.75 ATR) if the deep-level pattern holds. Source: PI-009, EXPLORE_001 #2, H-053. |
 | EN-005 | behaviour | PROPOSED | Q003 (2026-12-15) | — | Streak flag on the pick card (first-time / 2 / 3+ consecutive selections); lower default size note for first-time picks. Source: EXPLORE_001 #3. |
