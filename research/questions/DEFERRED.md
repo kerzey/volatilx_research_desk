@@ -1848,3 +1848,253 @@ further is filed until `/desk-run prompt PI-015`.
 
 Under this file's preamble **nothing here may be reported, briefed or quoted** until the triggers are
 met.
+
+---
+
+## Q036 / H-011 — "Does the published high/medium/low conviction label mark a better price path?" — **the arm E2 compares against does not exist on this scoring configuration**
+
+**Deferred 2026-09-14 by the registrar, autonomous run (DP-40..48), on this file's **second**
+admission ground (DP-43's 12-month ceiling) — in its strongest form, the Q025 shape: the binding
+rate is not slow, it is **exactly zero**, so the projected floor date is **undefined** rather than
+distant.** Drafted at `research/questions/Q036_confidence_label_validity/PREREG.md`; decided and
+recorded at `research/questions/Q036_confidence_label_validity/DECISIONS.md` (decision-maker,
+`decide` + `record` passes 2026-09-14, 19 items, 6 corrections); measured at
+`research/reports/STEWARD_Q036_exposure.md` (data-steward, 2026-09-14, R1, eight limbs (a)–(h),
+counts only, no outcome of any kind read, no live query — DP-50(c)). **Never locked: no
+`PREREG_LOCKED`, no `schedule.json`, no pin** — the Q020 / Q025 / Q030 / Q035 precedent;
+`state.json` reads `PREREG_DRAFT` at this writing and the controller's transition to `DEFERRED` is
+the coordinator's step, not the registrar's. **Both files are preserved exactly as drafted** —
+`@registrar apply Q036` was **not** run, so Corrections 1–6 stand in `DECISIONS.md` rather than in
+the draft's body, and **where the two disagree, `DECISIONS.md` "## Record — 2026-09-14" governs; any
+re-attempt builds from that record, not from the draft.** **The question number Q036 is consumed by
+this entry and is not reused.** This is **not** the first admission ground: the objective *is*
+measurable from the frozen manifests. What does not exist is one of the two arms.
+
+### What the question is, and why it is worth keeping
+
+The platform prints *"scored X with {confidence_level} conviction"* on every published card
+(`services/super_agent_select_public.py:212`, verified read-only at the pinned SHA), and **nothing
+has ever tested the word.** Q036 asked whether the label marks a better price path: two primaries,
+both night-level, both within-night touch-rate contrasts at the night's common ATR distance `d*_t`
+with a session t+1 open entry on the DP-09 20-session clock (DP-03(b), DP-42), both **two-sided at
+±5.0 pp (DP-20, DP-44)** — **E1**, the unconditional HIGH−MED touch-rate difference against H-011's
+own label-shuffle baseline; **E2**, the same contrast on adjacent-score-rank discordant pairs with
+`overall_score ≥ 82`, which is the part that is *not* a restatement of Q027's ranking result.
+
+**A confirmed negative was the branch with the larger consequence**, and that is why both primaries
+were registered two-sided: the desk's own weekly of 2026-09-12 recorded medium beating high on
+sealed nights (78% vs 65% next-open L1 touch), so a confirmed mis-ordering would **suspend a
+subscriber-facing claim** rather than add one. The design is complete and stands — population,
+`d*_t`, the label-integrity screen, the episode-clustered CI blocker (DP-51), the §8 clause 4 rule
+that "E1 confirms, E2 nulls" is a **NULL for Q036**. Nothing about it is unanswerable in principle —
+only unpopulated.
+
+### Why it cannot be registered — the label's own arithmetic against the measured completeness floor
+
+`_confidence_label(overall_score, completeness_score)`
+(`services/super_agent_select_scoring.py:1166-1171`, called at `:1425` **after** the ATR-elite cap
+block at `:1407-1423`, stamped at `:1451`; verified byte-identical at the pin) is a **joint step
+function**:
+
+- `high` ⇔ `overall_score ≥ 82` **∧** `completeness_score ≥ 65`
+- `medium` ⇔ ¬`high` **∧** `overall_score ≥ 68` **∧** `completeness_score ≥ 45`
+- `low` otherwise
+
+E2's population is therefore **`medium ∧ overall_score ≥ 82`**, which requires
+`completeness_score ∈ [45, 65)`. **The measured minimum `completeness_score` anywhere in the window
+is 65.3686, across all 4,195 scored `sas_candidates` rows — published and unpublished, any
+qualification status, any date.** The instant a row clears 82 it is `high` by construction, so
+**E2's arm is an empty cell by arithmetic, not a rare one**, and **all 26 of E1's contributing
+nights fall out of E2 solely because every MED row that night sits in `[80.05, 81.99]`** — §2.5's
+anticipated zero-mass gap, measured at its maximum possible value (100% of E1's nights, not a
+subset).
+
+Counts only, on `manifest_v001` + `manifest_prices_v001` against `exclusions_v003.json`, pick nights
+**2026-06-01..2026-09-10** (DP-06's segment), denominator = **elapsed sessions**
+(`STEWARD_Q036_exposure.md`):
+
+| quantity | gate (fixed at `decide`, before any count existed) | measured | call |
+|---|---|---:|---|
+| **E2 `r_join`, the limb that decides** (`overall_score ≥ 82`) | **≥ 0.43** | **0.0000** — 0/47 matured, 0/71 elapsed, 0/67 non-excluded | **SHORT by the whole 0.43** |
+| E1 `r_join`, Form (i), the schedule basis (item 6) | ≥ 0.43 | **0.5532** (26/47) | PASS |
+| E1 `r_join`, Form (ii), full denominator | — | 0.3662 (26/71) | descriptive |
+| `ρ_co` marginal (diagnostic only, item 6) | — | 0.6269 (42/67) / 0.5915 (42/71) | diagnostic |
+| (g) label-integrity mismatch, recomputed vs stored | ≤ 2% | **0.000%** (0 of 542; 0 boundary cases) | PASS |
+| (d) LOW arm | descriptive floor (item 12) | **0 nights** | structurally absent, not thin |
+| Minimum `completeness_score`, all scored rows | — | **65.3686** of 4,195 rows | the blocker |
+| Published label composition, 542 rows / 67 nights | — | **401 high / 141 medium / 0 low**; 25 of 67 nights single-label, every one all-HIGH | — |
+| `overall_score × completeness_score` grid, both cohorts | — | **every cell in the `[65,100]` completeness column**; 0 rows in `[35,45)`, 0 in `[45,65)` | — |
+| Population funnel | — | 71 elapsed · 68 non-excluded (`exclusions_v003`) · **67** after `payload_disabled_runs` (2026-06-02) · **47 matured to t+20** (last 2026-08-12) | — |
+| `d*_t` | — | defined on all 67 nights; median **1.858 ATR** (reproduces `STEWARD_Q027_exposure.md`'s 1.849 on an independently built ATR series); 0 zero-survivor, 0 fallback nights | — |
+
+**Both of `DECISIONS.md` item 7's independent DEFERRED triggers fire**, and neither was written with
+the counts in view: **E2's `r_join` < 0.37** on its own, and **E1 clearing while E2 fails**, which
+item 7 and PREREG §5.1's gate table both answer with *"DEFERRED, not lock E1 alone"*.
+
+**This deferral is not a data-quality defect.** Limb (g) measures **0.000%** with **0** boundary
+cases, so `sas_candidates.confidence_level` is exactly what `_confidence_label` at the pinned SHA
+would write from the stored columns; item 10's PI branch does **not** fire. What is filed instead is
+the *consequence* — a subscriber-facing field that is effectively constant — as **PI-016**
+(`research/PLATFORM_ISSUES.md`, med, OPEN), a recommendation only, and **no successor may cite it as
+evidence that the label does or does not predict the price path.** That question is this one, and it
+is deferred.
+
+### Why waiting does not fix it
+
+**DP-13 cannot cure a structural zero, and no window length can.** DP-13 extends a window **once**,
+by +30 sessions, when a floor is *marginal* at the decision date, and it fires on `eval.py`'s
+measured counts. It moves a slow rate to a later date; it cannot create a row in a cell whose
+membership condition is **arithmetically unsatisfiable under the running configuration**. At a rate
+of exactly zero the projected floor date is **undefined**, not merely distant — contrast Q034's
+finite "≈ session 880" and this question's own E1, which would clear 80 nights in ≈ 145 elapsed
+sessions and decides nothing. The extension is also registered **at lock**, and Q036 never locks.
+(The H-062 / Q025 reading of DP-13, verbatim: it rescues a floor short by a handful, not by 80 of
+80.) Nights arrive at ~21 a month and add contributing nights to E2 at a rate of **0.000**, so
+**no accrual date exists to name and none is invented.**
+
+### What was considered and rejected before deferring
+
+- **Locking E1 alone.** **Refused.** §1.2 and §8 clause 4 give the reason and the measurement does
+  not change it: the label *contains* `overall_score ≥ 82`, so an unconditional HIGH−MED contrast is
+  partly Q027's ranking result on a coarser variable. Locking E1 alone would add a primary to the F2
+  correction set that can only restate another question (**DP-29**) — and it would do so by dropping
+  the one endpoint that made this a different question, on the ground that its exposure rate is
+  comfortable. That is buying a runnable question with the part that was worth running.
+- **A lowered or widened completeness cut** — a "completeness ≥ 55" version, or re-basing the 82.
+  **Rejected (DP-25, rule 3).** The 82 and the 65 are the platform's own constants at `:1167-1170`,
+  not desk choices; moving either manufactures a MED arm and tests a label the platform does not
+  print.
+- **Substituting the unpublished `threshold_pass` (dark) cohort for the published slate.**
+  **Rejected** — item 1 and Correction 5, on the code rather than on preference: `threshold_pass` is
+  `overall_score ≥ max(lane_threshold, publication_floor = 80)` **and** `completeness_score ≥
+  min_completeness = 35` (`services/super_agent_select_scoring.py:1518-1521`), so the dark cohort
+  carries the **identical** two floors and the identical 65+ completeness ceiling — measured **564
+  medium / 82 high / 0 low on 646 rows**, every cell of its grid in the `[65,100]` column. It buys no
+  label mass at all, and it is Q027's population exactly.
+- **DP-13's single automatic extension.** **Rejected**, for the reason set out above: short by 80 of
+  80, at a rate of zero, on a question that never locks.
+
+### What would move it back into the backlog
+
+**One measured trigger, and it is not a date.** The blocker is a per-row structural property of the
+scoring configuration, not an arrival rate, so nights arriving at ~21 a month add contributing nights
+at a rate of 0.000 and **no accrual date exists to name**.
+
+- **The trigger, measured by the Steward on a then-current freeze over a trailing quarter, never
+  assumed from a projection:** **E2's `r_join` ≥ 0.43 joint contributing nights per elapsed session on
+  the `overall_score ≥ 82` series** (the §5.1 / item 7 gate, unchanged), **with E1's `r_join` ≥ 0.43 on
+  the unrestricted series at the same time**. (i) is the count that overturns this entry; E1's rate
+  alone never does.
+- **The necessary precondition, never once observed:** at least one published row per night carrying
+  **`completeness_score ∈ [45, 65)` together with `overall_score ≥ 82`**. Today the **minimum
+  `completeness_score` anywhere in the window is 65.3686** across all 4,195 scored rows, published and
+  unpublished alike, and **every cell of both §(e) grids sits in the `[65,100]` column** — zero rows in
+  `[35,45)`, zero in `[45,65)`, on either cohort. Q014 §2 independently records the same floor (65.4)
+  on its own control-pool screen.
+- **What must become true on the platform for that precondition to hold** — stated as a condition to
+  be observed, **not as a request, a recommendation or a brief**: the scoring stack must start leaving
+  a *partial* layer gap on a high-scoring name, i.e. the completeness distribution must reach below 65
+  on published rows above 82. Configurations under which that could happen: **`enable_fundamental_
+  enrichment` (or `enable_catalyst_enrichment`) running False** rather than the True the deployment
+  sets on every night measured (see Correction 6) — which would remove one or two layers from
+  completeness's numerator on every row; a **weight or timeframe-multiplier change** (v1.6 → v1.7, or
+  any edit at `super_agent_select_scoring.py:1316-1322`) that enlarges the effective-weight
+  denominator; a change to **`_confidence_label`'s own constants** at `:1166-1171`; or a widening of
+  the candidate universe that admits thin-coverage names above 82. **The desk takes no position on
+  whether any of these should ship**, and this entry is never a reason to ship one (the Q025(b)
+  precedent). Re-check **at the first freeze after any such change ships**, and not on a calendar.
+
+### What a re-attempt must re-measure — nothing here is inherited
+
+A configuration change is exactly the event that triggers re-entry, and under **DP-50(a)** it
+invalidates every count above. A re-attempt re-runs the **whole** R1 limb set on the then-current
+freeze — (a) label composition and single-label share, (b) and (c) both `r_join` series, (d) the LOW
+arm, (e) the `overall_score × completeness_score` grid on both cohorts, (f) the `config_json` tuple
+and the commit sweep, (g) label-integrity with item 10's 0.01 boundary tolerance, (h) the `d*_t`
+funnel — and additionally re-verifies, read-only in the platform repo: that `_confidence_label` still
+reads as at `fa70688` (`:1166-1171`), where it is called relative to the ATR-elite cap (`:1425` vs
+`:1407-1423`, which is what makes the §2.2 screen well-posed), the subscriber sentence at
+`super_agent_select_public.py:212`, and **whether the runtime `config_json` flags still differ from
+the code defaults**. The exclusions file current at that date replaces `exclusions_v003`, and the
+window is re-cut at any ship date that moves the §2.6 tuple (item 11). **E1's 0.5532 is not carried
+forward as a planning rate**; it is re-measured.
+
+### What is never re-specified, in any successor
+
+- **E2's cut is not lowered, widened or re-based.** The 82 and the 65 are the platform's own constants
+  at `:1167-1170`, not desk choices; moving either to manufacture a MED arm would test a label the
+  platform does not print, and would be a re-unit of the registered hypothesis (**DP-25**, rule 3).
+  There is no "completeness ≥ 55" version of this question.
+- **No E1-alone successor.** A question whose only primary is the unconditional HIGH−MED contrast is
+  Q027's ranking result restated on a coarser variable (§1.2, §8 clause 4, **DP-29**) and is refused
+  however comfortable its exposure rate is.
+- **No re-specification toward the arm that has mass.** Substituting `[80,82)`-vs-`[82,+)` for
+  HIGH-vs-MED is Q027's band contrast; substituting the dark cohort for the published slate is Q027's
+  population (item 1, Correction 5); substituting `completeness_score` as a continuous predictor is a
+  **different hypothesis** needing its own PREREG — and on a column with no observed mass below 65.37
+  it would be near-degenerate for the same reason. Each is a successor question with its own id, its
+  own §1 and its own MPE, never an edit to this one (**DP-25**, the Q025(a) precedent).
+- **The sealed post-hoc panel of §6 is not computed.** Item 4 tied it to the committed `eval.py` at
+  the decision pass; there is no `eval.py` and no decision pass, so the weekly of 2026-09-12's
+  uncontrolled "78% vs 65%" line stays uncorrected in the record — and stays unquotable, like every
+  other line under `DEFERRED.md`'s preamble.
+
+### Bookkeeping while deferred
+
+**No verdict of any kind was produced.** Q036 returns **no CONFIRMED, no NULL, no INCONCLUSIVE, no E1
+number and no E2 number** — a gate shortfall is not a verdict (the Q025 item 14 precedent). E1's
+0.5532 is an **exposure rate**, not a result about the label. **No `eval.py` was written and none
+exists, no `results/` directory exists and none may be created**, and no outcome — touch, first-touch
+date, return, excursion, `outcome_*`, `sas_selection_excursion` or
+`uoa_symbol_daily.fwd_return_*` — was read for this question at any point; R1 read forward bars only
+to establish that a bar exists (maturity accounting), and its counts are `NON_QUOTABLE` exposure
+measurements.
+
+**Correction set.** **F2 returns to the 16 primaries standing before this draft** — Q023 (2) +
+Q027 (2) + Q029's 10 companion IC endpoints + Q031 (2) — which is exactly `Q031 §7`'s own figure, so
+**no locked file needs editing and none was edited** (the H-062 / Q025 / H-083 precedent: a question
+that never locked never enters the correction set). Q036's two primaries never join it.
+
+**Successor freezes and routed requests.** **R2 is withdrawn** — no successor freeze is built or
+requested for Q036, and the shared selection build serving **Q027, Q029, Q031, Q033 and Q034 is not
+extended or re-scoped** for it; their own pins are unaffected and are not edited. **R3 is not
+issued**: no `eval.py` is written and the 2027-04-05 script deadline is void. The provisional
+schedule the `decide` pass carried (window 2026-09-15..2027-06-11, decision 2027-07-26, extension to
+2027-07-27 decided 2027-09-13) is **struck in full and is never inherited** — on any re-entry the
+whole schedule is recomputed from the new lock date at the then-measured rate, **out only**. What
+survives the striking is method, not dates: the gate thresholds are re-solved and never lowered
+(item 7), the scheduling rate stays `min(r_join, 0.6620)` on the **joint** event (item 6), floors
+stay 80 per primary and 20 per reported cell (DP-21), and the corrected holiday list stands
+(item 5, Correction 1).
+
+**`research/BACKLOG.md`** marks **H-011 — DEFERRED 2026-09-14**, not registered and **not merged into
+Q027** (DP-29: Q027 tests `overall_score` ranking and cannot return a verdict on a joint step
+function of the score *and* `completeness_score`).
+
+**Filings.** **`PI-016`** (`research/PLATFORM_ISSUES.md`, med, OPEN) — the conviction label is
+degenerate on the published slate; a **recommendation only** under DP-07 / DP-48, `HACI_DECIDED`
+unset until `/desk-run prompt PI-016`, and explicitly **not** a finding about whether the label
+predicts the price path. A `DATA_NOTES.md` note on Correction 6 — the runtime `config_json`
+overrides the ORM default for `enable_fundamental_enrichment` on every one of the 67 nights measured
+— is routed to the **Data Steward** (`DECISIONS.md` "Routed requests → data-steward (N1)"); the
+registrar writes nothing into `research/data/`. **`Q028_layer_signal_independence/PREREG.md` (locked)
+§9 `:506` and §10 `:580` carry the code-default reading that the measurement contradicts for
+`fundamental_quality`; the locked file stands and is not edited, and the discrepancy is flagged to
+the Red Team** to read against `STEWARD_Q036_exposure.md` §(f) and `Q029 §2` at sign-off.
+`Q032 (:368)`, `Q033 (:476)` and `Q034 (:498)` register `confidence_level` terciles as descriptive
+strata that will collapse to at most two cells on this data — their own §4 floors already mark a thin
+cell descriptive, so **nothing is owed and nothing is edited**; it is noted so the collapse is
+expected rather than discovered.
+
+**DP-50(b):** **no flag-off constraint is owed by Q036 and none is asserted.** The deferral removes
+the desk's only claim on the §2.6 settings, and a change to them is the very thing that could make
+this question testable again. Q027, Q028 and Q029 keep their own constraints; Q036 adds none.
+
+**Rule 14 note, carried forward:** Q036 requested no exception and needed none — every input is a
+16:05 ET candidate field (`overall_score`, `completeness_score`, `confidence_level`, direction, lane,
+the printed ladder), a split-adjusted bar dated ≤ t, or a point-in-time regime row legal from
+2026-06-09, with the session t+1 open used **only** as an entry price. **DP-05 is untouched and
+DP-41 is not engaged**, and a successor inherits that clean position.
+
+Under this file's preamble **nothing here may be reported, briefed or quoted** until the trigger is
+met.

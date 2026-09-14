@@ -37,6 +37,7 @@ Statuses: `OPEN` · `HACI_DECIDED:<fix|research|accept>` · `BRIEF_WRITTEN` · `
 | PI-013 | med | OPEN | `uoa_symbol_daily.score_swing` / `score_long` overwritten in place by the next-morning OI-confirmation pass; no point-in-time copy |
 | PI-014 | high | OPEN | Conviction Monitor's polarity arm silent since 2026-06-01: `polarity_unavailable_coverage_low` on 100% of in-scope rows, 0 polarity HOLD/EXIT rows — the EXIT tier is the technical arm alone |
 | PI-015 | high | OPEN | Projection layer (v1.6 weight 29, the largest) unscored — `available: false` — on 72.2% of published and 74.3% of capped main-lane rows; `overall_score` is a six-layer blend on ~3 of 4 picks |
+| PI-016 | med | OPEN | Conviction label degenerate on the published slate: `completeness_score` never below 65.37 (min 65.3686 of 4,195 scored rows), so `_confidence_label`'s completeness arm is inert — 401 high / 141 medium / **0 low** on 542 published rows, every `medium` the `[80,82)` score sliver; the subscriber sentence at `services/super_agent_select_public.py:212` re-prints "is the score ≥ 82" |
 
 ## Detail
 
@@ -327,3 +328,103 @@ whether the shipped ranking ever matched the documented v1.6 blend. If the answe
 pattern), not a scoring repair. Either way, **the behaviour change that would follow from Q035's
 hypothesis is not what is asked for here** — this is a completeness fix, and any change to how the
 slate is *ordered* still needs a research question and a full brief (rule 11).
+
+### PI-016 — the conviction label is degenerate: "high" is a re-print of "the score is ≥ 82"
+**Filed 2026-09-14 by the registrar (autonomous run, DP-40..48), on the decision-maker's
+recommendation at `research/questions/Q036_confidence_label_validity/DECISIONS.md`, "Corrections and
+filings added at record" → "Routed requests → registrar" (DP-07, DP-48). Severity med, status OPEN.
+Recommendation only — the decision is Haci's, and `HACI_DECIDED` stays unset until
+`/desk-run prompt PI-016`.**
+
+**The defect, in one line.** `completeness_score` never falls below **65.3686** anywhere in the
+window, so `_confidence_label`'s completeness arm is **inert**: the published label is decided by the
+score alone, and the sentence *"scored X with {confidence_level} conviction"*
+(`services/super_agent_select_public.py:212`) re-prints *"is the score ≥ 82"*.
+
+**Measured numbers, and where the desk read them.** `research/reports/STEWARD_Q036_exposure.md`
+§(a) / §(c) / §(e), counts only and **no outcome of any kind read**, on the pinned `manifest_v001` +
+`manifest_prices_v001` against `exclusions_v003.json`, pick nights 2026-06-01..2026-09-10, 67
+non-excluded nights:
+
+- **Published label composition: 401 `high` (74.0%) / 141 `medium` (26.0%) / 0 `low` (0.0%)** on
+  542 eligible published rows. **25 of 67 nights are single-label, and every one of them is
+  all-HIGH.**
+- **Minimum `completeness_score` = 65.3686** over **all 4,195 scored `sas_candidates` rows** in the
+  window — published, unpublished, any qualification status, any date. **Every cell of both §(e)
+  grids sits in the `[65,100]` completeness column**: zero rows in `[35,45)`, zero in `[45,65)`, on
+  the published slate (542 rows) and on the unpublished `threshold_pass` cohort (646 rows; 564
+  medium / 82 high / 0 low) alike. `Q014 §2` independently records the same floor (65.4) on its own
+  control-pool screen.
+- **Every `medium` row is the `[80, 82)` score sliver** — MED scores cluster in **`[80.05, 81.99]`**
+  on all 26 of the both-labels nights measured.
+- **The label column itself is written correctly.** Recomputing
+  `_confidence_label(overall_score, completeness_score)` from the stored columns with the literal
+  constants at `services/super_agent_select_scoring.py:1167-1170` gives **0 mismatches of 542
+  (0.000%), 0 rounding-boundary cases** (§(g)). **This is not a mis-written column**; it is a
+  classifier whose second input does not vary.
+- **Why the second input does not vary — an observed correlation, not a mechanism claim.** The
+  runtime `sas_runs.config_json` on **all 67** non-excluded nights carries
+  `enable_catalyst_enrichment = True` and **`enable_fundamental_enrichment = True`**, with only
+  `enable_smart_money_enrichment` at its coded default `False`
+  (`services/super_agent_select_models.py:109-111`) — i.e. **two of three enrichment layers populate
+  `completeness_score`'s numerator on every row**, and the deployment overrides the ORM default that
+  several PREREGs cite. `Q029 §2` records the same flag state independently (67 of 68 segment
+  nights). The tuple is constant across the window; the DP-50(a)/(b) commit sweep since `fa70688`
+  returns **NONE** at HEAD `d19c9a9`, and no v1.7 promotion is scheduled.
+
+**The arithmetic that makes it degenerate.** `_confidence_label`
+(`services/super_agent_select_scoring.py:1166-1171`, called at `:1425` after the ATR-elite cap block
+at `:1407-1423`, stamped at `:1451`) sets `high` ⇔ `overall_score ≥ 82 ∧ completeness_score ≥ 65`,
+`medium` ⇔ ¬`high` ∧ `overall_score ≥ 68 ∧ completeness_score ≥ 45`, else `low`. On a published slate
+floored at `publication_floor = 80` and `min_completeness = 35`
+(`services/super_agent_select_models.py:91`, `:98`), with completeness never below 65.37, the three
+tiers collapse to a single cut at 82: **`low` is unreachable and `medium` means "80.0 ≤ score <
+82.0"**. A subscriber reading "high conviction" is reading a two-point score band described in the
+language of confidence.
+
+**Desk impact.** **Q036 (H-011, confidence label validity) is DEFERRED** —
+`research/questions/DEFERRED.md`, "Q036 / H-011" — because its second primary's population
+(`medium ∧ overall_score ≥ 82`) is an **empty cell by arithmetic**: E2's contributing-night rate
+measures **0.0000 on every form** (0/47 matured, 0/71 elapsed, 0/67 non-excluded) against a gate of
+0.43, while E1 clears at 0.5532. **This row is emphatically *not* a finding that the label fails to
+predict the price path** — that question is Q036's, it is deferred, and **no brief and no successor
+question may cite this row as evidence for it.** Elsewhere, `Q032 (:368)`, `Q033 (:476)` and
+`Q034 (:498)` register `confidence_level` **terciles** as descriptive strata; on this data the column
+takes two values on the published slate, so those terciles collapse to at most two cells and will sit
+under the 20-contributing-night floor. Their own §4 floors already mark a thin cell descriptive, so
+**nothing is owed and no locked file is edited** — it is recorded here so the collapse is expected at
+their decision passes rather than discovered.
+
+**The platform check — repo-only, no database step (DP-49).** Everything below is satisfiable from
+the read-only platform repo: (i) read `_confidence_label` at `:1166-1171` and the `completeness_score
+= clamp(available_weight / total_weight × 100)` computation at `:1347` over the timeframe-adjusted
+effective weights at `:1316-1322`, and state **which layers can be absent at all** under the
+deployed enrichment flags — i.e. what the reachable range of `completeness_score` actually is;
+(ii) state whether the 65 / 45 constants were ever calibrated against an observed completeness
+distribution, or were chosen against a configuration in which more layers could be missing;
+(iii) confirm from the code whether any deployed path can produce `completeness_score < 65` on a row
+that also clears 82; (iv) a pure-function unit test over `_confidence_label` asserting the tier
+boundaries, plus `git show --stat` proving no other scorer file changed. **The before/after
+distribution is the Data Steward's**, on the pinned parquet (`manifest_v001`) and the successor
+freeze (DP-50(c)); the brief names that parquet as the before-snapshot and asks no one to capture one.
+
+**DP-50(b) ship timing — named, decision left to Haci.** Changing `_confidence_label`'s constants, or
+any enrichment flag, weight or timeframe multiplier, moves `completeness_score` and the label
+together and makes the label **two different features at the ship date** (DP-06 / DP-50(a)).
+In-flight questions that read the label or the score: **Q023** (`confidence_level` as a column),
+**Q024**, **Q027** and **Q031** (the `overall_score` blend and its published slate; Q027 and Q031
+share Q029's **2027-05-24** hard stop), **Q029** (a closed EVALUABLE / DEAD / UNEVALUABLE register
+that a mid-window ship would force it to re-derive), and **Q032 / Q033 / Q034**, whose descriptive
+`confidence_level` terciles would change definition mid-window. **Q036 itself asserts no
+constraint** — it is deferred, and a change to these settings is precisely what could make it
+testable again. The trade-off is stated; the decision is Haci's under DP-48, and the desk files
+nothing further until `/desk-run prompt PI-016`.
+
+**Recommend: fix — or accept, and stop calling it conviction.** Two honest options, and the desk
+takes no third. **`fix`** = re-derive the `:1167-1170` constants against the observed completeness
+distribution so the tiers separate something, **or** rename the field to the coverage measure it
+actually is and let the card say what it means. **`accept`** = leave the computation alone and stop
+describing the output as conviction on subscriber-facing surfaces, since on the running
+configuration it carries no information the printed score does not already carry. Either way, any
+change to how the slate is *scored or ordered* still needs a research question and a full brief
+(rule 11) — and the question of whether the label predicts anything remains **Q036, DEFERRED**.

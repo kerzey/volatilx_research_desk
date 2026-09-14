@@ -245,6 +245,24 @@ found only because they fell inside one question's 495-pick sample; a full sweep
 published symbols has not been done. Flagged to the Red Team as a candidate PI filing (distinct
 from PI-003). See `research/reports/STEWARD_Q018_exposure.md` Section 2 for the measured counts.
 
+## Enrichment flags: the runtime config overrides the code default (Steward, Q036 R1, 2026-09-14)
+
+Several PREREGs cite `services/super_agent_select_models.py:109-111` and state that
+`enable_fundamental_enrichment` and `enable_smart_money_enrichment` default `False`. The **code
+default is correctly cited**; it is **not** the value the deployment runs. Measured on
+`sas_runs.config_json` (`research/data/manifest_v001.json`) over all 67 non-excluded nights of
+2026-06-01..2026-09-10 (`research/reports/STEWARD_Q036_exposure.md` §(f)), and independently on 68
+nights by `Q029 §2` (67 of 68): `enable_catalyst_enrichment = True`, **`enable_fundamental_enrichment
+= True`**, `enable_smart_money_enrichment = False` (its coded default), constant across the window
+with no in-window ship. **Rule for studies: the runtime `config_json` tuple, pinned per night in the
+freeze, is the value of record for every enrichment flag, weight and multiplier -- never the ORM
+default.** A PREREG that reasons from the ORM default reasons about a configuration the platform does
+not run; the consequence measured in Q036 is that two of three enrichment layers populate
+`completeness_score`'s numerator on every row, and `completeness_score` never falls below 65.3686 in
+4,195 scored rows, which makes `_confidence_label`'s `medium` and `low` tiers unreachable on the
+published slate (`PI-016`; Q036 DEFERRED for that reason). `Q028 §9/§10` (locked) carries the
+code-default reading and is flagged to the Red Team rather than edited.
+
 ## Other
 
 - 16 published picks have no target ladder at all (`public_payload_json` lacks lane targets).
