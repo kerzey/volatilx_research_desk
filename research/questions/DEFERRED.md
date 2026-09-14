@@ -662,3 +662,186 @@ body (§5–§7, §10) and still carries the struck dates, the 0.696 stand-in an
 §8 text; where it and this entry or `DECISIONS.md` disagree, `DECISIONS.md` "## Record — 2026-09-13"
 governs, and any successor question builds from that record, not from the draft's body.** Under this
 file's preamble **nothing here may be reported, briefed or quoted.**
+
+---
+
+## Q030 / H-074 — "Does the candidate universe contain the market's big movers before they move?" — **the base-universe price freeze cannot be built: no Alpaca credentials in the desk's session**
+
+**Deferred 2026-09-14 by the registrar, autonomous run (DP-40..48), on this file's first admission
+ground: the objective cannot be measured with the artefacts the desk holds.** The blocker is
+**provisioning, not procurement, not accrual and not a grant** — the data exists at a vendor the
+desk is already licensed to read (rule 1 names `ALPACA_API_KEY` / `ALPACA_SECRET_KEY`), and the two
+variables are simply **not present in the desk's session environment**, so the freeze the question's
+population is defined on has never been built. Drafted at
+`research/questions/Q030_universe_discovery_recall/PREREG.md` (state `PREREG_DRAFT` → `DEFERRED`;
+**never locked: no `PREREG_LOCKED`, no `schedule.json`** — the Q020 / Q025 precedent); decisions at
+`research/questions/Q030_universe_discovery_recall/DECISIONS.md` (decision-maker, 2026-09-14, 13
+items + 7 corrections); the measurement at `research/reports/STEWARD_Q030_universe_freeze.md`.
+**Both files are preserved exactly as drafted** — nothing in either was edited or deleted for this
+deferral — and the question **resumes at `@registrar apply Q030`** when the trigger below is met.
+**The question number Q030 is consumed by this entry and is not reused.**
+
+### What the question is, and why it is worth keeping
+
+Haci's H4, *Discovery*. The ~57 stocks VolatilX puts in front of its scoring engine each night —
+does that pool contain the names that are about to make a big move far more often than the same
+number of names drawn at random from the investable market, **at least twice as often**? One
+primary, night-level, two-sided: **E1, the discovery lift** = mean nightly `recall_t`
+(`|M_t ∩ U_t^B| / |M_t|`, movers being base-universe symbols whose session high first touches
+`C_t + 3 × ATR14` somewhere in t+1..t+20) divided by mean nightly `e_t` (`|U_t^B| / |B_t|`, the
+same-size uniform draw's expectation), **MPE lift ≥ 2.00** (Haci's own number), mirror ≤ 0.50, with
+the **materiality floor `D = mean(recall_t − e_t) ≥ +1.0 pp`** as an inseparable second condition.
+
+**It is the step before every other selection question, and nothing else on the desk can stand in
+for it.** Q006 draws its controls from the night's own candidate pool; Q024's sector-random arm
+draws from the same pool; Q027 ranks inside it. **None of them can see what the pool never
+contained.** Q030 is the only registered question whose population is the market *outside* the pool,
+and both signs are consequential: a confirmed lift below 1 — the universe systematically avoiding
+the names that move — would be the most important thing this desk could say about candidate
+generation. The design is complete and stands: population, the `n_t = |U_t ∩ B_t|` denominator with
+the as-filed `|U_t|` version blocking, four baselines, the DP-51 two-CI gate, the corroboration gate,
+the mid-window split rule. Nothing about it is unanswerable in principle — only unbuilt.
+
+### Why it cannot be registered — the failing limb, named exactly
+
+The lock-or-DEFER gate (DECISIONS item 10, PREREG §5.3 R2) has three limbs: **credentials present**
+**and** **≥ 90% of the 2,405 pinned base symbols returning ≥ 60 daily bars** **and** an
+all-candidates contributing-night rate **≥ 0.36 per elapsed session**.
+
+**The failing limb is credentials: `no ALPACA_API_KEY / ALPACA_SECRET_KEY in the Steward's
+environment, so `manifest_prices_universe_v001` cannot be built`.** Checked with a direct presence
+test in the Steward's shell — stated, never inferred, per the Q024 R1(d) precedent — and the same
+absence was confirmed independently in the coordinator's own session. It is the same failure mode as
+`STEWARD_Q024_sas_vs_simple_benchmarks_exposure.md` §(d).
+
+**Coverage is UNMEASURED, not failed.** Because limb (i) failed, the request's own instruction —
+*"if it cannot be built, say which limb fails and stop"* — stopped the run: no Alpaca probe was
+attempted, no symbol list was narrowed, no coverage share was estimated. The ≥ 90% limb is therefore
+**untested and may still fail on measurement**; this entry does not claim it would pass.
+
+**The rate limb PASSED and is not the blocker.**
+
+| quantity | measured | source |
+|---|---:|---|
+| **(i) Credentials** — `ALPACA_API_KEY` / `ALPACA_SECRET_KEY` present in the desk session | **ABSENT (both)** | `STEWARD_Q030_universe_freeze.md` §(i) |
+| **(ii) Coverage** — share of the 2,405 pinned symbols returning ≥ 60 daily bars (gate ≥ 90%) | **NOT MEASURED** — probe blocked by (i) | §(ii) |
+| **(iii) Build** — `manifest_prices_universe_v001` | **NOT BUILT**; no manifest path, no sha256, no rows; nothing written to `research/data/` | §(iii) |
+| **(iii-rate) All-candidates contributing nights per elapsed session** (gate ≥ 0.36) | **0.6761 (48/71) — PASSES, clears the gate by 88%** | `STEWARD_Q027_exposure.md`, borrowed as a conservative lower bound (Q030's night rule is strictly broader) |
+| Pinned sector blob re-verified (credential-free) — entry count | **2,405**, matches the PREREG exactly | §(ii), `volatilx` `data/sp500_sectors.json` at `4171b1a` |
+| Pinned blob sha256, LF-normalized | **`c4d12610ac95a8a83a0fc2365d02b4963d6a4169a9352acf2578164111390201`**, matches exactly; no disagreement to flag | §(ii) |
+| **(iv) Nights with `n_t ≥ 1`**, pick nights 2026-06-01..2026-08-12, after `exclusions_v003.json` | **48 of 48 (100%)**; raw 51 of 51 | §(iv) |
+| `n_t` min / median / max, post-exclusion | **45 / 60.5 / 68** (raw 45 / 61.0 / 68) | §(iv) |
+| Nights removed by `exclusions_v003.json` in that span | **3** — 2026-06-26 (`uncorroborated_publication_runs`), 2026-07-02 and 2026-07-06 (`manual_runs`) | §(iv) |
+| **Nights with `m_t ≥ 1`** | **UNAVAILABLE** — needs universe-wide bars | §(iv) |
+| **`b_t` (gradeable base universe, ≥ 60 bars ≤ t plus a bar on night t)** | **UNAVAILABLE for the same reason** — the Steward's correction to the coordinator's framing | §(iv) |
+| Only pinned price freeze the desk holds | `manifest_prices_v001`, **436 symbols** (candidates + benchmarks) — not `B` | §(iv) |
+| As-filed residue (candidate symbols outside `B`, descriptive) | 7 of 51 nights, **one distinct symbol, `BRK.B`** — a ticker-format mismatch against the blob's key, not a true non-`B` name | §(iv) |
+
+**The mechanism, stated so no successor rediscovers it.** Every quantity in this question's
+denominator is defined over `B` — `b_t`, `m_t` and `e_t` all require daily bars for all 2,405 base
+symbols — and **the desk's only price freeze covers 436 symbols, which are the candidates and the
+benchmarks: precisely the names the universe already found.** There is no partial route. `n_t` is
+computable from `manifest_v001.sas_candidates` and the pinned blob alone, and it is never zero (48/48
+nights), which says the *numerator side* of the night rule would never bind — but a recall with no
+measurable mover set is not a statistic. **Waiting does not fix this**: nights accrue at ~21 a month
+and not one of them brings a bar for a symbol outside the 436, so there is **no date-based re-check
+trigger in this entry and none is invented**.
+
+### What was considered and rejected before deferring
+
+Each would have bought a lock by weakening the question, which DP-45 forbids.
+
+- **A narrower symbol list — build the freeze over whatever subset the desk can reach.** Rejected.
+  `B` *is* the population; a denominator built from a subset of `B` is a different population, and
+  the whole point of H-074 is the market **outside** the pool. Shrinking `B` shrinks `m_t` and `e_t`
+  together in a direction nobody can sign in advance, and the lift it produces answers a question
+  nobody filed.
+- **Using `manifest_prices_v001`'s 436 symbols as `B`.** Rejected outright, and named here because it
+  is the tempting one: those 436 are the candidate symbols plus benchmarks, so `U_t^B` would be
+  nearly all of `B_t`, `e_t` would approach 1 and the lift would approach 1 **by construction** — a
+  number that looks like a finding and is the arithmetic of its own denominator.
+- **A random sample of `B` (say 400 of the 2,405).** Rejected. It is the subset defect plus a second
+  one: `m_t` on a sample is a handful of symbols a night, so `recall_t` becomes a ratio of very small
+  counts and the night statistic is noise the 80-night floor cannot absorb.
+- **Estimating coverage from anything other than the probe** — from the 436-symbol freeze's fill
+  rate, from the blob's composition, from a vendor's published coverage claim. Rejected; R2 disallows
+  it explicitly, and a lock gate settled on an estimate is not a gate.
+- **A platform table in place of the freeze.** Rejected — no platform table holds daily bars for the
+  base universe; `uoa_symbol_daily` covers a screened subset and its `fwd_return_*` columns are
+  degraded and banned as outcomes (DATA_NOTES; FREEZE_v001 §5).
+- **Locking now and building the freeze before the decision pass.** Rejected. DECISIONS item 10 makes
+  R2 **blocking for the lock** precisely because a PREREG whose population cannot be constructed is
+  not falsifiable at lock (rule 3), and a lock that assumes a freeze which may never exist would put
+  a question into F8's correction set that cannot be run.
+- **DP-13's single automatic extension, or any wait.** Rejected — DP-13 rescues a floor that is
+  *marginal* at the decision date. No floor is short here; the rate limb passes at 0.6761. Nothing
+  accrues toward a credential.
+
+### What would move it back into the backlog — the trigger is a measurement, not a date
+
+**Both conditions, measured in the Steward's own session on a then-current freeze, never inferred and
+never projected:**
+
+1. **Credentials present.** A desk session in which **both `ALPACA_API_KEY` and `ALPACA_SECRET_KEY`
+   are present**, stated explicitly by the Steward with a direct presence test (the Q024 R1(d)
+   precedent: presence is asserted, never assumed).
+2. **Coverage measured at ≥ 90%.** The Steward's **trailing-60-session probe over all 2,405 symbols**
+   in the `mapping` key of the pinned blob returns **≥ 90% of them with ≥ 60 daily bars**, with the
+   count and list of zero-bar symbols reported, and with the blob re-verified at 2,405 entries and
+   sha256 `c4d12610…0201` (any disagreement is a loud failure). **If the probe runs and returns
+   below 90%, Q030 lands back in this file on the coverage limb with the measured share named** —
+   that is a different finding from today's, and this entry does not pre-empt it.
+
+**On both conditions holding, in this order:** R2(iii) builds and pins
+`manifest_prices_universe_vNNN` (daily bars, `adjustment=split` **and** `raw`, `feed=sip`, all 2,405
+base symbols plus every in-window candidate symbol and the existing benchmarks, ≥ 60 sessions before
+the window start through t+20 of the last in-window pick night, symbols lacking bars excluded and
+counted, never back-filled or imputed); R2(iv)'s counts-only `b_t` / `n_t` / `m_t` dry run fixes the
+sub-cell suppression list; **Q030 re-enters the queue at the front** (the Q020 precedent) with
+**`DECISIONS.md` binding in full** — items 1–13, Corrections 1–7 — folded into the PREREG at
+`@registrar apply Q030` before any lock. **§5.2's schedule is then re-derived session by session
+from the actual lock date, out only** (DP-43, DP-45): the window opens on the first trading session
+after the lock commit, the 119-session window end, the 2027-04-12 decision date, the 2027-04-19
+extended window end and the 2027-05-24 extension decision **are not carried forward as dates** —
+they are the arithmetic at a 2026-09-14 lock and nothing else. The **rate limb is not re-measured**;
+0.6761 is re-tested only as an inequality against the gate **re-solved from the new lock date
+against DP-43's 12-month ceiling**, which **tightens as the lock slips** (Correction 3). If the
+re-solved gate ever exceeds 0.6761, Q030 lands back here on this file's second admission ground with
+that arithmetic printed.
+
+**Whose call it is.** Provisioning two environment variables the desk is already licensed to use is
+**Haci's**, and it is neither a purchase nor a platform change: no `IMPLEMENTATION_BRIEF.md` follows
+from this entry, no enhancement is filed against the platform, and **DP-49 is not engaged** (nothing
+here hands a coding agent a database step). Rule 1 is untouched — the desk asks for no credential it
+is not already named to hold, and asks for no other.
+
+### Bookkeeping while deferred
+
+**No verdict of any kind was produced.** Q030 returns **no CONFIRMED, no NULL, no INCONCLUSIVE, no
+E1 and no lift**; a gate shortfall is not a verdict. **No `eval.py` was written and no `results/`
+directory exists.** **No outcome of any kind was read** for this question at any point — no touch,
+no first-touch date, no return, no excursion, no `outcome_*` column, no `sas_selection_excursion`, no
+`uoa_symbol_daily.fwd_return_*`, no recall, no lift and no intersection count; the Steward's report
+is counts of candidate symbols, an exclusions tally and a blob hash, on the pinned freeze, with **no
+live query** (DP-50(c)).
+
+`research/BACKLOG.md` marks **H-074 — DEFERRED (Q030 drafted; universe price freeze needs Alpaca
+credentials in the desk session)**, not registered. **F8's BH correction set does not contain Q030
+while deferred** (the H-062 / Q025 precedent), so F8 carries **no registered primary today** —
+H-081 and H-083 join it when they lock, and Q026 / Q028 are diagnostics that enter no correction set
+in any case. **No cross-question edit was required and none was made:** Q027 (F2) is untouched and
+its own R2 / R3 freeze requests stand on their own scope — the one-freeze-serves-both efficiency
+(PREREG §5.2) simply does not materialize while Q030 is deferred. Q030's Steward requests are
+**HELD and revive with the question**: R1(b)–(d) (corroboration gate, the non-`B` residue, the
+universe-side commit sweep), R3 (the successor selection freeze on Q030's account) and R4 (the sealed
+B-wide bars for the labelled post-hoc panel, droppable by construction); **R2 does not revive — it
+*is* the trigger above.**
+
+**The draft is preserved, and DECISIONS.md governs where the two disagree.** `apply` never ran, so
+the PREREG body still carries the pre-correction text: the borrowed 0.9538 planning rate and its
+8-session cushion, the 92-session window ending 2027-01-26, the decision date 2027-03-08 and the
+extension 2027-04-19, §5.3 listing all three gate limbs as pending, §9's flag-off dates, and §4.3's
+reference to R1 rather than R2(iii). **Where the draft and `DECISIONS.md` disagree, `DECISIONS.md`
+governs** (the Q025 precedent), and at `@registrar apply Q030` Corrections 1–7 plus the recomputed
+schedule are folded in **before** any lock — which is the whole reason the draft is kept rather than
+rewritten now. Under this file's preamble **nothing here may be reported, briefed or quoted.**
