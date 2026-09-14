@@ -2,6 +2,12 @@
 
 One page. Where things are, who does what, and what *you* do versus what the agents do.
 
+**2026-09-14 update:** Start with [the board](../research/BOARD.md): it now shows evidence
+available today, weekly review dates, operational work, and why each question is waiting.
+`/desk-run learning` refreshes internal evidence; `/desk-run schedule-audit` checks forecast
+arithmetic without opening outcomes or moving locked dates. Read the
+[learning policy](../research/LEARNING_POLICY.md) for what an early answer can support.
+
 ## The idea in one paragraph
 
 The desk turns "I think SAS picks do X" into a verdict you can defend. It does that by writing

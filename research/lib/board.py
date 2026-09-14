@@ -43,7 +43,7 @@ def table(rows, cols):
     if not rows:
         return "_none yet_\n"
     head = "| " + " | ".join(c for c, _ in cols) + " |\n|" + "---|" * len(cols) + "\n"
-    body = "".join("| " + " | ".join(str(f(r)) for _, f in cols) + " |\n" for r in rows)
+    body = "".join("| " + " | ".join(str(f(r)).replace("|", "\\|").replace("\n", "<br>") for _, f in cols) + " |\n" for r in rows)
     return head + body
 
 
@@ -55,6 +55,25 @@ def main() -> None:
     L.append("# Research desk — board\n")
     L.append(f"_Generated {q['today']} by `research/lib/board.py`. Do not edit; edit the source files and re-run. "
              "Ask the desk for anything on this page in plain words, or use the commands shown._\n")
+
+    L.append("## Evidence available now\n")
+    L.append("**INTERNAL / NON_QUOTABLE.** Mechanical facts and exploratory observations are separate from "
+             "the controller's verdicts. Priority: integrity → selection/benchmarks → ranking → layer value/economic objective. "
+             "[Learning policy](LEARNING_POLICY.md) · [Schedule audit](reports/SCHEDULE_AUDIT.md).\n")
+    L.append(table(q["learning"]["cards"], [
+        ("Q", lambda r: r["question"]), ("evidence", lambda r: r["label"]),
+        ("what we know", lambda r: r["finding"]), ("limits", lambda r: r["limit"]),
+        ("as of / next review", lambda r: r["as_of"] + " / " + r["review_on"] + (" — DUE" if r["review_due"] else "")),
+        ("registered decision", lambda r: r["decision_date"] or "not scheduled"),
+        ("sources", lambda r: ", ".join(f"[{Path(s).name}]({s.removeprefix('research/') if s.startswith('research/') else '../' + s})" for s in r["sources"]))]))
+    L.append("## Desk work available before final verdicts\n")
+    L.append(table(q["learning"]["work"], [("item", lambda r: r["id"]),
+        ("owner", lambda r: r["owner"]), ("next action", lambda r: r["what"])]))
+    L.append("## What each question is waiting for\n")
+    L.append("A missing counts snapshot is shown as unmeasured, not assumed to be a maturation delay. "
+             "Meeting counts never moves a locked decision date.\n")
+    L.append(table([r for r in q["readiness"] if r["reason"] != "RECORDED_STATE"], [
+        ("Q", lambda r: r["id"]), ("reason", lambda r: r["reason"]), ("next step", lambda r: r["detail"])]))
 
     # 1. Waiting on you
     L.append("## 1. Waiting on you\n")
@@ -95,8 +114,8 @@ def main() -> None:
         for p in pb:
             L.append(f"- playbook `{p['file']}` — {p['title'][:100]} — {p['status']}")
         L.append("")
-    L.append("**Candidate edges under test (locked; the desk looks once, on the date):**\n")
-    inflight = q["in_flight"] + q["needs_pin"] + q["drafts"]
+    L.append("**Registered studies and drafts (study outcomes follow their registered look schedule):**\n")
+    inflight = q["in_flight"] + q["needs_pin"] + q["drafts"] + q["due"]
     L.append(table(sorted(inflight, key=lambda x: str(x.get("due_on", "z"))),
                    [("Q", lambda r: r["id"]), ("question", lambda r: r["title"].split(": ", 1)[-1][:120]),
                     ("state", lambda r: r["state"]), ("decides on", lambda r: r.get("due_on", "—"))]))
@@ -142,7 +161,14 @@ def main() -> None:
                  f"so each resumes at `@registrar apply` with its DECISIONS.md binding in full and "
                  f"its schedule re-derived from the actual lock date, out only (DP-43, DP-45)")
     L.append("")
-    cal = [(str(x.get("due_on"))[:10], x["id"]) for x in q["in_flight"] if x.get("due_on") and re.match(r"\d{4}", str(x["due_on"]))]
+    cal = []
+    for x in q["questions"]:
+        if x["state"] not in ("PREREG_LOCKED", "DATASET_PINNED"):
+            continue
+        sch = x["schedule"]
+        d = sch.get("extension_date") if sch.get("extended") else sch.get("decision_date")
+        if d:
+            cal.append((d, x["id"]))
     if cal:
         L.append("| decides on | Q |\n|---|---|")
         for d, i in sorted(cal):

@@ -2,10 +2,77 @@
 
 _Generated 2026-09-14 by `research/lib/board.py`. Do not edit; edit the source files and re-run. Ask the desk for anything on this page in plain words, or use the commands shown._
 
+## Evidence available now
+
+**INTERNAL / NON_QUOTABLE.** Mechanical facts and exploratory observations are separate from the controller's verdicts. Priority: integrity → selection/benchmarks → ranking → layer value/economic objective. [Learning policy](LEARNING_POLICY.md) · [Schedule audit](reports/SCHEDULE_AUDIT.md).
+
+| Q | evidence | what we know | limits | as of / next review | registered decision | sources |
+|---|---|---|---|---|---|---|
+| Q026 | NOT_YET_ASSESSED | Point-in-time integrity audit is registered and pinned; a passing integrity verdict has not been recorded. | Other evidence remains conditional on valid prediction-time inputs. | 2026-09-14 / 2026-09-21 | 2026-09-21 | [PREREG.md](questions/Q026_point_in_time_integrity/PREREG.md), [state.json](questions/Q026_point_in_time_integrity/state.json) |
+| Q006 | EXPLORATORY | Existing April-May exploration suggests deeper targets and speed deserve more attention than raw L1/L2 hit rates. | 35 analysis nights in a strong tape; historical engine/data defects; no independent confirmation or trading rule. | 2026-09-14 / 2026-09-21 | 2026-10-05 | [EXPLORE_001.md](reports/explore/EXPLORE_001.md), [PREREG.md](questions/Q006_control_cohort_path/PREREG.md) |
+| Q024 | NOT_YET_ASSESSED | Five benchmark arms passed historical computability checks. No SAS-versus-benchmark performance conclusion is established by those checks. | 26 mature nights in the feasibility panel. The registered endpoint is target reaching, not portfolio profit after costs. Previously inspected history is exploratory. | 2026-09-14 / 2026-09-21 | 2027-05-17 | [STEWARD_Q024_sas_vs_simple_benchmarks_exposure.md](reports/STEWARD_Q024_sas_vs_simple_benchmarks_exposure.md), [PREREG.md](questions/Q024_sas_vs_simple_benchmarks/PREREG.md) |
+| Q027 | MECHANICAL | All 48 mature eligible nights passed the candidate-count and defined-statistic feasibility gates; ranking validity is still untested prospectively. | Feasibility measures whether the test can run, not whether higher scores predict better outcomes. | 2026-09-14 / 2026-09-21 | 2027-04-12 | [STEWARD_Q027_exposure.md](reports/STEWARD_Q027_exposure.md), [PREREG.md](questions/Q027_score_ranking_validity/PREREG.md) |
+| Q029 | MECHANICAL | In the examined segment, smart-money was uncomputed, GEX had zero production weight, projection failed E1/E2 coverage, and score/slate replay passed. | These facts do not prove a layer helps or hurts outcomes. The earlier layer/outcome audit already used the historical cohort. | 2026-09-14 / 2026-09-21 | 2027-04-12 | [STEWARD_Q029_feasibility.md](reports/STEWARD_Q029_feasibility.md), [PREREG.md](questions/Q029_layer_value_ablation/PREREG.md) |
+| Q034 | NOT_YET_ASSESSED | The economic-objective comparison is registered; it has no recorded comparative outcome verdict. | A stock-path endpoint does not by itself establish realized option-spread or portfolio profitability. | 2026-09-14 / 2026-09-21 | 2027-08-09 | [PREREG.md](questions/Q034_economic_objective/PREREG.md), [state.json](questions/Q034_economic_objective/state.json) |
+| Q028 | MECHANICAL | The absent-price-manifest parser defect is repaired and Q028 is pinned after checksum verification. Layer independence remains a scheduled outcome-free diagnostic. | Input redundancy does not establish whether a layer contributes predictive or economic value. | 2026-09-14 / 2026-09-21 | 2026-09-28 | [PREREG.md](questions/Q028_layer_signal_independence/PREREG.md), [state.json](questions/Q028_layer_signal_independence/state.json) |
+
+## Desk work available before final verdicts
+
+| item | owner | next action |
+|---|---|---|
+| LEARN-COMPANIONS | registrar | Turn the scoped historical work packages into individual fixed protocols for Q024/Q027/Q029; establish engine-vintage feasibility before outcomes. |
+| OPS-EN002-REVERIFY | data-steward | Write a new verification receipt against the corrected denominator specification and implemented SHA; no deployment or flag change. |
+| SCHEDULE-SUCCESSORS | registrar | Use DP-53 for unlocked Q030/Q032 drafts; scope separately registered earlier successors to affected locked studies, with shared-data and family obligations. Never move a locked date automatically. |
+| READINESS-Q006 | data-steward | Refresh Q006 readiness.json from frozen counts only, with every registered endpoint and source date. If the required snapshot does not exist, record the data dependency; do not substitute effects, invent counts or open the study's outcomes. |
+| READINESS-Q024 | data-steward | Refresh Q024 readiness.json from frozen counts only, with every registered endpoint and source date. If the required snapshot does not exist, record the data dependency; do not substitute effects, invent counts or open the study's outcomes. |
+| READINESS-Q027 | data-steward | Refresh Q027 readiness.json from frozen counts only, with every registered endpoint and source date. If the required snapshot does not exist, record the data dependency; do not substitute effects, invent counts or open the study's outcomes. |
+| READINESS-Q029 | data-steward | Refresh Q029 readiness.json from frozen counts only, with every registered endpoint and source date. If the required snapshot does not exist, record the data dependency; do not substitute effects, invent counts or open the study's outcomes. |
+| READINESS-Q034 | data-steward | Refresh Q034 readiness.json from frozen counts only, with every registered endpoint and source date. If the required snapshot does not exist, record the data dependency; do not substitute effects, invent counts or open the study's outcomes. |
+
+## What each question is waiting for
+
+A missing counts snapshot is shown as unmeasured, not assumed to be a maturation delay. Meeting counts never moves a locked decision date.
+
+| Q | reason | next step |
+|---|---|---|
+| Q002 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
+| Q003 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
+| Q004 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
+| Q006 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
+| Q007 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
+| Q008 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
+| Q009 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
+| Q010 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
+| Q011 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
+| Q012 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
+| Q013 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
+| Q014 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
+| Q015 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
+| Q016 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
+| Q017 | DEFERRED | See the question's measured re-entry trigger |
+| Q018 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
+| Q019 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
+| Q020 | DEFERRED | See the question's measured re-entry trigger |
+| Q021 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
+| Q022 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
+| Q023 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
+| Q024 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
+| Q025 | DEFERRED | See the question's measured re-entry trigger |
+| Q026 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
+| Q027 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
+| Q028 | SCHEDULED_DIAGNOSTIC | Outcome-free audit; run on its registered date |
+| Q029 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
+| Q030 | READY_TO_RESUME | Measured deferral trigger cleared; finish registration |
+| Q031 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
+| Q032 | READY_TO_RESUME | Measured deferral trigger cleared; finish registration |
+| Q033 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
+| Q034 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
+| Q035 | DEFERRED | See the question's measured re-entry trigger |
+| Q036 | DEFERRED | See the question's measured re-entry trigger |
+
 ## 1. Waiting on you
 
-- **EN-002** — run the brief in the platform repo, then tell the desk the SHA  
-  `/desk-run verify EN-002 <sha>`
+- nothing. The desk has no item that only you can move.
 
 **Ready when you ask** (you already decided these; the desk writes the prompt on request):
 
@@ -30,11 +97,12 @@ How you act on the lists below: **`/desk-run prompt <ID>`** writes the implement
 
 _none yet — every question so far is NULL, INCONCLUSIVE, or still waiting for its decision date._
 
-**Candidate edges under test (locked; the desk looks once, on the date):**
+**Registered studies and drafts (study outcomes follow their registered look schedule):**
 
 | Q | question | state | decides on |
 |---|---|---|---|
 | Q026 | did every input exist when SAS made the prediction? | DATASET_PINNED | 2026-09-21 |
+| Q028 | are the seven scoring layers seven signals, or three or four? | DATASET_PINNED | 2026-09-28 |
 | Q006 | does SAS selection beat a distance-matched control from its own universe, on the price path? | DATASET_PINNED | 2026-10-05 |
 | Q002 | do SAS picks reach the near targets sooner than matched candidates? | DATASET_PINNED | 2026-10-12 |
 | Q004 | does it matter whether you buy the pick after hours, at the open, or at 10:00? | DATASET_PINNED | 2026-10-26 |
@@ -54,13 +122,12 @@ _none yet — every question so far is NULL, INCONCLUSIVE, or still waiting for 
 | Q024 | Q024 — does SAS beat embarrassingly simple benchmarks, on the price path? | PREREG_LOCKED | 2027-05-17 (exposure check; hard stop 2027-06-28) |
 | Q019 | when the Conviction Monitor flags a recent pick EXIT, is closing it at the next open worth more than holding to the tent | DATASET_PINNED | 2027-05-24 |
 | Q023 | do the platform's 80–90 picks do worse on nights its own regime engine calls `strongly_bullish`? | PREREG_LOCKED | 2027-06-07 (exposure check; hard stop 2027-07-19) |
+| Q031 | is the SAS edge deteriorating over time, or is a weak stretch normal variation? | DATASET_PINNED | 2027-06-07 (exposure check; hard stop 2027-07-19) |
 | Q018 | for the same pick, does the day, the swing or the long-term lane plan make the most money — and does the answer depend o | PREREG_LOCKED | 2027-07-12 |
+| Q033 | does VolatilX get the direction right more reliably than it gets the distance right? | DATASET_PINNED | 2027-07-12 (exposure check; hard stop 2027-08-23) |
 | Q021 | Q021 — GEX pin risk and two-sided paths (does a pinned pick round-trip more often?) | DATASET_PINNED | 2027-08-09 (exposure check; hard stop 2027-09-20) |
+| Q034 | of the nine ways the desk can measure a pick, which one does VolatilX actually predict best? | PREREG_LOCKED | 2027-08-09 (exposure check; hard stop 2027-09-20) |
 | Q015 | do picks scoring 85–90 reach the swing target and then hand it back more often than picks scoring 80–85, and does exitin | DATASET_PINNED | 2027-08-30 |
-| Q031 | is the SAS edge deteriorating over time, or is a weak stretch normal variation? | DATASET_PINNED | ? (exposure check; hard stop 2027-07-19) |
-| Q033 | does VolatilX get the direction right more reliably than it gets the distance right? | DATASET_PINNED | ? (exposure check; hard stop 2027-08-23) |
-| Q034 | of the nine ways the desk can measure a pick, which one does VolatilX actually predict best? | PREREG_LOCKED | ? (exposure check; hard stop 2027-09-20) |
-| Q028 | are the seven scoring layers seven signals, or three or four? | PREREG_LOCKED | — |
 
 ## 4. Platform issues
 
@@ -191,6 +258,7 @@ _Each was a question the desk would once have asked you. It took the recommended
 | decides on | Q |
 |---|---|
 | 2026-09-21 | Q026 |
+| 2026-09-28 | Q028 |
 | 2026-10-05 | Q006 |
 | 2026-10-12 | Q002 |
 | 2026-10-26 | Q004 |
@@ -206,11 +274,13 @@ _Each was a question the desk would once have asked you. It took the recommended
 | 2027-04-05 | Q014 |
 | 2027-04-12 | Q027 |
 | 2027-04-12 | Q029 |
-| 2027-04-26 | Q007 |
 | 2027-05-17 | Q024 |
 | 2027-05-24 | Q019 |
 | 2027-06-07 | Q023 |
+| 2027-06-07 | Q031 |
 | 2027-07-12 | Q018 |
+| 2027-07-12 | Q033 |
 | 2027-08-09 | Q021 |
+| 2027-08-09 | Q034 |
 | 2027-08-30 | Q015 |
 

@@ -93,8 +93,13 @@ Coverage of that raw material, from the pinned freeze (`research/data/manifest_v
 | 2026-09 (to 09-10) | 61 | 43 | 7 |
 | **total** | **907** | **856** | **112** |
 
-In the tool's window (`trading_date >= 2026-06-01`): **579 published rows over 71 nights**. That is
-the before-state for §8 and it comes from the freeze, not from a live query (DP-50(c)).
+In the tool's window (`trading_date >= 2026-06-01`): **579 published rows over 71 nights**.
+Of those, **578 are tier-eligible** under §3.1's existing score >= 80 gate; one published row
+(TJX, 2026-06-11, score 79.5802) is below that gate. The output expectation is therefore
+**578 tier-eligible picks over 71 nights**, with the one-row difference explicitly reconciled.
+This is a specification correction dated 2026-09-14, supported by VERIFY_EN-002.md; it changes
+neither the shipped tier gate nor its payload. The original failed verification is preserved.
+These before-counts come from the freeze, not a live query (DP-50(c)).
 
 ---
 
@@ -514,7 +519,7 @@ from services.sas_speed_to_target import summarize_speed, load_control_reference
 df = pd.read_parquet(r"research/data/v001_sas_candidates.parquet")   # sha256 af40ad8a…a2f2
 pub = df[(df.qualified == True) & (df.selected_rank.notna()) &
          (pd.to_datetime(df.trading_date) >= "2026-06-01")]
-# expected from manifest_v001: 579 published rows over 71 nights (§1)
+# expected: 579 DP-28 published rows; 578 tier-eligible after the existing score >=80 gate (§1)
 rows = [...]   # build the §3.1 row dicts from level_hit_steps_json / public_payload_json,
                # as_of = 2026-09-10, passed_at_entry=None
 out = summarize_speed(rows, control_reference=load_control_reference())
@@ -522,9 +527,11 @@ print(out["picks"], out["nights"])
 print(hashlib.sha256(json.dumps(out, sort_keys=True, default=str).encode()).hexdigest())
 ```
 
-Record in `research/reports/VERIFY_EN-002.md`: `picks == 579`, `nights == 71`, the payload sha256,
-and that every cell reads `control_status == "AWAITING_Q002"`. If `picks`/`nights` differ, the row
-builder in the router disagrees with the frozen predicate — that is a FAIL, not a rounding note.
+Record in a **new dated verification report**: published input rows == 579, tier-eligible
+`picks == 578`, `nights == 71`, the one excluded sub-80 row identified above, the payload sha256,
+and every cell's `control_status == "AWAITING_Q002"`. Preserve `VERIFY_EN-002.md` as the failed
+original-specification receipt. Any discrepancy from these reconciled counts is a FAIL, not a
+rounding note. This correction does not assert a new replay passed or that the tool was deployed.
 
 **One read-only SQL, and only this one** (the live coverage the endpoint will see today, against the
 frozen baseline above):

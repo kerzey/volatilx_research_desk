@@ -1,5 +1,12 @@
 # The autonomous desk — what runs by itself, what is still yours
 
+**2026-09-14 update:** The board now starts with internal evidence cards, learning work and
+explicit readiness categories. Read [LEARNING_POLICY.md](../research/LEARNING_POLICY.md).
+Due studies and urgent integrity fixes lead the cycle; one bounded learning task precedes
+discretionary registration. Future schedules distinguish actual attrition from maturation.
+The schedule audit proposes planning scenarios without moving locked dates. Internal evidence
+does not authorize a subscriber claim or production change.
+
 **The short version.** The desk now works the backlog on its own: it takes the next hypothesis,
 drafts the question, settles every pre-registration decision from the rulebook, locks it, pins
 the data, waits for the decision date, runs the evaluation once, red-teams it, and writes the

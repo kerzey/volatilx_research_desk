@@ -23,6 +23,8 @@ import sys
 from datetime import date
 from pathlib import Path
 
+from learning import PRIORITY as QUESTION_PRIORITY, readiness, snapshot
+
 ROOT = Path(__file__).resolve().parents[2]
 QDIR = ROOT / "research/questions"
 
@@ -202,11 +204,11 @@ def build_queue(today: date = None, max_register: int = 2) -> dict:
             if sch.get("rule") == "immediate" or (dd and dd <= today.isoformat()):
                 due.append({**q, "due_on": dd or "now"})
             elif sch.get("rule") == "exposure-driven" and sch.get("hard_stop"):
-                in_flight.append({**q, "due_on": f"{sch.get('check_from') or '?'} (exposure check; hard stop {sch['hard_stop']})"})
+                in_flight.append({**q, "due_on": f"{sch.get('check_from') or dd or 'unscheduled'} (exposure check; hard stop {sch['hard_stop']})"})
             else:
                 in_flight.append({**q, "due_on": dd or "unknown — write schedule.json"})
         elif s == "PREREG_LOCKED":
-            needs_pin.append(q)
+            needs_pin.append({**q, "due_on": dd or "unscheduled"})
         elif s == "DEFERRED" and q["id"] in trigger_met:
             # A deferral whose DEFERRED.md entry now carries a TRIGGER MET banner. The blocker was
             # measured away, so the question resumes at `@registrar apply` and goes to the front of
@@ -247,10 +249,39 @@ def build_queue(today: date = None, max_register: int = 2) -> dict:
             elif st.startswith("FAILED"):
                 for_haci.append({"id": r["id"], "what": "verification failed — see research/reports/VERIFY_*.md", "type": "fix and re-run /desk-run verify"})
 
+    # Due studies keep their dates. Prioritization orders other work, never authorizes an early look.
+    priority = {qid: i for i, qid in enumerate(QUESTION_PRIORITY)}
+    for group in (drafts, needs_pin, resumable):
+        group.sort(key=lambda x: (priority.get(x["id"], len(priority)), x["id"]))
+    due.sort(key=lambda x: (x["due_on"], priority.get(x["id"], len(priority))))
+    learning = snapshot(qs, today=today, root=ROOT)
+    # A dated operational correction can route an existing item to desk work. Do not
+    # simultaneously tell Haci to implement the same already-reviewed brief again.
+    handled_items = {t["item_id"] for t in learning["work"] if t.get("item_id")}
+    for_haci = [item for item in for_haci if item["id"] not in handled_items]
+    wait_reasons = []
+    for row in qs:
+        try:
+            reason, detail = readiness(row, today, row["id"] in trigger_met and row["state"] == "DEFERRED", root=ROOT)
+        except (ValueError, KeyError, TypeError) as error:
+            reason, detail = "READINESS_INVALID", f"Repair counts-only metadata: {error}"
+        wait_reasons.append({"id": row["id"], "state": row["state"], "reason": reason,
+                             "detail": detail, "schedule": row["schedule"]})
+        if row["id"] in {"Q006", "Q024", "Q027", "Q029", "Q034"} and reason in {
+            "READINESS_UNMEASURED", "READINESS_STALE", "READINESS_INVALID"
+        }:
+            learning["work"].append({
+                "id": f"READINESS-{row['id']}", "owner": "data-steward",
+                "what": f"Refresh {row['id']} readiness.json from frozen counts only, with every registered "
+                        "endpoint and source date. If the required snapshot does not exist, record the data "
+                        "dependency; do not substitute effects, invent counts or open the study's outcomes.",
+                "source": "research/templates/READINESS_TEMPLATE.json",
+            })
     defaulted = [{"id": q["id"], "line": l} for q in qs for l in q["defaulted_decisions"]]
     return {
         "today": today.isoformat(),
         "resumable": resumable,
+        "learning": learning, "readiness": wait_reasons,
         "due": due, "runs_in_progress": runs, "needs_pin": needs_pin, "drafts": drafts,
         "in_flight": in_flight,
         "to_register": candidates[:max_register], "to_register_total": len(candidates),
@@ -267,6 +298,12 @@ def print_text(q: dict) -> None:
     print(f"=== desk queue — {q['today']} ===\n")
     print("DESK WORK, in order")
     n = 0
+    for x in q["runs_in_progress"]:
+        n += 1; print(f"  {n}. {x['id']} {x['state']} → {x['next']}")
+    for x in q["due"]:
+        n += 1; print(f"  {n}. DUE {x['id']} ({x['due_on']}): steward freeze-for → researcher run → validate → red-team → reporter")
+    for x in q["learning"]["work"]:
+        n += 1; print(f"  {n}. {x['id']} [{x['owner']}]: {x['what']}")
     for s in q["inbox"]:
         n += 1; print(f"  {n}. INBOX → backlog entry: {s[:110]}")
     for x in q["resumable"]:
@@ -274,10 +311,6 @@ def print_text(q: dict) -> None:
         print(f"       {x['why'][:120]}")
     for e in q["stale_backlog"]:
         n += 1; print(f"  {n}. BACKLOG bookkeeping: mark {e['id']} registered (a PREREG names it)")
-    for x in q["runs_in_progress"]:
-        n += 1; print(f"  {n}. {x['id']} {x['state']} → {x['next']}")
-    for x in q["due"]:
-        n += 1; print(f"  {n}. DUE {x['id']} ({x['due_on']}): steward freeze-for → researcher run → validate → red-team → reporter")
     for x in q["needs_pin"]:
         n += 1; print(f"  {n}. {x['id']} PREREG_LOCKED → steward advance DATASET_PINNED")
     for x in q["drafts"]:
@@ -290,7 +323,7 @@ def print_text(q: dict) -> None:
     if q["to_register_total"] > len(q["to_register"]):
         print(f"     … {q['to_register_total'] - len(q['to_register'])} more open hypotheses after these")
     if n == 0:
-        print("  nothing — the desk is waiting on calendar dates")
+        print("  nothing due — check evidence review dates and the readiness section")
 
     print("\nWAITING ON HACI")
     for x in q["for_haci"] or [{"id": "—", "what": "nothing", "type": ""}]:
@@ -304,6 +337,11 @@ def print_text(q: dict) -> None:
     print("\nIN FLIGHT (locked; no interim looks)")
     for x in q["in_flight"]:
         print(f"  {x['id']:<5} {x['state']:<15} due {x['due_on']}")
+
+    print("\nWHY QUESTIONS ARE WAITING (counts only; never an early-run permission)")
+    for x in q["readiness"]:
+        if x["reason"] != "RECORDED_STATE":
+            print(f"  {x['id']}: {x['reason']} — {x['detail']}")
 
     if q["defaulted_decisions"]:
         print("\nDECISIONS THE DESK MADE FOR HACI (review on the board; overturn = successor question)")

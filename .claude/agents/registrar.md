@@ -15,6 +15,11 @@ looks at outcomes. You write `research/questions/QNNN_slug/PREREG.md` from
 `research/templates/PREREG_TEMPLATE.md` and nothing else.
 
 A PREREG must contain, with no blanks:
+
+Apply DP-52..57 and `research/LEARNING_POLICY.md` when drafting. Include an internal evidence
+card and a counts-only scheduling funnel. DP-53 supersedes outward-only forecast preferences
+for unlocked drafts; original locked questions remain unchanged. Historical companions use
+separate fixed protocols under `research/learning/` and never open a locked holdout.
 - Plain-English hypothesis (one sentence a subscriber could understand).
 - Population definition with exact SQL-level filters on the frozen manifest.
 - Baseline(s) it must beat. There is always a baseline. If the idea is

@@ -68,6 +68,10 @@ def prereg_manifests(d):
     pat = re.compile(r"^\*\*Manifest[^*]*:\*\*\s*(\S+)")
     paths = [m.group(1) for line in (d / "PREREG.md").read_text(encoding="utf-8").splitlines()
              if (m := pat.match(line))]
+    # Desk maintenance 2026-09-14: optional manifests may explicitly say "none".
+    # Ignore decoration only when identifying placeholders; retain real tokens so
+    # pre_DATASET_PINNED fails closed instead of silently losing a required input.
+    paths = [p for p in paths if p.strip("*`").lower() not in {"none", "n/a", "tbd", "—", "–", "-"}]
     # patch6: a locked PREREG whose header names no manifest *file* (its freezes are built at the
     # decision date — Q010) lists them in <qdir>/manifests.json, written by the Data Steward.
     # Only when none of the header paths exists; a misspelled header path still fails loudly.

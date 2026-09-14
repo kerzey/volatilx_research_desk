@@ -1,0 +1,10 @@
+{
+  "as_of": "YYYY-MM-DD",
+  "sources": ["research/data/manifest_vNNN.json"],
+  "count_definition": "Each registered endpoint's exact eligibility, maturity and contribution rules; counts only.",
+  "endpoints": [
+    {"endpoint": "REGISTERED_ENDPOINT_NAME", "eligible_nights": 0,
+     "contributing_nights": 0, "required_nights": 80,
+     "post_lock_contributing_nights": 0, "required_post_lock_nights": 30}
+  ]
+}

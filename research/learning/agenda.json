@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "cards": [
+    {
+      "question": "Q026", "label": "NOT_YET_ASSESSED", "as_of": "2026-09-14", "review_on": "2026-09-21",
+      "finding": "Point-in-time integrity audit is registered and pinned; a passing integrity verdict has not been recorded.",
+      "limit": "Other evidence remains conditional on valid prediction-time inputs.",
+      "next_action": "Complete the registered integrity audit when due; surface input-lineage defects immediately.",
+      "sources": ["research/questions/Q026_point_in_time_integrity/PREREG.md", "research/questions/Q026_point_in_time_integrity/state.json"]
+    },
+    {
+      "question": "Q006", "label": "EXPLORATORY", "as_of": "2026-09-14", "review_on": "2026-09-21",
+      "finding": "Existing April-May exploration suggests deeper targets and speed deserve more attention than raw L1/L2 hit rates.",
+      "limit": "35 analysis nights in a strong tape; historical engine/data defects; no independent confirmation or trading rule.",
+      "next_action": "Maintain an evidence summary from EXPLORE_001; keep Q006's prospective and sealed data closed until due.",
+      "sources": ["research/reports/explore/EXPLORE_001.md", "research/questions/Q006_control_cohort_path/PREREG.md"]
+    },
+    {
+      "question": "Q024", "label": "NOT_YET_ASSESSED", "as_of": "2026-09-14", "review_on": "2026-09-21",
+      "finding": "Five benchmark arms passed historical computability checks. No SAS-versus-benchmark performance conclusion is established by those checks.",
+      "limit": "26 mature nights in the feasibility panel. The registered endpoint is target reaching, not portfolio profit after costs. Previously inspected history is exploratory.",
+      "next_action": "Review the counts-only schedule audit and define an in-sample historical companion with explicit engine-vintage limits.",
+      "sources": ["research/reports/STEWARD_Q024_sas_vs_simple_benchmarks_exposure.md", "research/questions/Q024_sas_vs_simple_benchmarks/PREREG.md"]
+    },
+    {
+      "question": "Q027", "label": "MECHANICAL", "as_of": "2026-09-14", "review_on": "2026-09-21",
+      "finding": "All 48 mature eligible nights passed the candidate-count and defined-statistic feasibility gates; ranking validity is still untested prospectively.",
+      "limit": "Feasibility measures whether the test can run, not whether higher scores predict better outcomes.",
+      "next_action": "Review the schedule's maturity accounting; specify a historical companion without opening the locked holdout.",
+      "sources": ["research/reports/STEWARD_Q027_exposure.md", "research/questions/Q027_score_ranking_validity/PREREG.md"]
+    },
+    {
+      "question": "Q029", "label": "MECHANICAL", "as_of": "2026-09-14", "review_on": "2026-09-21",
+      "finding": "In the examined segment, smart-money was uncomputed, GEX had zero production weight, projection failed E1/E2 coverage, and score/slate replay passed.",
+      "limit": "These facts do not prove a layer helps or hurts outcomes. The earlier layer/outcome audit already used the historical cohort.",
+      "next_action": "Use the existing mechanical findings for architecture triage; separately register any new historical replay as exploratory.",
+      "sources": ["research/reports/STEWARD_Q029_feasibility.md", "research/questions/Q029_layer_value_ablation/PREREG.md"]
+    },
+    {
+      "question": "Q034", "label": "NOT_YET_ASSESSED", "as_of": "2026-09-14", "review_on": "2026-09-21",
+      "finding": "The economic-objective comparison is registered; it has no recorded comparative outcome verdict.",
+      "limit": "A stock-path endpoint does not by itself establish realized option-spread or portfolio profitability.",
+      "next_action": "Map each registered endpoint to the product decision it can support; distinguish stock paths from costs, fills and option outcomes.",
+      "sources": ["research/questions/Q034_economic_objective/PREREG.md", "research/questions/Q034_economic_objective/state.json"]
+    },
+    {
+      "question": "Q028", "label": "MECHANICAL", "as_of": "2026-09-14", "review_on": "2026-09-21",
+      "finding": "The absent-price-manifest parser defect is repaired and Q028 is pinned after checksum verification. Layer independence remains a scheduled outcome-free diagnostic.",
+      "limit": "Input redundancy does not establish whether a layer contributes predictive or economic value.",
+      "next_action": "Complete the outcome-free diagnostic on its registered date; do not infer layer value from redundancy alone.",
+      "sources": ["research/questions/Q028_layer_signal_independence/PREREG.md", "research/questions/Q028_layer_signal_independence/state.json"]
+    }
+  ],
+  "tasks": [
+    {"id": "OPS-Q028", "status": "DONE", "owner": "maintenance", "due_on": "2026-09-14", "what": "Parser regressions passed across 36 questions; Q028 pinned through controller with checksum verification.", "source": "research/questions/Q028_layer_signal_independence/state.json"},
+    {"id": "LEARN-COMPANIONS", "status": "OPEN", "owner": "registrar", "due_on": "2026-09-14", "what": "Turn the scoped historical work packages into individual fixed protocols for Q024/Q027/Q029; establish engine-vintage feasibility before outcomes.", "source": "research/learning/HISTORICAL_COMPANIONS.md"},
+    {"id": "OPS-EN002-SPEC", "status": "DONE", "owner": "brief-writer", "due_on": "2026-09-14", "what": "Corrected the 579 published versus 578 tier-eligible expectation and preserved the original FAIL receipt.", "source": "research/reports/EN-002_SPEC_CORRECTION_2026-09-14.md"},
+    {"id": "OPS-EN002-REVERIFY", "item_id": "EN-002", "status": "OPEN", "owner": "data-steward", "due_on": "2026-09-14", "what": "Write a new verification receipt against the corrected denominator specification and implemented SHA; no deployment or flag change.", "source": "research/reports/EN-002_SPEC_CORRECTION_2026-09-14.md"},
+    {"id": "SCHEDULE-AUDIT", "status": "DONE", "owner": "maintenance", "due_on": "2026-09-14", "what": "Reproduced maturity accounting for Q024/Q027/Q029 from pinned source reports; identified inherited-rate reviews for Q031/Q033/Q034.", "source": "research/reports/SCHEDULE_AUDIT.md"},
+    {"id": "SCHEDULE-SUCCESSORS", "status": "OPEN", "owner": "registrar", "due_on": "2026-09-14", "what": "Use DP-53 for unlocked Q030/Q032 drafts; scope separately registered earlier successors to affected locked studies, with shared-data and family obligations. Never move a locked date automatically.", "source": "research/reports/SCHEDULE_AUDIT.md"}
+  ]
+}

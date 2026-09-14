@@ -7,6 +7,11 @@ so you call them, in order, with the Agent tool, and you run the controller and 
 CLAUDE.md rules 1–15 bind you exactly as before; what changed is only *who decides* — see
 `research/DECISION_POLICY.md` "Autonomous mode" (DP-40..48). Read that section first, every run.
 
+**2026-09-14 update:** Also read DP-52..57 and `research/LEARNING_POLICY.md`. These override
+outward-only planning preferences for unlocked drafts. Locked dates, floors and outcome protection
+remain. The queue includes internal-learning tasks and explicit readiness; finish due studies and
+urgent integrity work, then one bounded learning task before discretionary new registrations.
+
 ## Invocation
 
 ```
@@ -18,6 +23,8 @@ CLAUDE.md rules 1–15 bind you exactly as before; what changed is only *who dec
 /desk-run verify <PI|EN|TI>-NNN <sha>   # check an implementation Haci says is done
 /desk-run idea "<plain words>" # file Haci's idea and register it ahead of everything
 /desk-run board                # regenerate research/BOARD.md only
+/desk-run learning             # refresh priority evidence cards from permitted reports, then board
+/desk-run schedule-audit       # counts-only forecast audit; never edits registered dates
 ```
 
 `--ask` restores the old behaviour for one run: the Decision-maker's ASK items are put to Haci
@@ -97,6 +104,15 @@ each QNNN, the state tells you where to resume:
 "manifest … not found" and the PREREG header names no file, set `"pin_at_decision": true` in
 `schedule.json` and move on — it pins at its decision date (step C1).
 
+**D1. Internal learning.** Read the `learning.work` items in `desk_queue.py --json`. After due
+studies and urgent integrity work, complete one bounded item before E/F. Sources and next actions
+are in `research/learning/agenda.json`. Existing reports can be summarized without opening raw
+data. Cards carry their true as_of, review_on, label, limitations and sources; all are NON_QUOTABLE.
+Mark a task DONE only with its output/receipt. If a task needs a historical companion, first write
+the separate fixed protocol under LEARNING_POLICY.md and use only admitted in-sample selections.
+Never bring a locked sealed post-hoc panel forward. Do not change a lock to obtain an earlier
+answer. Missing readiness is a counts-only steward task, not permission to inspect outcomes.
+
 **E. Drafts.** A question at IDEA or PREREG_DRAFT resumes at the right point of step F: no
 DECISIONS.md → F2; DECISIONS.md with `_pending_` → F4; PREREG has a "Decisions before lock"
 section → F6.
@@ -112,7 +128,8 @@ ones first). For each H-NNN:
    `research/questions/QNNN_slug/PREREG.md` (QNNN = next free number) from the template with §11 in
    the fixed format. Your Recommendation line on each open decision is what will be applied
    (DP-40), so recommend the option that keeps the test honest, never the one that reaches a date
-   sooner. Do not address Haci in the draft. Reply DRAFTED QNNN_slug and the open-decision list."
+   sooner. Under DP-53 use an accurate maturity-separated forecast; later is not inherently safer.
+   Do not address Haci in the draft. Reply DRAFTED QNNN_slug and the open-decision list."
    On MERGED / DEFERRED: commit BACKLOG (and DEFERRED.md) and continue with the next hypothesis
    (it does not count against `--max-register`).
    On DRAFTED: `python research/lib/controller.py init QNNN` then
@@ -129,7 +146,10 @@ ones first). For each H-NNN:
 3. `@data-steward` with the routed request verbatim, plus: "Counts only — contributing nights per
    arm and per primary endpoint exactly as the draft's §2/§5 define them, the measured run-rate,
    and the projected date each floor (80 per endpoint, 20 per cell, 30 post-lock — DP-21/DP-24) is
-   reached. Write `research/reports/STEWARD_QNNN_exposure.md`. No outcomes, no touch rates."
+   reached. Under DP-53, report the fully observable calendar cohort and its exclusions separately
+   from the immature tail; use that cohort for the contribution-rate forecast and add maturity
+   once. Show uncertainty scenarios. Write `research/reports/STEWARD_QNNN_exposure.md`.
+   No outcomes, no touch rates."
 4. `@decision-maker record QNNN`. Prompt: "Autonomous mode. The Steward's numbers: <paste>. Settle
    every ROUTED item they settle: DP-43 window, decision date (first Monday on/after the last
    floor date + maturity + one week), the DP-13 extension date (+30 sessions) and DEFERRED
@@ -186,6 +206,11 @@ for that H-NNN with `--max-register 1`, then step G.
 
 **`register H-NNN`** — step F for that one, then G. **`due`** — steps C, D, G. **`board`** — G.
 
+**`learning`** — D1 and G. **`schedule-audit`** — run `python research/lib/schedule_audit.py`,
+review its source counts and planning assumptions, then G. Forecast scenarios never modify dates;
+unlocked drafts use DP-53, while locked questions need a separately registered successor for a
+different deciding experiment. Shared data and family obligations are declared explicitly.
+
 ## Final message (Haci reads only this)
 
 1. One paragraph: what the desk did this run (questions locked, pinned, run, verdicts, briefs).
@@ -195,4 +220,5 @@ for that H-NNN with `--max-register 1`, then step G.
 4. What stopped and why (a second red-team rejection, a validator failure, a guard block, the
    register budget), each with the file to look at. If nothing stopped, say the queue is empty
    and name the next decision date.
-Plain English; no agent transcripts; no numbers from locked questions.
+5. Evidence available now: newly updated cards, limitations, next review and registered verdict dates.
+Plain English; no agent transcripts; no new outcome numbers from locked questions.

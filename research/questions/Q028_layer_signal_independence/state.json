@@ -1,6 +1,6 @@
 {
   "id": "Q028",
-  "state": "PREREG_LOCKED",
+  "state": "DATASET_PINNED",
   "history": [
     {
       "state": "IDEA",
@@ -18,8 +18,19 @@
       "at": "2026-09-14T06:03:16.997757+00:00",
       "by": "desk",
       "note": "DP-46: DECISIONS.md complete, no pending items"
+    },
+    {
+      "state": "DATASET_PINNED",
+      "at": "2026-09-14T16:44:29.774726+00:00",
+      "by": "desk",
+      "note": "2026-09-14 authorized maintenance: explicit absent-manifest placeholders ignored; all 36 header regressions passed; registered definition and decision date unchanged"
     }
   ],
   "prereg_commit": "15d6f52281ef9519cca6bb1d8c022bbcd8f76e60",
-  "prereg_sha256": "d94287eca043e9fe5ea7c359caa529a79db8c57b4d8306ed9479688f6c62741f"
+  "prereg_sha256": "d94287eca043e9fe5ea7c359caa529a79db8c57b4d8306ed9479688f6c62741f",
+  "manifest": "research/data/manifest_v001.json",
+  "manifest_sha256": "b03f355a68373aadd0f2dc56c9154158929642291bf6caacb2f5a9bf15bef374",
+  "manifests": {
+    "research/data/manifest_v001.json": "b03f355a68373aadd0f2dc56c9154158929642291bf6caacb2f5a9bf15bef374"
+  }
 }

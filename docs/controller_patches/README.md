@@ -1,5 +1,11 @@
 # Controller patches — apply by hand
 
+**Installed 2026-09-14 under Haci's explicit workflow-maintenance request:** the controller now
+skips only explicit absent-manifest placeholders, preserving every other header token unchanged.
+The 36-question regression sweep passes and Q028 advanced to DATASET_PINNED after checksum
+verification. Its decision date and PREREG are unchanged. The original instructions below are
+historical; do not reapply the older broad patch7 implementation over this narrower repair.
+
 Enforcement code (`research/lib/controller.py`, validators, freeze, `.claude/`) is edited by a
 human outside the desk (CLAUDE.md rule 15). The desk can only prepare the change and a test.
 Each patch here is a small idempotent Python script that edits the target in place, writes a

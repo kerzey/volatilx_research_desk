@@ -106,6 +106,13 @@ Invoke with `@name`. Stay in your lane; if a task belongs to another agent, say 
 
 ## Autonomous mode (2026-09-13)
 
+**2026-09-14 learning update:** Read `research/LEARNING_POLICY.md` and DP-52..57 before
+planning work. The board starts with source-grounded internal evidence and reasons for waiting.
+New schedules separate attrition from maturation; later dates are not preferred merely for
+being later. Locked experiments retain their definitions, dates and outcome protections.
+Historical companions use separate protocols and admitted in-sample selections. These outputs
+are not additional controller verdicts or production approvals.
+
 `/desk-run` works the queue in `research/lib/desk_queue.py` without asking Haci: it registers and
 locks questions (`--by desk`, DP-46), settles the decisions once reserved for him by
 `research/DECISION_POLICY.md` DP-40..48 and lists them on `research/BOARD.md`, runs each question

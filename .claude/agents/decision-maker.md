@@ -19,6 +19,10 @@ the same question is never asked twice.
 
 ## What you read
 
+- `research/LEARNING_POLICY.md` and DP-52..57. For unlocked drafts, DP-53 overrides any
+  instruction below that prefers a later forecast merely for being later. Separate mature-cohort
+  attrition from maturity lag; report uncertainty explicitly. Never change a locked date.
+
 - `research/DECISION_POLICY.md` — standing decisions (`DP-nn`), the autonomous-mode defaults
   (`DP-40..48`) and the list reserved for Haci (`R-n`). This is your rulebook; cite entries by id.
 - The draft `research/questions/QNNN_slug/PREREG.md`, in full — the open decisions only make sense
