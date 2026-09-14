@@ -22,7 +22,7 @@ Statuses: `OPEN` · `HACI_DECIDED:<fix|research|accept>` · `BRIEF_WRITTEN` · `
 
 | ID | Severity | Status | Issue |
 |---|---|---|---|
-| PI-001 | high | IMPLEMENTED:2d5776c | `uoa_symbol_daily.fwd_return_*` still ~95% degraded; 30d relapsed to 0% from 07-27 — brief: `research/briefs/PI-001_fwd_return_backfill_window.md` |
+| PI-001 | high | FAILED:merged to main but no date recovered (still ~5%, 21–25/498 through 2026-09-02) — deployed nightly likely not running d19c9a9 | `uoa_symbol_daily.fwd_return_*` still ~95% degraded; 30d relapsed to 0% from 07-27 — brief: `research/briefs/PI-001_fwd_return_backfill_window.md` |
 | PI-002 | high | HACI_DECIDED:fix | No coverage watchdog fires on PI-001 (none found in the codebase by that name) |
 | PI-003 | med | HACI_DECIDED:fix | `atr_pct` corrupted around splits (ATR computed on raw bars) |
 | PI-004 | med | HACI_DECIDED:fix | Manual re-runs indistinguishable from nightly runs in `super_agent_select_runs` |
@@ -52,6 +52,8 @@ is showing mostly nulls. **Recommend: fix.**
 [65, 100] sessions in-process, so the stale Azure WebJob wrapper can no longer shorten it; the
 effective window is now printed on every run. Two files, no scoring path touched.
 **MERGED, DEPLOY UNKNOWN (corrected 2026-09-14).** `2d5776c` is on `main` via merge commit `4775e49` (PR #26, "Merge pull request #26 from kerzey/fix/pi-001-backfill-window-floor", 2026-09-13 18:02:57 -0500); `git show --stat 4775e49` confirms exactly the two files the brief named (`scripts/run_nightly_pipeline.py`, `tests/test_nightly_pipeline_backfill_window.py`) and nothing else. Whether this has reached the production WebJob (brief §3 Step A') and whether a nightly has run it are unknown to the desk from a read-only git+DB check. See `research/reports/VERIFY_PI-001.md` §8 for the 2026-09-14 pass -- verdict PENDING, not VERIFIED.
+
+**Second 2026-09-14 pass, verdict FAILED (verification-blocked, not a code finding).** Merge to `main` re-confirmed (git-only); the deployed WebJob wrapper source already requests 65 trading days. But the brief's actual proof -- the §8 coverage-recovery DB check -- could not run: no desk credential (`RESEARCH_DB_URL` or otherwise) was present in that session, and Azure WebJob logs are not visible to the desk at all. FAILED here means "not verified as recovered," not "the fix is broken." See `research/reports/VERIFY_PI-001.md` §9.
 
 **Residual hole — one reconciled statement (2026-09-13, after two verify passes disagreed).**
 Both passes counted correctly; they counted different sets, and both summaries were imprecise.

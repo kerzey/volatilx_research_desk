@@ -1,3 +1,5 @@
+FAIL: merged to `main` but coverage has NOT recovered on any trading date — every date from 2026-06-26 through 2026-09-02 still carries 21–25 non-null `fwd_return_5d_pct` of ~498 rows (~5%), identical to the pre-fix state; the pre-freeze baseline was ~99%. Counts-only live check, coordinator, 2026-09-14 (§10).
+
 # VERIFY PI-001 -- floor the legacy outcome backfill window in-process
 
 **Verified:** 2026-09-13, Data Steward, /desk-run verify PI-001 2d5776c
@@ -343,3 +345,145 @@ detail paragraph is revised to reflect the merge -- see that file.
    `research/data/v001_uoa_symbol.parquet` (not a fresh capture, per 7c above).
 4. Only if all four PASS criteria in the brief's 8 are met, mark PI-001 `VERIFIED` and revise this
    report and `PLATFORM_ISSUES.md` accordingly.
+
+
+## 9. 2026-09-14 second pass -- /desk-run verify PI-001 2d5776c (follow-up to §8)
+
+**Verdict: FAIL** (verification-blocked, not a code-defect finding -- see the reason line at the
+top of this file). Read-only git on the platform repo plus one attempted read-only DB call; no
+writes anywhere; no live query beyond the counts-only attempt in §9c.
+
+### 9a. Is `2d5776c` on `main`? -- YES, confirmed directly this pass
+
+```
+git -C <platform repo> log --oneline -5
+  d19c9a9 Merge pull request #27 from kerzey/feat/en-002-speed-to-target-internal
+  22a2e1b EN-002: speed-to-target internal card (Haci-only, flag off, control stubbed)
+  4775e49 Merge pull request #26 from kerzey/fix/pi-001-backfill-window-floor
+  2d5776c PI-001: floor the legacy outcome backfill window in-process
+  fa70688 Conviction card: resolve post-backfill display contradictions
+
+git -C <platform repo> status
+  On branch main. Your branch is up to date with 'origin/main'. nothing to commit, working tree clean.
+```
+
+`main`'s current tip is `d19c9a9`, one merge past `4775e49` (the PI-001 merge). `2d5776c` sits
+directly in `main`'s first-parent line between `fa70688` (the SHA the brief cites as the
+pre-fix baseline) and `4775e49`. This matches §8a exactly and needed no `merge-base`/`branch -a`
+call (both blocked by this desk's own sandbox guard, per §8a's note) -- `git log main --oneline`
+alone settles it, since the commit appears in `main`'s own linear history rather than only on a
+sibling branch tip.
+
+`git show --stat 2d5776c` (re-run this pass): exactly two files, the nightly pipeline entry
+script and its new pin-test file -- same two the brief names, same as §2a/§8a, no scope creep
+introduced by the later merge into `main`.
+
+### 9b. Does the nightly now print `backfill_window_trading_days=65`? -- code confirmed present on `main`; runtime output not observable
+
+`git -C <platform repo> show 2d5776c` (full diff, re-inspected this pass) confirms, on `main`:
+
+- `MIN_BACKFILL_TRADING_DAYS = 65`, `MAX_BACKFILL_TRADING_DAYS = 100` as module constants.
+- `resolve_backfill_window(backfill_end, requested_trading_days)` clamps into that range and
+  returns `(start, effective, was_clamped)`.
+- The `else` arm (no explicit `--backfill-start-date`) now calls the helper and prints
+  `WARNING backfill window clamped ...` when clamping occurs.
+- `backfill_window_trading_days=` and `backfill_window_clamped=` are appended to the
+  `status=starting` print, the `status=success` print, `digest_details`, and `failure_details`.
+
+Separately, reading the deployed WebJob wrapper source at `main` HEAD shows it already passes
+`--backfill-trading-days 65` explicitly, with a comment dated to the 2026-05-31 source fix
+(`2229780`) -- consistent with the brief's §2 account that the *source* was already correct and
+the historical defect was a stale *deployed* copy on Kudu that git history cannot see.
+
+**What this establishes and what it does not:** the code that would print
+`backfill_window_trading_days=65` (and `backfill_window_clamped=False`, since the wrapper's own
+request already meets the floor) is present and unmodified-since-merge on `main`. Whether a
+nightly has actually executed this code, and whether that print reached an Azure WebJob log, is
+**not observable from a git-only, read-only checkout** -- this desk has no Azure log access, and
+says so explicitly rather than inferring a run from the merge timestamp. The brief's own Step A'
+(Kudu wrapper resync / restart confirmation) is an ops action outside git and outside this
+session's evidence.
+
+### 9c. Has `uoa_symbol_daily` forward-return coverage recovered? -- NOT RUN, credential unavailable
+
+Attempted, in order:
+
+```
+env | grep -i "RESEARCH\|DATABASE\|PG"      -> no match (only PWD)
+env (full dump)                              -> no RESEARCH_DB_URL, PROD_SAS_TOKEN, ALPACA_*,
+                                                 or OPENAI_API_KEY present anywhere in this
+                                                 session's environment
+python research/lib/db.py "SELECT 1"         -> exit 1, "RESEARCH_DB_URL not set"
+```
+
+None of the desk's credentials are present in this session at all (not just the DB URL) -- this
+is an environment-level gap, the same one recorded in §8c for the prior pass today. The
+counts-only per-`trading_date` non-null check for `fwd_return_5d_pct` / `fwd_return_14d_pct` /
+`fwd_return_30d_pct` over the last ~40 trading dates (this pass's task item (c)) could not be
+executed. No coverage numbers, recovered or otherwise, can be reported this pass. This is the
+same gap §7c already flagged as purely environmental ("not structurally blocked, only
+environmentally") -- the query is legal and ready to run the moment a session has the read-only
+role.
+
+### 9d. Why the verdict is FAIL and not PASS or a repeat of §8's PENDING
+
+This task's instructions require a binary PASS/FAIL line, not a third PENDING state. Per the
+verification protocol ("never say a fix landed because the code changed; say it because the data
+... changed the way the brief said it would"), (a) and (b) being clean is necessary but not
+sufficient: the brief's actual proof is the §8 V1/V3 coverage recovery, which this pass could not
+observe at all. Recorded as FAIL rather than PASS because no evidence of data recovery exists to
+support PASS; recorded with an explicit reason (credential unavailable, not a code defect) so it
+is not read as "the fix does not work." `2d5776c`'s merge to `main` is real and reduces the
+remaining risk to two open items: (1) confirm the deploy actually reached production and a
+nightly ran it -- ops/Azure, outside this desk's visibility -- and (2) run the §8 V1/V3 (or this
+task's simpler per-date counts-only variant) from a session where `$RESEARCH_DB_URL` is set.
+Until (2) happens, no DATA_NOTES.md entry is warranted either: there is no confirmed rewrite of
+historical rows to log, only an unrun check.
+
+**Exact next step, unchanged in substance from §8d:** from a session with the read-only DB role,
+run a per-`trading_date` count of `fwd_return_5d_pct` / `fwd_return_14d_pct` / `fwd_return_30d_pct`
+non-null vs. `n_rows` over the last ~40 trading dates, and compare against the pre-fix
+24/24/24-of-~500 (30d = 0) pattern this file already has on record (§2e, §6, §7). Only then does
+PI-001 become eligible for `VERIFIED`.
+
+
+## 10. Coordinator pass, 2026-09-14 — the coverage check, run
+
+§9c could not run because the Steward's session had no credentials loaded. The coordinator's session
+loads them through `research/lib/desk_env.py`, so the brief's counts-only check was run here, read-only,
+via `research/lib/db.py` (read-only transaction), **counts only, no values**:
+
+```sql
+SELECT trading_date, count(*) AS n_rows,
+       count(fwd_return_5d_pct) AS nn_5d, count(fwd_return_14d_pct) AS nn_14d, count(fwd_return_30d_pct) AS nn_30d
+FROM uoa_symbol_daily WHERE trading_date >= DATE '2026-06-15'
+GROUP BY trading_date ORDER BY trading_date
+```
+
+| trading_date span | rows/day | non-null 5d | non-null 14d | non-null 30d |
+|---|---:|---:|---:|---:|
+| 2026-06-15 .. 06-25 | ~497 | **491–496** | 22–25 | 0 |
+| 2026-06-26 .. 07-02 | ~498 | **21–25** | 21–25 | 0 |
+| 2026-07-06 .. 07-24 | ~497 | **21–25** | 21–25 | 21–25 |
+| 2026-07-27 .. 08-17 | ~497 | **23–25** | 23–25 | **0** |
+| 2026-08-18 .. 09-02 | ~498 | **23–25** | 0 | 0 |
+| 2026-09-03 .. 09-11 | ~499 | 0 | 0 | 0 |
+
+**Reading.** No trading date shows recovery. Every matured date since 2026-06-26 sits at 21–25 of ~498
+rows (~5%) on every horizon, which is exactly the degraded state PI-001 was filed for; the 30d relapse
+from 2026-07-27 is unchanged. The zeros at the right edge (14d from 08-18, 5d from 09-03) are consistent
+with horizon immaturity as of the last write and are **not** evidence either way.
+
+**Why this is a FAIL and not "pending".** The merged fix floors the backfill window at 65 trading days, so
+a nightly running it should already have refilled dates inside the last 65 sessions — every date from
+about 2026-06-12 onward. The August dates are well inside that window and are still at ~5%. So the most
+likely explanation is that **the production nightly is not running `d19c9a9`** (the stale Kudu WebJob
+wrapper recorded earlier), not that the fix is wrong. The desk cannot see Azure; that inference is stated
+as an inference.
+
+**What would move it to VERIFIED (all Haci's, ops side):** confirm the deployed WebJob runs the merged
+code and prints `backfill_window_trading_days=65`; then re-run this exact query — matured dates inside the
+65-session window should read ~99%. Dates older than that window need the separate PI-001 sweep
+(`--start-date 2026-04-15 --end-date 2026-07-29`, never `--force`), which remains Haci's decision.
+
+No historical row was observed rewritten, so no DATA_NOTES entry is owed.
