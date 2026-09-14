@@ -13,4 +13,4 @@ waiting for the cycle: `/desk-run idea "…"`.
 _(nothing waiting — add a `- [ ] ` line below)_
 
 - [x] Does SAS actually have an edge? H0: SAS ranking contains no predictive information beyond simple benchmarks. Compare SAS Top 10 not only against random stocks but against embarrassingly simple alternatives — SPY / equal-weight S&P 500 / sector-adjusted random / 20-day momentum / 60-day momentum / analyst revisions / simple technical rank — on forward 1d / 3d / 7d / 14d / 30d returns after risk adjustment. → H-067 (F1), 2026-09-13
-
+- [x] Is the edge in SAS — or merely in the market exposure of its picks? SAS may select semiconductor momentum names in a semiconductor bull run and look wonderful without having discovered anything beyond "buy strong semiconductor stocks". Attribution: return = market beta + sector + size + momentum + volatility + SAS residual alpha. After removing known exposures, is there anything left? Permutation-style tests expose inherited exposure. → H-068 (F1), 2026-09-13
