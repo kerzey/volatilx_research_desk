@@ -1,0 +1,9 @@
+{
+  "decision_date": "2027-02-22",
+  "extension_date": "2027-04-05",
+  "hard_stop": null,
+  "rule": "fixed",
+  "extended": false,
+  "check_from": "2027-02-22",
+  "note": "PREREG §5: window pick nights 2026-07-08..2027-01-13 (132 elapsed sessions), sized so the 80-contributing-night floor is met inside the primary window at the one-sided 90% lower bound (0.6088/session) of the measured 0.6957 contributing nights per elapsed session, not at the point estimate; +20-session maturity, +1wk margin, first Monday = 2027-02-22; single DP-13 extension to window end 2027-02-26 decided Monday 2027-04-05, then DEFERRED (no second extension, no hard stop); gates ≥80 contributing nights, ≥20 per arm, ≥20 per reported sub-cell, ≥30 post-lock nights (DP-21/DP-24) on eval.py's measured counts at the single pass."
+}
