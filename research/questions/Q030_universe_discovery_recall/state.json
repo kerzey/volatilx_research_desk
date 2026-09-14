@@ -1,6 +1,6 @@
 {
   "id": "Q030",
-  "state": "PREREG_DRAFT",
+  "state": "PREREG_LOCKED",
   "history": [
     {
       "state": "IDEA",
@@ -24,6 +24,14 @@
       "at": "2026-09-14T18:38:29.866852+00:00",
       "by": "desk",
       "note": "deferral lifted: credentials present, coverage 97.55% vs 90%, R2(iii) dry run delivered; patch8"
+    },
+    {
+      "state": "PREREG_LOCKED",
+      "at": "2026-09-14T19:07:31.474726+00:00",
+      "by": "desk",
+      "note": "DP-46: DECISIONS.md complete, no pending items"
     }
-  ]
+  ],
+  "prereg_commit": "ee2a047290879556b5658508b01450d975965ed6",
+  "prereg_sha256": "37b77de40bfdbb912969f9f8a1a3ccbfd8c3272d0df76d97476b83aa157fe8bc"
 }
