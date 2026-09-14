@@ -1,6 +1,6 @@
 {
   "id": "Q028",
-  "state": "PREREG_DRAFT",
+  "state": "PREREG_LOCKED",
   "history": [
     {
       "state": "IDEA",
@@ -12,6 +12,14 @@
       "at": "2026-09-14T05:49:45.823833+00:00",
       "by": "registrar",
       "note": ""
+    },
+    {
+      "state": "PREREG_LOCKED",
+      "at": "2026-09-14T06:03:16.997757+00:00",
+      "by": "desk",
+      "note": "DP-46: DECISIONS.md complete, no pending items"
     }
-  ]
+  ],
+  "prereg_commit": "15d6f52281ef9519cca6bb1d8c022bbcd8f76e60",
+  "prereg_sha256": "d94287eca043e9fe5ea7c359caa529a79db8c57b4d8306ed9479688f6c62741f"
 }

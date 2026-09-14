@@ -4,5 +4,5 @@
   "hard_stop": "2026-10-12",
   "rule": "fixed",
   "extended": false,
-  "note": "PREREG §5.4: population closed at manifest_v001 (2026-09-10), post-lock projection 0 contributing nights, so the schedule is fixed; DP-13 extension and DP-43 exposure rule have no input. Hard stop bounds §4.1/§8's two-pass Gate 0 fix-and-re-run loop; still failing there = INCONCLUSIVE."
+  "note": "PREREG §5.4: population closed at manifest_v001 (2026-09-10), post-lock projection 0 contributing nights, so the schedule is fixed; DP-13 extension and DP-43 exposure rule have no input. Hard stop bounds §4.1/§8's two-pass Gate 0 fix-and-re-run loop; still failing there = INCONCLUSIVE. PIN BLOCKED 2026-09-14: the state machine's header parser reads the PREREG line '**Manifest (prices):** **none — not used.**' as a manifest path '**none' and the DATASET_PINNED precondition fails with 'manifest **none not found'; the PREREG is hash-locked (DP-22) so the header cannot be reworded. Needs a human maintenance patch to the state-machine parser (skip non-path header values such as 'none') under DESK_ADMIN, then `advance Q028 DATASET_PINNED --by desk`. The selections manifest research/data/manifest_v001.json exists and verifies."
 }
