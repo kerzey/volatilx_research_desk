@@ -1,6 +1,6 @@
 {
   "id": "Q024",
-  "state": "PREREG_DRAFT",
+  "state": "PREREG_LOCKED",
   "history": [
     {
       "state": "IDEA",
@@ -12,6 +12,14 @@
       "at": "2026-09-14T03:11:13.337664+00:00",
       "by": "registrar",
       "note": ""
+    },
+    {
+      "state": "PREREG_LOCKED",
+      "at": "2026-09-14T04:19:27.106661+00:00",
+      "by": "desk",
+      "note": "DP-46: DECISIONS.md complete, no pending items; pin_at_decision (prospective window, successor freezes; EW arm conditional on RSP pinnability at R2)"
     }
-  ]
+  ],
+  "prereg_commit": "fb7dfd0519187731107991ad36b59b4ddc78894d",
+  "prereg_sha256": "d29193bcb4cec9789e346f43c02089f82a8a03cd802645dadbe5efae41ebe257"
 }
