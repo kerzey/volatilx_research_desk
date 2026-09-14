@@ -20,7 +20,6 @@ _Generated 2026-09-14 by `research/lib/board.py`. Do not edit; edit the source f
 
 | item | owner | next action |
 |---|---|---|
-| LEARN-COMPANIONS | registrar | Turn the scoped historical work packages into individual fixed protocols for Q024/Q027/Q029; establish engine-vintage feasibility before outcomes. |
 | OPS-EN002-REVERIFY | data-steward | Write a new verification receipt against the corrected denominator specification and implemented SHA; no deployment or flag change. |
 | SCHEDULE-SUCCESSORS | registrar | Use DP-53 for unlocked Q030/Q032 drafts; scope separately registered earlier successors to affected locked studies, with shared-data and family obligations. Never move a locked date automatically. |
 | READINESS-Q006 | data-steward | Refresh Q006 readiness.json from frozen counts only, with every registered endpoint and source date. If the required snapshot does not exist, record the data dependency; do not substitute effects, invent counts or open the study's outcomes. |
@@ -62,9 +61,9 @@ A missing counts snapshot is shown as unmeasured, not assumed to be a maturation
 | Q027 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
 | Q028 | SCHEDULED_DIAGNOSTIC | Outcome-free audit; run on its registered date |
 | Q029 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
-| Q030 | READY_TO_RESUME | Measured deferral trigger cleared; finish registration |
+| Q030 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
 | Q031 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
-| Q032 | READY_TO_RESUME | Measured deferral trigger cleared; finish registration |
+| Q032 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
 | Q033 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
 | Q034 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
 | Q035 | DEFERRED | See the question's measured re-entry trigger |
@@ -113,6 +112,7 @@ _none yet — every question so far is NULL, INCONCLUSIVE, or still waiting for 
 | Q010 | does Q009's stop result repeat on nights nobody had seen when it was registered? | PREREG_LOCKED | 2027-02-22 |
 | Q016 | Q016 — two-sidedness by beta and ATR (does volatility at selection predict a round trip?) | DATASET_PINNED | 2027-02-22 |
 | Q022 | Q022 — sector cluster nights (does a concentrated slate change what the picks do?) | PREREG_LOCKED | 2027-02-22 |
+| Q030 | does the candidate universe find the big movers before they move? | PREREG_LOCKED | 2027-03-01 (exposure check; hard stop 2027-04-12) |
 | Q012 | for a pick below 90, is it better to take the first small target and put the money into the next pick, or to hold the co | DATASET_PINNED | 2027-03-22 |
 | Q013 | does a pick whose earnings report lands within three sessions run a worse path than a pick whose report is further out? | DATASET_PINNED | 2027-03-22 |
 | Q014 | does a week of repeated unusual-options activity before the pick night make a SAS pick better, and does SAS add anything | DATASET_PINNED | 2027-04-05 |
@@ -120,6 +120,7 @@ _none yet — every question so far is NULL, INCONCLUSIVE, or still waiting for 
 | Q029 | which of the seven scoring layers actually earns its weight? | PREREG_LOCKED | 2027-04-12 (exposure check; hard stop 2027-05-24) |
 | Q007 | for a pick already held from the pick-night close, does a next-morning gap of more than 2% predict the rest of the trade | DATASET_PINNED | 2027-04-26 (exposure check; hard stop 2027-06-30) |
 | Q024 | Q024 — does SAS beat embarrassingly simple benchmarks, on the price path? | PREREG_LOCKED | 2027-05-17 (exposure check; hard stop 2027-06-28) |
+| Q032 | does the SAS selection edge exist only in identifiable tape states? | PREREG_LOCKED | 2027-05-17 (exposure check; hard stop 2027-06-28) |
 | Q019 | when the Conviction Monitor flags a recent pick EXIT, is closing it at the next open worth more than holding to the tent | DATASET_PINNED | 2027-05-24 |
 | Q023 | do the platform's 80–90 picks do worse on nights its own regime engine calls `strongly_bullish`? | PREREG_LOCKED | 2027-06-07 (exposure check; hard stop 2027-07-19) |
 | Q031 | is the SAS edge deteriorating over time, or is a weak stretch normal variation? | DATASET_PINNED | 2027-06-07 (exposure check; hard stop 2027-07-19) |
@@ -135,7 +136,7 @@ _Source: `research/PLATFORM_ISSUES.md`. Statuses: OPEN → HACI_DECIDED:fix/rese
 
 | ID | status | issue |
 |---|---|---|
-| PI-001 | IMPLEMENTED:2d5776c | `uoa_symbol_daily.fwd_return_*` still ~95% degraded; 30d relapsed to 0% from 07-27 — brief: `research/briefs/PI-001_fwd_return_backfill_wind |
+| PI-001 | OPEN | `uoa_symbol_daily.fwd_return_*` still ~95% degraded; 30d relapsed to 0% from 07-27 — brief: `research/briefs/PI-001_fwd_return_backfill_wind |
 | PI-002 | HACI_DECIDED:fix | No coverage watchdog fires on PI-001 (none found in the codebase by that name) |
 | PI-003 | HACI_DECIDED:fix | `atr_pct` corrupted around splits (ATR computed on raw bars) |
 | PI-004 | HACI_DECIDED:fix | Manual re-runs indistinguishable from nightly runs in `super_agent_select_runs` |
@@ -151,6 +152,7 @@ _Source: `research/PLATFORM_ISSUES.md`. Statuses: OPEN → HACI_DECIDED:fix/rese
 | PI-014 | OPEN | Conviction Monitor's polarity arm silent since 2026-06-01: `polarity_unavailable_coverage_low` on 100% of in-scope rows, 0 polarity HOLD/EXI |
 | PI-015 | OPEN | Projection layer (v1.6 weight 29, the largest) unscored — `available: false` — on 72.2% of published and 74.3% of capped main-lane rows; `ov |
 | PI-016 | OPEN | Conviction label degenerate on the published slate: `completeness_score` never below 65.37 (min 65.3686 of 4,195 scored rows), so `_confiden |
+| PI-017 | OPEN | A forced UOA re-run deletes the **whole trading date** from `uoa_contract_daily`, `uoa_symbol_daily` and `uoa_bulletins`, then rebuilds only |
 
 ## 5. Enhancements to build in the platform
 
@@ -251,9 +253,8 @@ _Each was a question the desk would once have asked you. It took the recommended
 
 ## 8. Backlog and calendar
 
-- Open hypotheses: **5** · registered: 48 · deferred (data missing): H-041, H-055, H-062, H-067, H-078, H-080
-- Next to register (DP-47 order): H-014, H-002, H-021, H-022
-- **Deferrals lifted, resuming at the front of the queue:** Q030, Q032 — the blocker was measured away, so each resumes at `@registrar apply` with its DECISIONS.md binding in full and its schedule re-derived from the actual lock date, out only (DP-43, DP-45)
+- Open hypotheses: **1** · registered: 53 · deferred (data missing): H-014, H-021, H-022, H-041, H-055, H-062, H-067, H-078, H-080
+- Next to register (DP-47 order): —
 
 | decides on | Q |
 |---|---|
@@ -269,12 +270,14 @@ _Each was a question the desk would once have asked you. It took the recommended
 | 2027-02-22 | Q010 |
 | 2027-02-22 | Q016 |
 | 2027-02-22 | Q022 |
+| 2027-03-01 | Q030 |
 | 2027-03-22 | Q012 |
 | 2027-03-22 | Q013 |
 | 2027-04-05 | Q014 |
 | 2027-04-12 | Q027 |
 | 2027-04-12 | Q029 |
 | 2027-05-17 | Q024 |
+| 2027-05-17 | Q032 |
 | 2027-05-24 | Q019 |
 | 2027-06-07 | Q023 |
 | 2027-06-07 | Q031 |
