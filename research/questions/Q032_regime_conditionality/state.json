@@ -1,6 +1,6 @@
 {
   "id": "Q032",
-  "state": "PREREG_DRAFT",
+  "state": "PREREG_LOCKED",
   "history": [
     {
       "state": "IDEA",
@@ -24,6 +24,14 @@
       "at": "2026-09-14T18:38:31.592423+00:00",
       "by": "desk",
       "note": "deferral lifted: SPY 424 bars vs 250; limbs a/b/c PASS on true partition; patch8"
+    },
+    {
+      "state": "PREREG_LOCKED",
+      "at": "2026-09-14T19:08:32.284873+00:00",
+      "by": "desk",
+      "note": "DP-46: DECISIONS.md complete, no pending items; e_min=3, limb (f) CLEAR"
     }
-  ]
+  ],
+  "prereg_commit": "acd505800c80f641da894aeada6f7de58bb0c5cf",
+  "prereg_sha256": "9ff1835784d702f46d68d9ee8454f3c5b99fc0e91eeb7e8f1a1d876839937384"
 }
