@@ -1085,6 +1085,7 @@ quoted.**
 > **Next:** R2(i) pins the SPY history into a freeze, then Q032 re-enters the queue and resumes at
 > `@registrar apply Q032` with its DECISIONS.md binding in full. The drafted schedule is re-derived from the
 > actual lock date, **out only** (DP-43, DP-45).
+> **RE-REGISTERED 2026-09-14** as Q032; this entry is now history only.
 **Deferred 2026-09-14 by the registrar, autonomous run (DP-40..48), on this file's first admission
 ground: the objective cannot be measured with the artefacts the desk holds.** The blocker is
 **provisioning — not procurement, not accrual, not a grant and not the DP-43 ceiling**. It is the

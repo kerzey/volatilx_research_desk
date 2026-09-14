@@ -1,0 +1,9 @@
+{
+  "decision_date": "2027-05-17",
+  "extension_date": "2027-06-28",
+  "hard_stop": "2027-06-28",
+  "rule": "exposure-driven",
+  "extended": false,
+  "pin_at_decision": true,
+  "note": "§5.2 floor A at 0.6620 (item 3 cap; matured 62/72); 121 sessions, DP-13 extension to 151; e_min=3"
+}
