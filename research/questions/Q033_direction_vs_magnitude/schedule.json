@@ -1,0 +1,9 @@
+{
+  "decision_date": "2027-07-12",
+  "extension_date": "2027-08-23",
+  "hard_stop": "2027-08-23",
+  "rule": "exposure-driven",
+  "extended": false,
+  "pin_at_decision": true,
+  "note": "PREREG §5.2 (P1 alone; P2 deferred at lock and carrying no date): window 2026-09-15..2027-04-30 = 158 elapsed sessions at the measured 0.6620 contributing nights/session, binding floor A (80 nights) reached at session 121 and the end not pulled in; end + 40 sessions BINDING MATURITY (§2.3/§2.5, DECISIONS Correction 1 — not the primary's 20-session clock) = 2027-06-29 on the calendar including 2027-06-18 (Correction 2), + one calendar week = 2027-07-06, first Monday on or after = 2027-07-12; single DP-13 extension to pick nights ..2027-06-14 (session 188) decided 2027-08-23 = hard stop, then DEFERRED."
+}

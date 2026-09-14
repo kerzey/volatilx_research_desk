@@ -1439,3 +1439,185 @@ he traded it. It may therefore be used only as the **FOUNDER arm's own realised 
 feature, a filter or a label on any other question (rule 14: it does not exist at 16:05 ET on the
 pick night). Under this file's preamble **nothing here may be reported, briefed or quoted** until
 the triggers are met.
+
+---
+
+## Q033 / H-081 — `V = G_μ − G_α`, the interaction endpoint (P2 only) — **the tape arm cannot be assigned: the SPY history the partition needs exists in no pinned freeze and cannot be fetched without Alpaca credentials**
+
+**Deferred 2026-09-14 by the registrar, autonomous run (DP-40..48), on this file's first admission
+ground: the objective cannot be measured with the artefacts the desk holds.** This is an
+**endpoint-level deferral, not a question-level one** — the H-067 / Q024 precedent.
+`research/questions/Q033_direction_vs_magnitude/PREREG.md` **locks with P1 (`A`, the direction
+excess) alone**, `state.json` goes to `PREREG_LOCKED` (not `DEFERRED`), `schedule.json` is written,
+and **no question number is consumed**. Decisions and the governing record:
+`research/questions/Q033_direction_vs_magnitude/DECISIONS.md` (decision-maker, 2026-09-14, 33 items +
+22 corrections, "## Record — 2026-09-14", items 16, 22, 23, 30, 33); the measurement:
+`research/reports/STEWARD_Q033_exposure.md` (R1, counts only). The blocker is **provisioning — not
+procurement, not accrual, not a grant and not the DP-43 ceiling** — and it is the **same blocker, the
+same two environment variables and the same desk session as Q030 / H-074 and Q032 / H-079**, its
+third firing in one day.
+
+### What the endpoint is, and why it is worth keeping
+
+**It is the half of H-081 that Haci's own line is about.** `V = G_μ − G_α`, where
+`G_x = mean_{BENIGN} x_t − mean_{HOSTILE} x_t`: the tape-arm contrast of the control-adjusted
+**magnitude** excess (first touch of the pick's own printed swing L3 within 20 sessions of the t+1
+open — Q006 `Delta_t` on the DP-09 clock) minus the same contrast of the **direction** excess (the
+±0.5 ATR own-side-first race). H-081's PASS predicts `V > 0`: *target attainment is the
+tape-conditional part of the claim and direction is not*. Two-sided, night-level, **MPE ±10.0 pp**
+(DP-20's larger-MPE clause: `V` is one difference further than a difference of differences, and at
+~100 nights a 5 pp bar on a triple difference returns INCONCLUSIVE by construction rather than by
+evidence).
+
+**Everything designed for it stands and is recorded as designed**, so a successor inherits rather
+than re-argues: the bar-only partition (§2.2, identical to Q032's), the ±0.5 ATR band, the ±10.0 pp
+MPE, the **equivalence NULL clause** (NULL requires the point estimate inside ±MPE **and both CIs
+entirely inside ±MPE**), the DP-51 two-CI gate, the 80% HOSTILE composition guard, the level clauses
+`NO_EXCESS_TO_COMPARE` / `MAGNITUDE_IS_THE_CONDITIONAL_ONE` / `BOTH_CONDITIONAL` /
+`BOTH_MOVE_TOGETHER`, the four arm × half stability cells, the tape-episode block bootstrap and the
+tape-episode label permutation. **P1 does not depend on any of it** — "do published picks go their
+own way more often than their look-alikes?" needs no regime label at all — which is why the question
+locks rather than defers.
+
+### Why it cannot be measured — the failing limb, named exactly
+
+PREREG §5.3 R1 gained **limb (f)** at `decide` (DECISIONS item 16) precisely so this would be
+discovered at the lock and not at the 2027 decision pass: a presence test for
+`ALPACA_API_KEY` / `ALPACA_SECRET_KEY` in the desk session and a coverage probe for SPY
+split-adjusted daily bars from **2025-01-02**.
+
+**Limb (f) FAILED: both variables are unset in the desk session, stated by a direct presence test and
+never inferred, and no retrieval was attempted** — there is nothing to attempt without credentials,
+and rule 1 forbids looking for or requesting any other (`STEWARD_Q033_exposure.md` §(f); the Q024
+R1(d) / Q030 §(i) / Q032 §(g) precedent). Under DECISIONS item 16's registered branch, a failed probe
+with no pinned alternative **defers P2 at the lock and lets P1 lock alone**.
+
+**What the arm needs, exactly.** `trend_t` needs `SMA50_t` **and `SMA200_t`** (UP iff
+`close > SMA50 > SMA200`), and `vol_t` is an **expanding-window tercile of SPY's 20-session realised
+volatility over every SPY session ≤ t, requiring ≥ 250 such sessions**. A window opening 2026-09-15
+therefore needs SPY split-adjusted daily bars from **2025-01-02**. `manifest_prices_v001` holds
+**153** SPY bars (2026-02-02..2026-09-10) and reaches only **133** computable rvol20 observations, so
+the first session with ≥ 250 prior SPY sessions is **never** — not in this freeze and not in any
+freeze the desk holds. The same absence, measured from inside the data instead of at the credential.
+
+### The second, independent ground — the rarer-arm episode supply
+
+**PREREG §8 clause 2's gate (≥ 5 gate-counting tape-episodes per arm) is not shown to be reachable,
+at the reading that governs.** DECISIONS item 23 settles which reading that is: the **strict
+full-window t+40-matured** one, **1 episode / 71 elapsed sessions = 0.0141 against a floor of
+0.025 — SHORT**. The Steward's two looser readings are recorded and **neither is adopted**:
+**0.0323** (sub-period-restricted) and **0.0563** (eligible-pick basis). Where two readings of one
+count differ only in how easily a floor is reached, the desk takes the one that does not reach it
+(DP-45) — and DECISIONS item 6's censoring-removal licence was written for limb (a)'s **rate**, whose
+denominator a successor freeze can guarantee, not for an **episode count**, whose supply no freeze
+can. **`V` therefore carries two independent deferral grounds, and both must be re-measured before
+any successor may lock.**
+
+### The counted limbs, recorded for the re-check and for nothing else
+
+Every count below is on the **SMA50-only one-sided bound**, which is explicitly **not** §2.2-legal
+(HOSTILE is a lower bound, BENIGN an upper bound, because adding `SMA50 > SMA200` can only move
+nights out of `UP`). None of it is exposure evidence for the registered partition, and **none of it
+sizes anything in the locked Q033**:
+
+| limb | floor (as filed) | measured, SMA50-only proxy | strict §2.2 | read |
+|---|---:|---:|---:|---|
+| (a) contributing nights / elapsed session (**P1's limb**) | 0.40 | **0.6620** (item 6's cap binds: `min(0.8710, 0.6620)`) | — | **PASS — gates P1, which locks** |
+| (b) rarer-arm (HOSTILE) contributing nights / session | 0.10 | **0.3099** (22 of 68 nights) | 0.0000 | proxy only; travels with `V` |
+| (b) rarer-arm gate-counting tape-episodes / session | 0.025 | 0.0563 unmatured · **0.0141 t+40-matured** | 0.0000 | **SHORT at the governing reading** |
+| (c) composition | — | **six-cell** proxy where §2.2 registers **nine**; first session with ≥ 250 prior SPY sessions = **never** (153 bars, 133 rvol20) | — | cannot revise the suppression list in either direction |
+| (f) SPY-history feasibility probe | must succeed | — | — | **FAIL — credentials absent, probe not attempted** |
+
+The Steward's informational note that the proxy HOSTILE arm is much richer than the draft's 0.20
+placeholder (0.42 / 0.31 / 0.18 by month) would have moved the binding floor from B to A and pulled a
+decision date ~5 weeks in. **It is not taken and no schedule was built on it** (DP-43, DP-45): it is a
+bounded proxy for a partition nobody can assign.
+
+### What was considered and rejected before deferring
+
+- **Re-specifying the partition to SMA50-only** — the one move that would let `V` be measured today,
+  on a split the desk has already counted. **Rejected, and it may never be made inside Q033 or any
+  successor edit of it** (PREREG §5.3 R2(i), DECISIONS items 16, 22): that is a different arm, chosen
+  *after* the data existed and after its counts were seen, which is the exact thing rule 3 and DP-45
+  exist to stop. A SMA50-only partition is **a different question with its own id, its own MPE and its
+  own §10**. Stated twice here for the same reason Q032's entry states it twice: the measured proxy
+  makes it tempting.
+- **Deferring Q033 whole.** Rejected: P1's own gate limb clears with 65% headroom (0.6620 against
+  0.40) and P1 is a pooled level that needs no arm. Deferring an answerable question because an
+  unanswerable endpoint sits beside it deletes answerable questions.
+- **Locking P2 and probing at the decision pass.** Rejected in advance — that is what limb (f) exists
+  to prevent. Discovering this in July 2027 would have cost the whole window; discovering it at the
+  lock cost an afternoon.
+- **DP-13's single automatic extension.** Rejected: it rescues a floor that is *marginal at a decision
+  date*, and thirty more sessions produce neither SPY bars nor a credential.
+- **Deferring on DP-43's ceiling instead.** Rejected as a mis-filing: the proxy rates sit comfortably
+  inside the ceiling. The ground is the first, not the second.
+- **Merging into Q023 or Q031.** Rejected on the same grounds Q032's entry gives: Q023 runs the
+  platform-label contrast on the 80–90 band, and decay in time is not conditionality on the tape.
+
+### What would move it back into the backlog — the trigger is a measurement, not a date
+
+**The H-074 trigger, cited by id and shared verbatim with Q030 and Q032** (`DEFERRED.md`,
+"Q030 / H-074", 2026-09-14): **both `ALPACA_API_KEY` and `ALPACA_SECRET_KEY` present in a desk
+session, stated by the Steward with a direct presence test, AND a market-data coverage probe that
+returns the bars** — here **SPY split-adjusted daily bars from 2025-01-02**, feed `sip`, coverage and
+first / last bar date only, market-data endpoints only. **Both limbs, measured, never assumed:**
+credentials present but SPY history unretrievable is the same deferral. **No calendar re-check date is
+named, because no amount of waiting produces the bars.** Satisfying that one trigger re-opens Q030,
+Q032's successor and this endpoint **in registration order**. Provisioning two environment variables
+the desk is already licensed to use is **Haci's call**; it is neither a purchase nor a platform
+change, no `IMPLEMENTATION_BRIEF.md` follows, and **DP-49 is not engaged**.
+
+**What a successor must re-measure before it may lock — seven things, none inherited from the record
+above:**
+
+1. **The §2.2 split on the true `close > SMA50 > SMA200` trend and the true ≥ 250-session volatility
+   tercile.** The SMA50-only proxy is a one-sided bound and is never the registered partition.
+2. **The arm-bearing contributing-night rate** under §2.5's **complete** rule (≥ 3 valid published
+   picks, each with ≥ 5 valid matched controls, matured to t+40, carrying a legal arm label).
+3. **The rarer-arm contributing-night rate** (floor B).
+4. **The rarer-arm gate-counting tape-episode rate on a t+40-matured basis** (floor D) — the limb that
+   read 0.0141 < 0.025 here, and the one this freeze could not measure honestly.
+5. **The nine-cell `trend_t` × `vol_t` composition** — only six cells were observable here — and with
+   it the single permitted suppression revision, **cells added only, never removed**.
+6. **The DP-50(a)/(b) commit sweep and the v1.7 schedule check on the new freeze.** Today's "NONE"
+   (HEAD `d19c9a9`) is an absence of a schedule, not a permanent clearance.
+7. **The lock-or-DEFER inequalities re-solved from the trading calendar** against DP-43's 12-month
+   ceiling **measured from the successor's own lock date** — they tighten as that date moves later.
+
+**How `V` comes back.** As a **successor question with its own id**, inheriting Q033's definitions
+verbatim — the partition, the ±0.5 ATR band, the ±10.0 pp MPE, the equivalence NULL clause, the DP-51
+two-CI gate, the 80% composition guard — and **never by editing Q033**, whose lock fixes `m = 1` (the
+H-067 / Q024 precedent, rule 3). Its window is **prospective-only from its own lock commit**, with
+Q033's window carried as a labelled panel. It must also carry, in its own §10, the measured
+`d_L3 < 0.5` share of **3.89% (20 of 514 valid picks)** — the conflation that biases `V` toward zero,
+left in place deliberately and never screened out (DECISIONS items 21, 31).
+
+### Bookkeeping
+
+**No verdict of any kind was produced for P2 and no outcome was read.** `V` returns no CONFIRMED, no
+NULL, no INCONCLUSIVE, no `G_μ`, no `G_α` and no arm difference; a gate shortfall is not a verdict.
+No `eval.py` exists and no `results/` directory exists for Q033 at this date. The Steward's report is
+counts of nights, picks, controls and bars on the pinned freezes, reading a forward bar only to
+establish that a bar exists, with **no live query** (DP-50(c)).
+
+**Correction sets.** **`m = 1`** inside Q033 (P1 alone) and **F8 = 1** at that lock, never below it.
+**`A` stays in the F1 companion set, which is 28.** **F2 carries no Q033 endpoint while `V` is
+deferred: 17 → 16** (Q023 2 + Q027 2 + Q029's 10 companion IC endpoints + Q031 2) — the
+H-062 / Q025 / Q032 precedent. **No locked PREREG records Q033's `V` in its correction set, so no
+locked file is edited and none was.** `G_μ` is not computed at all, so §8 clause 8's `G_μ` half and
+the `G_μ` / `G` pairing lapse. `research/BACKLOG.md` marks **H-081 — registered as Q033 (P1 only);
+the interaction half deferred, SPY history needs Alpaca credentials in the desk session**. Q033's R2
+rider for SPY-from-2025-01-02 is **withdrawn and HELD** and is not built while this endpoint is
+deferred; **Q027's, Q029's and Q031's own successor-freeze requests and pins are unaffected and are
+not edited** (rule 3, DP-22). Floors **B** and **D**, §8 clauses **2, 3, 5, 7, 9** and the `G_μ` half
+of clause 8, §10 threat 3, and the tape-episode block bootstrap and label permutation all travel here
+with the endpoint.
+
+**Caveat carried forward, so no successor repeats it.** Q033's own **2027-07-12** run prints `α_t`,
+the raw direction and L3-touch rates, the descriptive `μ_t` and the §4.3 per-level reads **on the
+nights 2026-09-15..2027-04-30**. A successor carrying `V` is therefore **post-hoc with respect to
+those nights** and must run **prospective-only from its own lock**, with Q033's window as a labelled
+panel — exactly the constraint Q033 itself applied to the sealed 2026-06-01..2026-08-12 stretch.
+Under this file's preamble **nothing here may be reported, briefed or quoted** until the trigger is
+met.
