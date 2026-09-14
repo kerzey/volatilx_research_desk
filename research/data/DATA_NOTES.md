@@ -198,6 +198,53 @@ in-sample elites are 9 distinct symbols, mostly memory/semis. Haci (2026-09-10) 
 understand *why*. Any "elite" claim is a claim about ~45 picks and a handful of names until this
 is understood — say so in every report.
 
+## _enforce_ladder_monotonic did not exist for the first five weeks of the sealed-but-live window (steward, Q018 R1, 2026-09-13)
+
+Platform commit `5fa3db4` ("W3: publication-time cross-lane ladder monotonicity (H4 family)",
+2026-07-06) is what ships `_enforce_ladder_monotonic` (`services/super_agent_select_service.py:195-215`).
+Before that commit there was no cross-lane re-sort at all -- a payload was published exactly as
+the lane-plan writer produced it, monotonic or not. Measured directly from `manifest_v001` on the
+495 six-level-eligible 80-90 published picks 2026-06-01..2026-09-09 (`STEWARD_Q018_exposure.md`
+Section 2): flattened-ladder non-monotonicity is **25.71% (36 of 140) before 2026-07-06** and
+**0.00% (0 of 355) on/after 2026-07-06**. The desk's standing "historically ~28%" figure for this
+share is consistent with the pre-fix regime only; a blended figure across the whole window
+(7.27%) understates the pre-fix rate and overstates the post-fix rate. The same commit range also
+introduces `SuperAgentSelectConfig.publication_floor = 80.0` (`services/super_agent_select_models.py:86-91`,
+commit `1765a6f`, 2026-07-07) and a multi-day bear/dark-lane build-out
+(`services/super_agent_select_service.py` / `super_agent_select_scoring.py`, 2026-06-28..2026-07-06)
+touching the same wrong-side-target and ladder-integrity machinery the six-level eligibility test
+leans on.
+
+**Rule for studies:** any study whose population spans 2026-07-06 and that reads ladder
+monotonicity, "unresolvable ladder" status, or a wrong-side-of-close exclusion as a single-regime
+fact must split at 2026-07-06 (DP-06 pattern) or state explicitly that it is reporting a blend of
+two mechanisms. See `research/reports/STEWARD_Q018_exposure.md` Section 2 / Section 5 for the full
+commit list and the empirical split.
+
+## `public_payload_json.lane_plans` price levels are on the wrong split scale for some symbols (steward, Q018 R1, 2026-09-13)
+
+Distinct from the already-documented `atr_pct` corruption (PI-003, above): for a subset of
+symbols, the lane plan's own printed price levels (`entry`, `stop`, `targets`, `invalidation`
+inside `public_payload_json.lane_plans`) are on a different price scale than `C_t` computed from
+`prices_daily_split` for the identical symbol/date -- consistent with the lane-plan writer's price
+reference having been built from a raw (non-split-adjusted) price while `prices_daily_split`
+correctly retro-adjusts the whole history. Measured on the 495-pick population
+`STEWARD_Q018_exposure.md` Section 2 uses: **APH, 14 of 14 eligible picks in-window (100%),
+2026-06-05..2026-08-12, ratio ~2.00-2.05x** (systematic, not episodic -- every APH pick this
+window carries the mismatch); **KLAC, 1 night (2026-06-05), ~10.18x**; **CRWD, 1 night
+(2026-06-29), ~4.07x**; **MNST, 1 night (2026-07-13), ~2.02x**. The six-level eligibility test's
+wrong-side-of-`C_t` check does not catch this: a raw-scale bullish target is still nominally
+"above" a much smaller split-adjusted close, so the row passes eligibility while the printed
+distance is not real.
+
+**Rule for studies:** any ATR-distance, price-level or percent-move computation that mixes a
+payload's own printed price level with `C_t`/ATR from `prices_daily_split` should screen for
+`target / C_t` (or `entry / C_t`) outside a sane band (e.g. [0.5, 1.5] for a near target) before
+trusting the ratio, and should not assume this is limited to APH/KLAC/CRWD/MNST -- these four were
+found only because they fell inside one question's 495-pick sample; a full sweep across all
+published symbols has not been done. Flagged to the Red Team as a candidate PI filing (distinct
+from PI-003). See `research/reports/STEWARD_Q018_exposure.md` Section 2 for the measured counts.
+
 ## Other
 
 - 16 published picks have no target ladder at all (`public_payload_json` lacks lane targets).
