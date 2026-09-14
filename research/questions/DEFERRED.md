@@ -1264,3 +1264,178 @@ is knowledge available at 16:05 ET on the pick night and contains no outcome. **
 counts in this entry as firmly as anything else — they are planning numbers on a partition that was
 never legally assignable.** Under this file's preamble **nothing here may be reported, briefed or
 quoted** until the trigger is met.
+
+---
+
+## H-078 — "Founder vs Robot vs Dumb: can the edge actually be harvested?" (Haci's H8) — **two data blockers: the desk holds no record of Haci's fills, and no cost model in money units**
+
+**Deferred 2026-09-14 by the registrar, autonomous run (DP-40..48), under DP-47** ("new data needed"
+hypotheses go straight to this file with the data named) **and this file's first admission ground:
+the objective cannot be measured with the artefacts the desk holds.** The blocker is **procurement
+and elicitation, not accrual, not a rule-14 grant and not the DP-43 ceiling** — no amount of waiting
+produces either missing artefact. **Nothing was drafted:** no PREREG, no directory, no `eval.py`, no
+`results/`, **no question number consumed** (Q036 stays free). The hypothesis resumes as a new
+registration, in queue order, when the trigger below is met.
+
+### What the question is, and why it is worth keeping
+
+Haci's H8. Every other question on this desk measures whether the *prediction* is good. This one
+measures whether the prediction becomes **money in a real account after costs** — the gap the desk
+has never closed. Three arms on the same pick nights:
+
+- **ROBOT** — mechanical execution of the platform's committed plan: session t+1 open entry, SELECT
+  scale-out `[0, 15, 30, 15, 25, 15]` on the flattened L1–L6 ladder
+  (`volatilx services/sas_conviction_card.py:203-218`), no stop (DP-02), result in ATR per trade
+  (DP-10), **after costs**.
+- **DUMB** — the identical plan run on Q024's benchmark arms and on Q006's distance-matched control,
+  also after costs.
+- **FOUNDER** — Haci's realised trades on the same names, from his own fills.
+
+PASS = the robot beats the dumb arms after costs and risk, and the founder comparison becomes a
+diagnostic (does discretion add or subtract?). FAIL = the robot does not clear the dumb arms once
+costs are paid, which would mean prediction quality is not becoming realisable returns — the single
+most consequential NULL available to this desk, and the reason the hypothesis is kept rather than
+killed. The mechanism for FAIL is concrete and already half-measured elsewhere: a target-touch edge
+can be eaten by entry slippage on a gapping open (Q004's L1-already-passed rate) and by six legs of
+scale-out commission on a move of roughly one ATR.
+
+### What is already covered, and is therefore not what this entry defers (DP-29)
+
+**The before-costs half of ROBOT vs DUMB is already locked and must not be registered twice.**
+Q024's **clause-7 money gate** is exactly that contrast — the platform's committed SELECT scale-out,
+truncated to a 20-session budget, in ATR per trade, SAS minus each benchmark arm
+(`research/questions/Q024_sas_vs_simple_benchmarks/PREREG.md` §4, clause 7; decides 2027-05-17,
+hard stop 2027-06-28) — and Q006's `E1`/`E2` are the same comparison expressed as a control-adjusted
+touch rate (decides 2026-10-05). **Neither carries a cost line.** What H-078 adds, and all it adds,
+is (i) the **cost line** and (ii) the **FOUNDER arm**. Both are blocked below.
+
+### Blocker 1 — the FOUNDER arm: the desk holds no record of any fill Haci has ever made
+
+`playbook/` contains a single `README.md` and no trade data of any kind. No platform table records
+the founder's executions: `whale_watch_ledger` is empty (0 rows, `manifest_v001`), and no other
+frozen table carries an account, an order or a fill. **The Alpaca trading API is out of scope under
+rule 1** — the desk's credentials are market-data credentials, and the desk may not look for,
+request or use any other, so "pull his fills from the broker" is not available to the desk at any
+price. The arm has no proxy: reconstructing what Haci "probably" did from the printed lane plan is
+precisely the ROBOT arm, so a proxy FOUNDER arm would be a tautology dressed as a comparison.
+
+**Exactly what the desk needs, in the form it needs it.** One immutable export, **one row per
+fill**, covering every fill in the study window — not only the ones on published picks (a file
+filtered to picks conditions the arm on hindsight, and the desk cannot un-condition it afterwards):
+
+| field | form | why it is required |
+|---|---|---|
+| `fill_timestamp` | ISO-8601 with timezone offset, to the second | entry basis (DP-03/DP-11) and knowledge time (rule 14) both need the clock, not the date |
+| `symbol` | underlying ticker | the join to the pick night |
+| `asset_class` | `equity` or `option` | the two cannot share a P&L column |
+| `occ_symbol` | OCC 21-char contract symbol, blank for equity | option legs are uninterpretable without expiry/strike/right |
+| `side` | `buy` / `sell` | — |
+| `position_effect` | `open` / `close`, blank for equity | a close at a target touch is the whole execution claim |
+| `quantity` | signed integer, shares or contracts | — |
+| `fill_price` | decimal, per share or per contract | — |
+| `commission`, `fees` | decimal per fill, actual not modelled | this is half of blocker 2, measured instead of assumed |
+| `order_id`, `fill_id` | broker ids | de-duplication across partial fills |
+
+Format: **CSV, UTF-8, header row, one file per export**, dropped at
+`playbook/trades/fills_<from>_<to>.csv` or its location named in `research/INBOX.md`. Source: **Haci
+only** — his broker's own trade-confirmation or activities export, downloaded by him, **not retyped
+by hand** (a retyped file cannot be pinned honestly). The Data Steward pins it with a sha256 in a
+manifest before any read, the DP-50(c) rule applying to it exactly as to a parquet.
+
+**A second, unmeasurable gate rides on the same file.** Rule 6's floors are 20 contributing nights
+per cell and 80 per primary (DP-21). One discretionary trader's fills may well not reach them, and
+**the desk cannot know whether they do until the file exists** — so the re-entry check below is two
+measurements, not one, and a FOUNDER arm that arrives below the floor is registered **descriptive at
+lock** (DP-43), never promoted to make the number look complete.
+
+### Blocker 2 — the cost line: a money-unit MPE the desk may not invent (DP-44, R-4)
+
+The ROBOT-after-costs and DUMB-after-costs arms do not need the founder's file. They need a **cost
+model in money units** — per-share or per-contract commission, the half-spread paid at a market
+open, and a slippage assumption for a scale-out leg filled on a target touch — and under **DP-44**
+those are Haci's costs: *"No money-unit MPE is invented — a hypothesis that needs one is DEFERRED
+with the question stated."* The BACKLOG line as written contemplated a conservative default under
+DP-40; **DP-44 is the more specific rule and DP-45 takes the stricter of two readings**, so the desk
+does not default here, and this entry records the correction rather than acting on it.
+
+**The question stated, so it can be answered in one line each:**
+
+1. **Commission** — per equity share and per option contract, per leg, at his broker, including any
+   per-order or assignment fee. (A number, or "zero, my broker is commission-free on equities".)
+2. **Spread paid at entry** — what he assumes he gives up entering at the t+1 open: half the quoted
+   spread, a fixed cents-per-share figure, or a basis-point figure.
+3. **Slippage on a scale-out leg** — a target-touch sell is a resting limit for him or a market
+   order? If limit, the arm may assume a fill at the level; if market, the desk needs the give-up.
+4. **The gate.** Once (1)–(3) exist, the after-costs verdict still needs an MPE. The desk's standing
+   answer is DP-10's **0.25 ATR per trade** applied to the *after-costs* contrast — that is a
+   translation of an existing DP, not a new money MPE, and is what the successor will use unless he
+   says otherwise. Haci's own "+0.10R" from the Master Hypothesis Program is **not** carried: with no
+   stop assumed (DP-02) R has no denominator.
+
+Answers to (1)–(3) become a DP entry (R-4: "once he sets one for a metric type it becomes a DP entry
+and is not asked again") and unblock **every** future after-costs question, not only this one.
+
+### What was considered and rejected before deferring
+
+- **Registering ROBOT-after-costs now with a desk-chosen cost default**, as the BACKLOG line
+  envisaged. Rejected under DP-44 and DP-45: a cost assumption is the *only* thing standing between
+  a PASS and a FAIL on a contrast whose before-costs half is already locked in Q024, so inventing it
+  would let the desk choose the verdict. One line from Haci removes the problem permanently.
+- **Registering the FOUNDER arm on a reconstructed proxy** (assume he bought the elite picks after
+  hours per TI-001 and sold at each printed level). Rejected: that *is* the ROBOT arm with a
+  different label, and the comparison would measure nothing.
+- **Merging the whole hypothesis into Q024** (DP-29). Rejected as a partial-merge only: Q024's
+  clause-7 gate is the before-costs half and is recorded above as covered, but Q024 is locked
+  (rule 3) and cannot acquire a cost line or a founder arm; a locked file is never edited to absorb
+  a new arm.
+- **Merging into Q006.** Rejected: Q006's endpoints are control-adjusted touch rates with no plan
+  P&L at all.
+- **Deferring under DP-43's 12-month ceiling.** Rejected as a mis-filing: the blocker is not
+  exposure. The ROBOT/DUMB arms sit on nights Q024 is already accruing; they would clear a floor
+  long before they clear a cost model.
+- **Waiting under DP-13's single automatic extension.** Rejected: DP-13 rescues a floor marginal at
+  a decision date. There is no decision date here, and thirty more sessions produce neither a fills
+  export nor a commission schedule.
+
+### What would move it back into the backlog — two triggers, both measurements, neither a date
+
+**Trigger A (unblocks ROBOT-after-costs and DUMB-after-costs, the two arms that need no founder
+data):** Haci answers cost questions (1)–(3) above, in `research/INBOX.md` or on the board. The
+Decision-maker records them as a **new DP entry** (R-4), and the hypothesis re-enters the queue as
+an **F6 successor registered after Q006 decides (2026-10-05)**, so that the control contrast it
+builds on has a ledgered verdict. Its window is **prospective-only from its own lock commit**
+(Q024's own §1 precedent — the sealed period's absolute SAS returns have already been printed in the
+weeklies, so a benchmark arm is not blind on those nights), and it inherits Q024's clause-7 plan
+definition **verbatim**, cost line added, so the two are comparable.
+
+**Trigger B (unblocks the FOUNDER arm):** the fills CSV above **present** under `playbook/trades/`
+or named in `INBOX.md`, **and** the Steward's sha256 pin of it, **and** a measured count of
+contributing nights — nights on which at least one fill joins to a published pick — against the
+rule-6 floors. **All three limbs, measured, never assumed:** a file that exists but supplies 11
+contributing nights re-enters as a descriptive panel of a Trigger-A question, not as a primary.
+
+**Order.** Trigger A alone is enough to register the after-costs question; Trigger B alone is not
+enough to register anything, because the founder arm is only interpretable beside a costed robot.
+If both are met, one question carries three arms as H-078 proposed.
+
+**No `IMPLEMENTATION_BRIEF.md` follows from this entry, and DP-49 is not engaged**: nothing here
+asks for a platform change or a database step. Trigger A is one message from Haci; Trigger B is a
+file he exports from his own broker.
+
+### Bookkeeping while deferred
+
+**No verdict of any kind was produced, and no outcome was read** — no touch, no first-touch date, no
+return, no excursion, no `outcome_*` column, no `sas_selection_excursion`, no P&L of any shape, for
+any arm; **no live query was made** (DP-50(c)) and no freeze was requested. **H-078 was never
+registered, so no correction set changes**: F6 is unchanged, no locked PREREG names an H-078
+endpoint, and no locked file is edited (rule 3, DP-22). `research/BACKLOG.md` marks
+**`[x] H-078 — DEFERRED`** with this entry cited. The `research/BOARD.md` line moves with this
+entry. **Q024's and Q006's own schedules, pins and correction sets are unaffected and are not
+edited.**
+
+**Caveat carried forward, so no successor repeats it.** A founder-fills file is, by construction,
+**a record of decisions made with knowledge of outcomes the desk is blind to** — he saw the tape as
+he traded it. It may therefore be used only as the **FOUNDER arm's own realised result**, never as a
+feature, a filter or a label on any other question (rule 14: it does not exist at 16:05 ET on the
+pick night). Under this file's preamble **nothing here may be reported, briefed or quoted** until
+the triggers are met.
