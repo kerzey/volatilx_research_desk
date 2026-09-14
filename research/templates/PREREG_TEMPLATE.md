@@ -39,6 +39,10 @@
   Add <k> maturity sessions once; never estimate attrition from an immature tail (DP-53).
 - Planning scenarios and justified margin: <...>. Precision/power assumptions at the MPE,
   including dependence, multiplicity and strata: <...>. Floors alone do not guarantee precision.
+- Interim look (DP-58) — registered here or not at all: <none | 60 contributing nights per primary
+  endpoint, projected <date>>. Boundary: `p_perm < 0.005`, point estimate clearing the MPE, and both
+  DP-51 CIs excluding the MPE. Success-only, never futility. The 20-per-cell and 30-post-lock floors
+  bind unchanged, so 60 total with a cell under 20 continues. The decision date below does not move.
 - Collection end <date>; decision <date>; single DP-13 extension <date>; hard stop <date>.
   Define exact counts-only extension/DEFERRED branch. Do not inspect effects to choose an extension.
 - Write schedule.json with decision_date, extension_date, hard_stop, rule, extended, check_from
@@ -65,8 +69,10 @@
   A CI including zero alone does not establish no effect.
 - INCONCLUSIVE: uncertainty cannot distinguish meaningful benefit from no benefit, inconsistent
   periods, or a specified validity failure. Counts shortfall follows §5's extension/DEFERRED rule.
-- Fixed look: <date>. No interim outcome looks. If a new sequential design is appropriate,
-  preregister boundaries, dependence assumptions and multiplicity before any prospective outcome.
+- Fixed look: <date>, deciding at α <0.05 | 0.048 when a DP-58 interim is registered>. Interim look:
+  <none | <date>, DP-58 boundary — success only>. No unregistered interim outcome look, ever. Any other
+  sequential design preregisters boundaries, dependence assumptions and multiplicity before any
+  prospective outcome.
 
 ## 9. If CONFIRMED, what changes
 <a line in the Manual Trading Guide / a lane rule / a flag in SAS config / a marketing claim type>

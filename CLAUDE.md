@@ -47,7 +47,9 @@ platform repo.
    - Fixed-horizon close-to-close return is secondary and descriptive.
 6. **The unit of inference is the trading night.** Stock rows are aggregated per night first.
    Monte Carlo control draws never add to n. CIs come from date-clustered or block bootstrap;
-   p-values from permutation tests. Floors: 20 nights per cell, 80 nights total.
+   p-values from permutation tests. Floors: 20 nights per cell, 80 nights total; a question may
+   register **one** interim look at 60 total under DP-58's boundary — it waives no floor, may stop
+   early only for success, and must be declared before the lock or not at all.
    Every PREREG names a minimum practical effect (MPE); "positive but below MPE" is INCONCLUSIVE.
 7. **Regime is the dominant variable.** Every result is reported stratified by
    `market_regime_daily` regime, and by the calendar split in the PREREG. April–May 2026
