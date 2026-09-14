@@ -34,6 +34,7 @@ _none yet — every question so far is NULL, INCONCLUSIVE, or still waiting for 
 
 | Q | question | state | decides on |
 |---|---|---|---|
+| Q026 | did every input exist when SAS made the prediction? | DATASET_PINNED | 2026-09-21 |
 | Q006 | does SAS selection beat a distance-matched control from its own universe, on the price path? | DATASET_PINNED | 2026-10-05 |
 | Q002 | do SAS picks reach the near targets sooner than matched candidates? | DATASET_PINNED | 2026-10-12 |
 | Q004 | does it matter whether you buy the pick after hours, at the open, or at 10:00? | DATASET_PINNED | 2026-10-26 |
@@ -47,6 +48,8 @@ _none yet — every question so far is NULL, INCONCLUSIVE, or still waiting for 
 | Q012 | for a pick below 90, is it better to take the first small target and put the money into the next pick, or to hold the co | DATASET_PINNED | 2027-03-22 |
 | Q013 | does a pick whose earnings report lands within three sessions run a worse path than a pick whose report is further out? | DATASET_PINNED | 2027-03-22 |
 | Q014 | does a week of repeated unusual-options activity before the pick night make a SAS pick better, and does SAS add anything | DATASET_PINNED | 2027-04-05 |
+| Q027 | does a higher SAS score actually mean a better price path? | PREREG_LOCKED | 2027-04-12 (exposure check; hard stop 2027-05-24) |
+| Q029 | which of the seven scoring layers actually earns its weight? | PREREG_LOCKED | 2027-04-12 (exposure check; hard stop 2027-05-24) |
 | Q007 | for a pick already held from the pick-night close, does a next-morning gap of more than 2% predict the rest of the trade | DATASET_PINNED | 2027-04-26 (exposure check; hard stop 2027-06-30) |
 | Q024 | Q024 — does SAS beat embarrassingly simple benchmarks, on the price path? | PREREG_LOCKED | 2027-05-17 (exposure check; hard stop 2027-06-28) |
 | Q019 | when the Conviction Monitor flags a recent pick EXIT, is closing it at the next open worth more than holding to the tent | DATASET_PINNED | 2027-05-24 |
@@ -54,6 +57,7 @@ _none yet — every question so far is NULL, INCONCLUSIVE, or still waiting for 
 | Q018 | for the same pick, does the day, the swing or the long-term lane plan make the most money — and does the answer depend o | PREREG_LOCKED | 2027-07-12 |
 | Q021 | Q021 — GEX pin risk and two-sided paths (does a pinned pick round-trip more often?) | DATASET_PINNED | 2027-08-09 (exposure check; hard stop 2027-09-20) |
 | Q015 | do picks scoring 85–90 reach the swing target and then hand it back more often than picks scoring 80–85, and does exitin | DATASET_PINNED | 2027-08-30 |
+| Q028 | are the seven scoring layers seven signals, or three or four? | PREREG_LOCKED | — |
 
 ## 4. Platform issues
 
@@ -151,14 +155,21 @@ _Each was a question the desk would once have asked you. It took the recommended
 - **Q024** #9 (at `record`) Window end, decision date, extension — chose **2026-09-14..2027-04-07 (142 sessions), Monday 2027-05-17**, extension Monday 2027-06-28, sized on the measured 0.5652; not taken: **the drafted 2027-03-29, ten weeks sooner**, or the 0.9783 pre-maturity rate that would have been sooner still — DP-43/DP-45.
 - **Q025** #6 Window end and decision date — the DP-43 rule fired and **chose DEFERRED**: measured binding rate **0.000 contributing nights per elapsed session** against a 0.35 gate, so there is no honest date; not taken: a wider caliper or a soft sector block, which would have produced nights by weakening the control — DP-43, DP
 - **Q025** #6 Window end and decision date — chose **the DP-43 window computed at `record` from the Steward's measured rate, sized at its one-sided 90% lower bound (provisionally window to 2027-01-13, decision Monday 2027-02-22, one extension to 2027-02-26 decided Monday 2027-04-05), and DEFERRED if the binding rate is below 0.35
+- **Q027** #7 Window start — chose **prospective-only, pick nights ≥ 2026-09-15**; not taken: read the sealed
+- **Q027** #8 Window end and decision date — chose **window end 2027-03-05, decision Monday 2027-04-12**
+- **Q029** #9 Window start — chose **prospective-only, pick nights ≥ 2026-09-15**; not taken: read the sealed
+- **Q029** #10 Window end, decision date, extension — chose **2026-09-15..2027-03-05, decided Monday 2027-04-12,
+- **Q030** #8 Window start — chose **prospective-only, pick nights after the lock commit**; not taken: read the
+- **Q030** #9 Window end and decision date — chose **window end 2027-03-05, decision Monday 2027-04-12**
 
 ## 8. Backlog and calendar
 
-- Open hypotheses: **23** · registered: 30 · deferred (data missing): H-041, H-055, H-062, H-067
-- Next to register (DP-47 order): H-069, H-070, H-073, H-076, H-075
+- Open hypotheses: **14** · registered: 39 · deferred (data missing): H-041, H-055, H-062, H-067
+- Next to register (DP-47 order): H-082, H-079, H-080, H-081, H-084
 
 | decides on | Q |
 |---|---|
+| 2026-09-21 | Q026 |
 | 2026-10-05 | Q006 |
 | 2026-10-12 | Q002 |
 | 2026-10-26 | Q004 |
@@ -172,6 +183,8 @@ _Each was a question the desk would once have asked you. It took the recommended
 | 2027-03-22 | Q012 |
 | 2027-03-22 | Q013 |
 | 2027-04-05 | Q014 |
+| 2027-04-12 | Q027 |
+| 2027-04-12 | Q029 |
 | 2027-04-26 | Q007 |
 | 2027-05-17 | Q024 |
 | 2027-05-24 | Q019 |
