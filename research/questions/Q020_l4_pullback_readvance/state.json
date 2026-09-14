@@ -1,0 +1,23 @@
+{
+  "id": "Q020",
+  "state": "DEFERRED",
+  "history": [
+    {
+      "state": "IDEA",
+      "at": "2026-09-14T00:13:16.913474+00:00",
+      "by": "agent"
+    },
+    {
+      "state": "PREREG_DRAFT",
+      "at": "2026-09-14T00:13:20.375066+00:00",
+      "by": "registrar",
+      "note": ""
+    },
+    {
+      "state": "DEFERRED",
+      "at": "2026-09-14T00:34:53.854600+00:00",
+      "by": "desk",
+      "note": "needs a DP-05(c) rule-14 grant: the EVENT classifier reads prices_daily_split/prices_hourly_raw bars from sessions t+1..t+40 on picks and controls alike to set population, control set and the decision basis X_b (09:30 ET session b+1); desk may not grant it (DP-41)"
+    }
+  ]
+}

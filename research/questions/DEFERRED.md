@@ -145,3 +145,121 @@ on this hypothesis is **post-hoc with respect to manifest_v001** and must either
 be built on a freeze whose nights postdate those snapshots. The exposure counts used above are not
 subject to that caveat — they count nights that carry a bear pick, which is knowledge available at
 16:05 ET on the pick night and contains no outcome.
+
+---
+
+## Q017 — "GEX pin risk and two-sided paths" (H-061) — **superseded by Q021 before lock; a bookkeeping entry, not a research deferral**
+
+**Filed 2026-09-13 by the registrar, autonomous run.** Q017 is **not** here on either admission ground:
+its objective is measurable from the frozen manifests, and its decision date (Monday 2027-08-09) sits
+**inside** DP-43's 12-month ceiling on the Steward's measured exposure (0.868–0.909 contributing nights
+per session, `research/reports/STEWARD_Q017_exposure.md` item 3). It is here for registration mechanics
+only: **Q017's draft `PREREG.md` was committed before `@registrar apply` could fold in the amendments
+recorded in its `DECISIONS.md`**, and the write guard treats a committed draft as locked (rule 3). The
+desk does not untrack the file or rewrite history, so the question was **re-registered as Q021**
+(`research/questions/Q021_pin_risk_two_sided/PREREG.md`) with every amendment folded in and with the
+hypothesis, population, arms, endpoint, MPE, window, decision date, extension and decision rule
+**unchanged**. The controller marks Q017 DEFERRED with the note *"superseded by Q021 — draft committed
+before apply; re-registered with DECISIONS folded in"*.
+
+**No data was unsealed.** Q017 was never run: no `eval.py` was written, no `results/` directory exists,
+and no outcome of any kind — touch, `TWO_SIDED`, return or arm difference — was read for Q017 or for
+Q021. The only measured numbers in either file come from the Steward's exposure count, which is counts
+only and reads a forward bar solely to establish that it exists. H-061 is therefore **not** double-counted
+in the F3 correction: Q021 is the one registered question, and `research/BACKLOG.md` records H-061 as
+registered as Q021.
+
+**Nothing moves this entry back into the backlog** — there is nothing to revive. The live question is
+Q021; Q017's directory stays as the historical record of the draft and its decisions, and the Steward's
+exposure report keeps its `STEWARD_Q017_exposure.md` filename because it was produced under that id.
+
+---
+
+## Q020 — "L4 touched → retrace to L2 → re-advance" (H-033) — **needs a rule-14 grant the desk may not give itself (DP-41)**
+
+**Deferred 2026-09-13 by the registrar, autonomous run, on this file's first admission ground: the
+objective cannot be measured with the licence the desk holds.** This is a **rule-14 blocker, not a
+sample-size one** and not a DP-43 ceiling one — the blocker is a **grant**, not procurement and not
+time. Drafted at `research/questions/Q020_l4_pullback_readvance/PREREG.md` (state stays
+`PREREG_DRAFT`; no `PREREG_LOCKED`, no `schedule.json`); decisions at
+`research/questions/Q020_l4_pullback_readvance/DECISIONS.md`, item 1.
+
+### What the question is, and why it is worth keeping
+
+Haci's example 1. A pick you are holding runs to its fourth ladder target, then trades back down to
+its second. Is that a hold — re-commit at the next morning's open and work it back to L4 — or the end
+of the move, flatten the runner? Both signs are tradeable and the PREREG registers both, with two
+primaries required in the same sign: **E1**, the event-matched re-advance rate (L4 touched again
+within 20 sessions of the decision basis, MPE +5.0 pp, DP-20), and **E2**, the event-matched realized
+ATR of the re-add plan (MPE 0.25 ATR, DP-10), plus an absolute gate that E2's own expectation clear
+zero. The design is complete and stands: population, arms, DP-12 event-matched control, decision rule,
+threats. Nothing about it is unanswerable in principle — only unlicensed.
+
+### The exception it needs, exactly
+
+The hypothesis conditions on a **completed excursion**, so the classifier that assigns the event is
+made of forward bars:
+
+- **Tables and columns** — `prices_daily_split` daily OHLC, and `prices_hourly_raw` hourly OHLC for
+  the same-session ordering rule (resolving the case where the L2 touch falls on the same session as
+  the L4 touch).
+- **Rows** — published picks **and** the unpublished same-night control pool. Both arms, because the
+  DP-12 control is condition-first: a control enters only if it completed the same round trip at the
+  same ATR distances from its own close.
+- **Time** — bars from **sessions t+1 … t+40**, i.e. a decision time for that one input of **09:30 ET
+  on session `b+1`, `b ≤ 40`** (at most session t+41). Every other input stays at 16:05 ET on the pick
+  night.
+- **Purpose** — assigning the EVENT (`a` = the first L4 touch, `b` = the first qualifying L2 touch at
+  or after it) and therefore **population membership, control-set membership and the decision basis
+  `X_b = O_{b+1}`**.
+- **What it is not** — **no outcome** enters through it: every outcome is measured strictly after
+  `X_b`. No selection-side input moves. It licenses nothing beyond this question.
+
+### Why the desk cannot grant it
+
+Under **DP-41** the desk grants itself no new rule-14 exception; it names the one it needs and defers.
+The precedent chain, in one place: **Q008 §6.1 / DP-05(b)** is a **2-session** question-scoped grant
+for exactly this kind of input, with the decision time for that one input moved to 16:00 ET on session
+t+2, and DP-05 records that Haci **explicitly declined the standing-rule version** — the general
+"a later clock is fine when the bar only classifies" licence — on **2026-09-13**; **Q009 §6 (locked)**,
+the adverse-side mirror of this very shape, rests on the fact that *"no session-t+1 quantity enters
+any primary endpoint **or any eligibility filter**"*, and Q020's EVENT **is** an eligibility filter on
+both arms. Q020 asks for the Q008 licence over **40 sessions instead of 2**, on picks and controls
+alike. The draft's contrary reading cited a **sibling draft** (Q019, unlocked the same day), which is
+not precedent; that citation and the sentence "Q020 needs no rule-14 exception and requests none" are
+struck from §6 (DECISIONS Correction 1), and `research/lib/validators.py:17`
+(`ET_DECISION = "16:05"`) is left as the enforcement code wrote it (rule 15).
+
+### What moves it back into the backlog
+
+**One sentence from Haci: add the scope above to `research/DECISION_POLICY.md` DP-05 as (c).** There is
+no data to buy, no table to build and no nights to wait for — the frozen manifests already contain the
+bars. On that grant Q020 **re-enters the queue at the front** (DP-41), with:
+
+- **DECISIONS.md items 2, 3, 4 and 8 binding** — the condition-first DP-12 control (minimum 3
+  event-completing matched controls, picks below that dropped and counted); re-advance = first touch of
+  **L4** again within **R = 20** sessions of `X_b`; the **full unit** position at `X_b` with the
+  `BAND_EXITS` residual printed beside it as the descriptive execution report; and the schedule rule.
+- **Corrections 1–4 already applied** to the PREREG (the exception request in §6, the Saturday
+  extension date fixed to **Monday 2027-06-14**, DP-49 in the §9 brief bullet, DP-50(b) named in the
+  §9 filing bullet).
+- **The §5 schedule recomputed from the new lock date, never carried forward** (item 8): window start
+  stays **2026-06-01** (DP-06), the window end is re-derived at the Steward's measured
+  matched-contributing rate `r`, and the `r ≥ 0.31` ceiling threshold is **re-solved** against the new
+  12-month ceiling — it tightens as the lock date moves later. Dates may move **out only** (DP-43,
+  DP-45).
+- **The two Steward requests revive with it and are HELD until then:** R1 (the counts-only exposure
+  funnel, blocking for lock — it measures the very classifier in dispute, so it is not run while the
+  question cannot be tested) and R2 (the `manifest_v002` / `manifest_prices_v002` successor pair, due
+  before the decision pass, never a blocker for lock).
+
+If, on re-entry, R1 measures `r` below the re-solved threshold, Q020 lands back here on the **second**
+admission ground (DP-43's 12-month ceiling) with that measured rate named — a separate test that the
+grant does not settle.
+
+**Bookkeeping while deferred.** `research/BACKLOG.md` marks **H-033 deferred 2026-09-13 pending a
+DP-05(c) grant**, not registered; Q020's two primaries are **not** in the F4 correction set (F4 is 9:
+Q007 4 + Q008 3 + Q013 2) and **E2 is not** in F6 (F6 is 15, Q019 §7's figure). **No data was
+unsealed:** no `eval.py` exists, no `results/` directory exists, no exposure count was run, and no
+outcome of any kind — touch, re-advance, plan result or arm difference — was read for Q020. Under this
+file's preamble nothing here may be reported, briefed or quoted until the grant exists.
