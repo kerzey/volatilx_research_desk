@@ -1,0 +1,9 @@
+{
+  "decision_date": "2027-05-24",
+  "extension_date": "2027-07-12",
+  "hard_stop": null,
+  "rule": "fixed",
+  "extended": false,
+  "note": "PREREG §5: window pick nights 2026-06-01..2027-05-03 (+10-session maturity, +1wk margin, first Monday = 2027-05-24); single DP-13 extension to window end 2027-06-15 decided Monday 2027-07-12, then DEFERRED (no hard stop, no second extension); gates ≥80 contributing nights per primary and ≥30 post-lock nights (DP-21/DP-24) on eval.py's measured counts; R1 measured A=42, r=0.6885/elapsed session vs a 0.35 plan and a 0.26 DEFER floor, which under DP-43/DP-45 moves nothing in — the end is a fixed calendar date, not an accrual target.",
+  "check_from": "2027-05-24"
+}

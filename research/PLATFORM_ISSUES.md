@@ -35,6 +35,7 @@ Statuses: `OPEN` · `HACI_DECIDED:<fix|research|accept>` · `BRIEF_WRITTEN` · `
 | PI-011 | high | HACI_DECIDED:fix | Printed swing stop on the wrong side of the pick-night close for 67 of 382 published picks (17.5%) |
 | PI-012 | med | HACI_DECIDED:research | 2026-06-26: three qualified, ranked picks the night's own run audit does not record; no run-history table |
 | PI-013 | med | OPEN | `uoa_symbol_daily.score_swing` / `score_long` overwritten in place by the next-morning OI-confirmation pass; no point-in-time copy |
+| PI-014 | high | OPEN | Conviction Monitor's polarity arm silent since 2026-06-01: `polarity_unavailable_coverage_low` on 100% of in-scope rows, 0 polarity HOLD/EXIT rows — the EXIT tier is the technical arm alone |
 
 ## Detail
 
@@ -190,3 +191,60 @@ told apart from unconfirmed ones.
 **Recommend: fix** — keep the 16:05 score in its own column (`score_swing_pt`, `score_long_pt`) or write
 the confirmed score to a new column and leave the original untouched; either way the point-in-time
 value must survive. Fix, not research: no behaviour changes, only where a value is stored.
+
+### PI-014 — the Conviction Monitor's polarity arm has been dark since 2026-06-01
+**Evidence:** `research/reports/STEWARD_Q019_exposure.md` §6 and §8, counts only, on the pinned
+freeze (`manifest_v001`, table key `conviction_monitor`, 3,339 rows; no live query, DP-50(c)).
+`polarity_unavailable_coverage_low` appears in `reason_codes_json` on **100% of in-scope monitor rows
+in every month 2026-06 through 2026-09**, with **0 exceptions**; `polarity_tier` is `WATCH` on
+**every** row dated ≥ 2026-06-01 (0 HOLD, 0 EXIT); the only 35 polarity-EXIT and 53 polarity-HOLD rows
+in the whole freeze are in **May 2026**, when the arm still worked (80.3% unavailable then, so it was
+already degrading). Consequence: **284 of 284** primary EXIT flags on pick nights
+2026-06-01..2026-08-26 fired via the technical arm alone, on a tier that prints EXIT for **61%** of
+published picks within five sessions.
+**This is not the 2026-05-16 polarity rollback.** `docs/POLARITY_ROLLBACK_2026_05_16.md` disabled
+v1.6 polarity **in SAS scoring** by flipping `SuperAgentSelectConfig.flow_polarity_enabled` to
+`False`. The monitor does not read that flag — it recomputes polarity locally
+(`services/conviction_monitor_service.py:906-937`, `:1177-1186`) — and it kept writing polarity
+HOLD/EXIT rows for two weeks *after* the rollback shipped, dying at the 2026-05-31 / 06-01 boundary.
+A "working as intended" reading of the silence is wrong.
+**Cause (read-only, and not in the monitor):** the monitor's tier code has not changed since
+**2026-05-16** — `git log --follow services/conviction_monitor_service.py` returns exactly three
+commits, all that day (13234cc / baf17b8 / 2cb7a7e), and nothing since; `scripts/run_conviction_monitor.py`
+and `routers/conviction_monitor.py` show no commits since the manifest SHA `fa70688`. So this is an
+**input** failure, not a logic change. The gate is `services/conviction_monitor_service.py:184-185` —
+`coverage is None or coverage < config.polarity_coverage_threshold → ("WATCH", ["polarity_unavailable_coverage_low"])`
+— where `coverage_ratio = decomp_premium_total / contract_premium_total` (`:928-937`) is built by
+`services/symbol_context_builder.py:136-175` from **`uoa_contract_daily.buy_premium` /
+`sell_premium` / `premium_total`**. A 100% failure means the **aggressor decomposition** is empty or
+near-empty for the monitored symbols on every date since 2026-06-01, or `premium_total` has been
+inflated relative to it. Same table family as **PI-001** (`uoa_symbol_daily` write degradation from
+2026-05-20, still ~5% of baseline) and still uncovered by any watchdog (**PI-002**) — the third silent
+UOA-side degradation, and the first to reach a paid surface's logic.
+**Reproducing check — for the Data Steward on `$RESEARCH_DB_URL`, read-only.** `uoa_contract_daily` is
+**not** in `manifest_v001`, so this is an operational diagnosis, not a study input and not a brief's
+before-snapshot; it is addressed to the Steward and never to the coding agent (DP-49). By month from
+2026-04-01, over the SAS published-pick symbols: the share of `uoa_contract_daily` rows with
+`buy_premium + sell_premium > 0`, the median `(buy_premium + sell_premium) / premium_total`, the row
+count per date, and the date the median first falls below `polarity_coverage_threshold`. Plus, from
+the read-only platform repo, `git log --follow services/symbol_context_builder.py` and any change to
+`ConvictionMonitorConfig`'s polarity thresholds between 2026-05-20 and 2026-06-10 — R1 item (7) dated
+the monitor service only, so the builder and the config are the two unexamined code paths. If a fix is
+briefed, pin that coverage aggregate in the successor freeze so the before/after is reproducible
+(DP-50(c)).
+**Desk impact:** Q019 (locked 2026-09-13, decision 2027-05-24) tests "the Conviction Monitor's EXIT
+tier" and therefore tests **the technical arm alone** for the life of its window; the restriction is
+written into its §1/§8/§9 and travels with the verdict (Q019 DECISIONS #10). No other locked question
+reads this table.
+**Recommend: fix — and fix the input, not the gate.** The coverage threshold is doing its job;
+lowering it would publish a polarity tier computed from a fraction of the premium. **DP-50(b) timing
+constraint, named here as the policy requires:** restoring polarity changes which picks receive
+`EXIT` — a column a locked PREREG reads — so the PI-011 / Q010 pattern applies and the choice is
+Haci's. **Either** the restoration is held **flag-off until Q019's decision date, 2027-05-24**; **or**
+it ships with a dated `DATA_NOTES.md` entry (column, date range, ship SHA), Q019's window start moves
+to the first pick night after the ship and its schedule is recomputed at the measured 0.6885
+nights/session — ≈ 8 months to refill the floor — and if that pushes the decision date past
+**2027-09-13**, Q019 goes to DEFERRED (Q019 DECISIONS #12(a), DP-43's ceiling). On the arithmetic, a
+ship before ≈ **2027-03-08** is survivable and one after it is not. **The desk does not ask for the
+fix to be held**: a live surface with one of its two arms silent is worse than a research question
+that may have to restart. The cost is written here so the choice is made with it in view.
