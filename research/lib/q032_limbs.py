@@ -109,15 +109,23 @@ def main() -> None:
     df["contributing"] = df.contributing_unmatured & df.matured_t40
 
     elapsed = len([d for d in sess if df.night.min() <= d <= df.night.max()])
+    # Correction 2026-09-14 (decision-maker, Q032 DECISIONS item 18): a t+40-matured count must be
+    # divided by the sessions of the fully observable (matured) calendar cohort, exclusions retained
+    # (DP-53) — not by every elapsed session. Dividing matured nights by all sessions and then adding
+    # 40 sessions of maturity again counts maturity twice. The first version of this script did that.
+    mature_sessions = len([d for d in sess if df.night.min() <= d <= mature_cutoff]) if mature_cutoff else 0
 
     def episodes(sub_arm: str, matured: bool) -> int:
         """Maximal runs of consecutive sessions carrying sub_arm; unlabelled/excluded sessions do
-        not break a run; an episode counts only if it holds >= 1 contributing night."""
+        not break a run; an episode counts only if it holds >= 1 contributing night. On the matured
+        basis the scan stops at the maturity cutoff, so the count belongs to the same cohort as its
+        denominator."""
         flag = "contributing" if matured else "contributing_unmatured"
         contrib = set(df.loc[df[flag] & (df.arm == sub_arm), "night"])
-        runs, cur, n = [], [], 0
+        last = mature_cutoff if matured else df.night.max()
+        runs, cur = [], []
         for d in sess:
-            if d < df.night.min() or d > df.night.max():
+            if d < df.night.min() or d > last:
                 continue
             arm_d = spy.iloc[idx[d]].arm
             if arm_d == sub_arm:
@@ -139,12 +147,16 @@ def main() -> None:
     rarer = min(("BENIGN", "HOSTILE"), key=lambda k: counts.get(k, 0)) if counts else "HOSTILE"
     rarer_u = min(("BENIGN", "HOSTILE"), key=lambda k: counts_u.get(k, 0)) if counts_u else "HOSTILE"
 
-    a_rate = df.contributing.sum() / elapsed
+    a_rate = df.contributing.sum() / mature_sessions
     a_rate_u = df.contributing_unmatured.sum() / elapsed
-    b_rate = counts.get(rarer, 0) / elapsed
+    b_rate = counts.get(rarer, 0) / mature_sessions
     b_rate_u = counts_u.get(rarer_u, 0) / elapsed
-    c_rate = episodes(rarer, True) / elapsed
-    c_rate_u = episodes(rarer_u, False) / elapsed
+    ep = {arm: episodes(arm, True) for arm in ("BENIGN", "HOSTILE")}
+    ep_u = {arm: episodes(arm, False) for arm in ("BENIGN", "HOSTILE")}
+    e_min = min(ep.values())
+    ep_rarer = min(ep, key=ep.get)          # floor D is per arm, so the binding arm is the one with fewer EPISODES
+    c_rate = e_min / mature_sessions
+    c_rate_u = min(ep_u.values()) / elapsed
 
     def verdict(v, f):
         return f"**{v:.4f}** vs {f} — {'PASS' if v >= f else '**SHORT**'}"
@@ -161,18 +173,29 @@ def main() -> None:
              "starts 2026-09-15, so every night in it is calibrated. The \"never\" finding is superseded.\n")
     L.append(f"- SPY bars: **{len(spy)}**, {spy.date.min()} .. {spy.date.max()}. "
              f"SMA200 defined from **{spy.loc[spy.sma200.notna(), 'date'].min()}**.\n")
+    L.append("## Correction to the first version of this report\n")
+    L.append("The first version divided the t+40-matured counts by **all** elapsed sessions in the panel "
+             "(112), including the immature tail, and the schedule then added 40 sessions of maturity again "
+             "— maturity counted twice, which DECISIONS item 3 and DP-53 forbid. Its rates (0.5536 / 0.2589 / "
+             "0.0268) were biased low and are **superseded**. Caught by the Decision-maker at `record` "
+             "(DECISIONS item 18). This version divides matured counts by the matured calendar cohort, "
+             "exclusions retained, and reports floor D's episodes **per arm**, since floor D is per arm "
+             "(DECISIONS item 21).\n")
     L.append("## The three rate limbs\n")
     L.append(f"Panel: **{len(df)}** pick nights {df.night.min()}..{df.night.max()} over **{elapsed}** "
              f"elapsed sessions. t+40 maturity cutoff inside this freeze: **{mature_cutoff}** "
-             f"(last bar {last_bar}).\n")
-    L.append("| limb | floor | t+40-matured | unmatured |\n|---|---|---|---|")
-    L.append(f"| (a) contributing nights / session | {FLOOR_A} | {verdict(a_rate, FLOOR_A)} | {verdict(a_rate_u, FLOOR_A)} |")
-    L.append(f"| (b) rarer-arm nights / session | {FLOOR_B} | {verdict(b_rate, FLOOR_B)} (rarer = {rarer}) | {verdict(b_rate_u, FLOOR_B)} (rarer = {rarer_u}) |")
-    L.append(f"| (c) rarer-arm episodes / session | {FLOOR_C} | {verdict(c_rate, FLOOR_C)} | {verdict(c_rate_u, FLOOR_C)} |")
+             f"(last bar {last_bar}); **matured calendar cohort = {mature_sessions} sessions**, "
+             f"{df.night.min()}..{mature_cutoff}.\n")
+    L.append("| limb | floor | matured cohort (decides) | all-period, unmatured (proxy only) |\n|---|---|---|---|")
+    L.append(f"| (a) contributing nights / session | {FLOOR_A} | {verdict(a_rate, FLOOR_A)} ({int(df.contributing.sum())}/{mature_sessions}) | {verdict(a_rate_u, FLOOR_A)} |")
+    L.append(f"| (b) rarer-arm nights / session | {FLOOR_B} | {verdict(b_rate, FLOOR_B)} (rarer by nights = {rarer}, {counts.get(rarer, 0)}/{mature_sessions}) | {verdict(b_rate_u, FLOOR_B)} (rarer = {rarer_u}) |")
+    L.append(f"| (c) fewer-episode arm's episodes / session | {FLOOR_C} | {verdict(c_rate, FLOOR_C)} (e_min = {e_min}, arm {ep_rarer}) | {verdict(c_rate_u, FLOOR_C)} |")
     L.append(f"\n- Arm split, t+40-matured contributing nights: " +
-             ", ".join(f"**{k}** {v}" for k, v in sorted(counts.items())) + f" (rarer = **{rarer}**)")
+             ", ".join(f"**{k}** {v}" for k, v in sorted(counts.items())) + f" (rarer by nights = **{rarer}**)")
     L.append(f"- Arm split, unmatured: " + ", ".join(f"**{k}** {v}" for k, v in sorted(counts_u.items())))
-    L.append(f"- Rarer-arm episodes: **{episodes(rarer, True)}** matured, **{episodes(rarer_u, False)}** unmatured")
+    L.append(f"- **Gate-counting tape-episodes per arm, matured cohort: BENIGN {ep['BENIGN']}, HOSTILE "
+             f"{ep['HOSTILE']} → e_min = {e_min}** (DECISIONS item 21's branch variable). "
+             f"All-period: BENIGN {ep_u['BENIGN']}, HOSTILE {ep_u['HOSTILE']}.")
     L.append(f"- Nights excluded by exclusions_v003: **{int(df.excluded.sum())}**; "
              f"unlabelled (no arm): **{int(df.arm.isna().sum())}**; "
              f"not t+40-matured in this freeze: **{int((~df.matured_t40).sum())}**\n")
@@ -193,7 +216,8 @@ def main() -> None:
     out.write_text("\n".join(L) + "\n", encoding="utf-8")
     df.to_csv(out.with_suffix(".csv"), index=False)
     print(f"wrote {out.relative_to(ROOT)}")
-    print(f"  (a) {a_rate:.4f} / {FLOOR_A}   (b) {b_rate:.4f} / {FLOOR_B} [{rarer}]   (c) {c_rate:.4f} / {FLOOR_C}")
+    print(f"  matured cohort {mature_sessions} sessions: (a) {a_rate:.4f} / {FLOOR_A}   (b) {b_rate:.4f} / {FLOOR_B} [{rarer}]   (c) {c_rate:.4f} / {FLOOR_C}")
+    print(f"  episodes per arm (matured): {ep}  e_min={e_min}   (all-period: {ep_u})")
     print(f"  unmatured: (a) {a_rate_u:.4f}  (b) {b_rate_u:.4f}  (c) {c_rate_u:.4f}")
 
 

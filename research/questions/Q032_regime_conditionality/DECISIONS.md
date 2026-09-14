@@ -10,6 +10,10 @@ State checked: `state.json` = `PREREG_DRAFT` (registrar, 2026-09-14) — in scop
 > pinned alternative (items 12 and 15; the H-074 / Q030 blocker). **Q032 does not lock; no schedule
 > exists; every provisional date below is struck.** Read **"## Record — 2026-09-14"** and
 > **"## Schedule"** before anything else in this file.
+>
+> **RE-ENTRY, 2026-09-14 (`record` addendum): the deferral trigger was met and Q032 is back at
+> PREREG_DRAFT.** The DEFERRED outcome above is closed. Read **"## Record — 2026-09-14 (re-entry)"**
+> (items 17–22) and the rewritten **"## Schedule"**, which supersede the struck block.
 
 ## The headline
 
@@ -406,18 +410,201 @@ trading calendar** when the freeze is built; the holiday list used here is 2026-
 2027-01-01, 2027-01-18, 2027-02-15, 2027-03-26, 2027-05-31 and 2027-06-18. A correction to any date
 may move it **out, never in**.
 
+## Record — 2026-09-14 (re-entry)
+
+Run: `record Q032` addendum, 2026-09-14, decision-maker, autonomous (DP-40..48, DP-52..58). State
+checked: `state.json` = `PREREG_DRAFT` (desk, 2026-09-14T18:38Z, "deferral lifted") — in scope.
+Sources: `research/reports/STEWARD_Q032_limbs_true_partition.md` (counts only, true §2.2 partition,
+`manifest_prices_universe_v001`); the Q032 section of
+`research/reports/BLOCKED_Q030_Q032_registration_2026-09-14.md` (the registrar's rebuilt schedule);
+items 1–16 and Corrections 1–5 above. **No `results/` directory, no `eval.py`, no outcome of any kind
+was read.** Items 1–16 are not rewritten. Items 13–14's *method* binds and is re-run here. The
+DEFERRED branch above is closed because its trigger was met.
+
+**The headline: the registrar counted the calendar correctly but used the wrong rate.** The
+arithmetic from 187 sessions to Monday 2027-08-23 is right, and both holidays it added are real.
+**But the 187 is wrong.** The Steward's "t+40-matured" rates divide the nights that have matured
+(pick nights up to 2026-07-15 only) by **all 112** elapsed sessions (running to 2026-09-10). Then 40
+sessions of maturity are added again on top, so **maturity is counted twice**. Item 3 banned that
+construction by name ("numerator and denominator counted over the same sub-period"). DP-53 bans it
+for every unlocked draft ("add maturity once … do not penalize a forecast for its immature tail and
+then add that wait again").
+
+The correct basis is the **fully observable cohort**: the 72 sessions 2026-04-01..2026-07-15, with
+exclusions kept in the denominator. On that basis:
+- window = **121 sessions**
+- decision = **Monday 2027-05-17**
+- DP-13's ordinary **+30** extension fits, decided **Monday 2027-06-28**, which is the hard stop.
+
+So the truncated-extension question does not come up on the main path. It is still answered (no) for
+the branches where it would.
+
+Floor D is not trimmed and Q032 is not deferred. Its risk is disclosed with numbers. **One count is
+still missing before lock:** floor D is *per arm*, and the Steward reported the episode count only
+for the arm that is rarer *by nights*.
+
+### Derivation, from the Steward's own counts (arithmetic, not a new measurement)
+
+- **Calendar (NYSE; 2026 holidays 04-03, 05-25, 06-19, 07-03, 09-07).** 2026-04-01..2026-09-10 =
+  **112** sessions. This matches the Steward. 2026-04-01..2026-07-15 = **72** sessions, and t+40 of
+  2026-07-15 = **2026-09-10**, the freeze's last bar. This matches the Steward's cutoff and its
+  "40 not matured".
+- **Where the 10 exclusions fall.** Unmatured contributing nights = 102 = 112 − 10, and unlabelled
+  nights = 0. So every non-excluded night contributes. Matured contributing nights = 62 = 72 − 10. So
+  **all 10 exclusions sit inside the 72-session cohort**, and the item-3 rate is
+  **r₄₀ = 62/72 = 0.8611**, not 0.5536.
+- **Scheduling rates (item 3's `min(r₄₀, 0.6620)`, kept as written).**
+  - The cap is also the Q033 precedent: same population, same window start, floor A at session 121.
+  - Contributing nights: **0.6620**. The cap binds.
+  - DP-06 sub-period: on 2026-06-01..2026-07-15 (31 sessions) the same-basis rate cannot fall below
+    (31 − 10)/31 = 0.677. So the cap binds there too, and the Steward's wider 2026-04-01 panel
+    changes no date.
+  - Rarer arm by nights (BENIGN, 29 of 62): **0.6620 × 29/62 = 0.3096**. The uncapped rate is
+    29/72 = 0.4028 and is printed, not used.
+  - HOSTILE (33 of 62): 0.3524 capped.
+  - Gate-counting episodes: **3/72 = 0.04167** for BENIGN. This is a tape property, not a funnel
+    property, so the cap does not apply. The HOSTILE count is **not reported** (item 21).
+
+| floor | rate used | sessions | first reached |
+|---|---|---:|---|
+| **A** 80 contributing nights | 0.6620 (item 3 cap; r₄₀ 0.8611 → 93) | **121** | **2027-03-09 — BINDS** |
+| **B** 20 nights, per arm (min = BENIGN) | 0.3096 (uncapped 0.4028 → 50) | 65 | 2026-12-15 |
+| **C** 30 post-lock nights (DP-24) | 0.6620 | 46 | 2026-11-17 |
+| **D** 5 gate-counting episodes, per arm | 3/72 = 0.04167 (BENIGN; HOSTILE pending, item 21) | 120 | 2027-03-08 |
+
+**Ceiling re-solve (Correction 3), corrected.**
+- Latest admissible decision is Monday 2027-09-13. That requires t+40 ≤ 2027-09-03 (−1 week lands
+  on 2027-09-06, Labor Day, so the last session before it is 09-03).
+- So the latest window end is **session 205 = 2027-07-09**, not 206 = 2027-07-12. Session 206 reaches
+  t+40 on 2027-09-07, and first Monday on or after 09-14 is 2027-09-20, past the ceiling.
+- Inequalities are floors ÷ 205, rounded up: **0.40 / 0.10 / 0.025**, identical to the file's
+  as-filed values.
+- Measured on the item-3 basis: **0.6620 (r₄₀ 0.8611) / 0.3096 / 0.0417**. All three limbs PASS. The
+  episode limb has 67% headroom, against the registrar's 7% on the double-penalized rate.
+
+| # | Decision | Bucket | Choice | Basis |
+|---|---|---|---|---|
+| 17 | Truncated DP-13 extension | **DEFAULTED (R-3)** | **No truncated extension in any branch. Q032's extension is DP-13's +30 sessions or nothing.** If the +30 extension would decide after 2027-09-14, no extension is registered, **hard stop = decision date**, and a gate still short there sends Q032 to DEFERRED. On item 18's schedule the +30 fits (pick nights to session 151 = 2027-04-21, decided Monday 2027-06-28, 9.5 months). So this rule binds only in item 21's `e_min = 2` branch, or after an item-9 window cut. **Why:** a truncated extension is a length no DP entry names. DP-43 fixes "DP-13's single extension = +30 sessions" and item 14 repeats it, so setting a new length would be writing policy, not applying it (DP-40). No extension is also the option less likely to reach CONFIRMED (DP-45), and DP-53 gives the later date no weight. The cost is recorded, not hidden: where this rule binds, a floor-D shortfall at the decision date ends the question with no second run. The truncation as proposed was also mis-dated: 206 → 2027-09-20, past the ceiling. The admissible version would have been **session 205 = 2027-07-09, decided Monday 2027-09-13**. | DP-43; DP-13; item 14; DP-45; not taken: extension truncated to session 205, deciding 2027-09-13 |
+| 18 | Does the registrar's schedule stand | **DECIDED (correction)** | **The calendar stands; the rate basis does not, so the schedule is rebuilt.** Verified correct: session 187 = 2027-06-11; t+40 = 2027-08-10; first Monday after + one week = 2027-08-23; +30 → session 217 = 2027-07-27 → 2027-10-04; **2027-07-05 and 2027-09-06 are both NYSE holidays** (Independence Day observed; Labor Day), as is 2027-06-18. Wrong: the 0.5536 / 0.2589 / 0.0268 rates, for the reason above. The same error also makes the "item 3's cap does not bind — 0.5536 is slower" sentence false. **Rebuilt by item 14's method on item 3's basis:** window **2026-09-15..2027-03-09 = 121 sessions** (floor A binds); t+40 = 2027-05-05 (Good Friday 2027-03-26 excluded); + one week = 2027-05-12; **decision Monday 2027-05-17** (8.1 months). **Extension +30** to session 151 = **2027-04-21**; t+40 = 2027-06-17 (Memorial Day 05-31 excluded); + one week = 2027-06-24; **decided Monday 2027-06-28 = hard stop**. This moves the dates *in*. That is allowed and required: DP-53 governs this unlocked draft, and "out only" never licensed keeping an arithmetic error. | item 3; item 14; DP-53; `LEARNING_POLICY.md` "Counts-only readiness and scheduling"; Q033 `schedule.json`; not taken: 187-session window deciding 2027-08-23 — maturity counted twice |
+| 19 | Floor D rests on 3 episodes: lock, DEFER, or a different plan | **DEFAULTED (R-3)** | **Lock, with floor D left at 5 per arm, the gate checked on `eval.py`'s measured counts, the single +30 extension, then DEFERRED.** There is no measured deferral ground: every limb passes, and D is reached inside the window at the point rate. DP-57 asks for a justification, not a deferral, and the justification is written into §5.1 and §10 as follows. **(a) Planning uncertainty, stated as numbers.** Three events in 72 sessions give an exact Poisson 95% interval of 0.62–8.77 episodes, so sessions-to-5-episodes ranges from ≈ 42 to ≈ 582. At the point rate, P(an arm is below 5 at session 121) ≈ 43%, so the extension is the likely path. P(still below 5 at session 151) ≈ 25%, so **about one chance in four of ending DEFERRED, before allowing for tape persistence, which makes these figures optimistic**. **(b) Dependence is already priced into inference.** CI-1 and the p-value resample tape-episodes (§4.4), and DP-51's CI-2 is required. Five episodes per arm is a floor that makes the contrast estimable; it does not guarantee a precise one. A near-minimum episode count yields a wide CI-1 and most likely INCONCLUSIVE, never a relaxed gate. **(c) Strata.** Only 4 of 9 cells were observed and UP×HIGH carries 90.9% of matured HOSTILE nights. The registrar's composition threat and the six-cell suppression addition stand. **(d) Readiness (DP-56).** The Steward's `readiness.json` prints per-arm label-run and gate-counting episode counts, counts only. It **never** triggers an early run, an early deferral or a date move. **Why not DEFER:** there is no measured ground (DP-43 defers on a date past the ceiling, and the date is 2027-05-17). A deferral would forfeit the blind prospective nights from 2026-09-15 for an uncertainty that only those nights can resolve. **Why not the registrar's 187:** stretching the window to lower the deferral risk (≈ 11% at 187 on the same Poisson) is not DP-43's method, and the 187 came from a double count, not from a precision argument. A quantile-based window would be a new rule, so it is proposed below, not applied. | DP-57; DP-53; DP-43; DP-13; DP-56; DP-45 (the shorter, extension-backed plan is the one less likely to CONFIRM); not taken: DEFER now on three episodes — no measured ground; forfeits the window |
+| 20 | DP-58 interim look | **DECIDED** | **The registrar's declination is confirmed and re-derived on item 18's schedule.** 60 contributing nights arrive at session **91** on the scheduling rate (session 70 on r₄₀). By then the slower arm projects **3.8** gate-counting episodes (**2.9** at session 70), against §8 clause 2's 5. DP-58 waives no floor and no gate, and forbids futility stops, so the interim could only return "continue". A look that cannot stop is not a sequential design (`LEARNING_POLICY.md`: stopping boundaries must be specified; repeated CI checks are not one). Resampling ≈ 3 episodes per arm for DP-58's episode-clustered boundary is degenerate. The registrar's sentence is adopted for §5.2 and §8 with its number re-pointed: *"DP-58 is in scope and is deliberately not registered; at 60 contributing nights the slower arm projects fewer than 4 gate-counting tape-episodes against clause 2's 5, so the interim could return only 'continue'. No interim looks."* | DP-58; DP-57; ground 3; not taken: register the 60-night interim — can only return "continue" |
+| 21 | Floor D per arm: the HOSTILE episode count | **ROUTED → data-steward — LOCK PRECONDITION** | Waits on the matured gate-counting episode count for **both** arms (request below). Floor D is "≥ 5 per arm", and tape runs alternate, so HOSTILE can carry 2, 3 or 4 episodes against BENIGN's 3. The arm rarer by nights is not necessarily rarer by episodes (on the unmatured basis the arm rarer by nights flips to HOSTILE). **Branches fixed now**, with `e_min` = the smaller count and D = ⌈5 × 72 / `e_min`⌉: **`e_min ≥ 3`** → D ≤ 120, floor A binds, **item 18's schedule stands unchanged**. **`e_min = 2`** → D = 180: window 2026-09-15..**2027-06-02**; t+40 = 2027-07-30 (06-18 and 07-05 excluded); **decision Monday 2027-08-09**; the +30 extension would decide 2027-09-20, so **none** (item 17); **hard stop 2027-08-09**; halves 1–90 / 91–180; DP-50(b) flag-off to 2027-08-09. **`e_min ≤ 1`** → D ≥ 360 sessions, past the ceiling, so **DEFERRED** under DP-43 with the counts named. No other count moves any date. | — |
+| 22 | Limb (f): DP-50(a)/(b) commit sweep and v1.7 check since `fa70688` / HEAD `d19c9a9` | **ROUTED → data-steward — in progress — LOCK PRECONDITION** | Not waited on here. The lock commit waits on it. The DP-50(b) window it must cover is now **2026-09-15..2027-05-17** (to **2027-06-28** if the extension fires; to 2027-08-09 in item 21's `e_min = 2` branch). A listed change scheduled inside that window is item 9's window cut, applied at lock. | — |
+
+### Corrections to the registrar's re-entry output (applied at `apply`)
+
+1. **§5.1 / §5.2 rates:** 0.5536 / 0.2589 / 0.0268 → **0.6620 (item 3 cap; r₄₀ = 62/72 = 0.8611
+   printed) / 0.3096 (BENIGN; uncapped 0.4028 printed) / 0.0417 (3/72, BENIGN; HOSTILE per item
+   21)**. The sentence "item 3's 0.6620 cap does not bind — 0.5536 is slower" is struck (item 3,
+   DP-53).
+2. **§5.2 schedule:** window 187 → **121** (2027-03-09); decision 2027-08-23 → **2027-05-17**;
+   extension "NONE ADMISSIBLE" → **+30 to session 151 = 2027-04-21, decided 2027-06-28**; hard stop
+   2027-08-23 → **2027-06-28**; binding floor D → **A** (D at 120, pending item 21).
+3. **§5.3 ceiling re-solve:** session 206 / 2027-07-12 → **session 205 / 2027-07-09**; inequalities
+   floors ÷ 205 = **0.40 / 0.10 / 0.025** (the as-filed values, now exact).
+4. **§8 clauses 1–2:** "no extension behind the gate" → **the single +30 DP-13 extension stands behind
+   every gate**, then DEFERRED (item 17's no-extension rule applies only in item 21's `e_min = 2`
+   branch).
+5. **§6 halves:** 1–94 / 95–187 → **1–61 / 62–121**; extended **1–76 / 77–151**.
+6. **§9 DP-50(b) flag-off:** 2027-08-23 → **2027-05-17 (2027-06-28 if the extension fires)**.
+7. **§5.3 R2 dates:** selection freeze pick nights **2026-09-15..2027-03-09**; daily bars (every
+   candidate symbol, SPY from 2025-01-02) through **2027-05-05**, delivered before 2027-05-17.
+   Extension pair: pick nights ..**2027-04-21**, bars through **2027-06-17**, delivered before
+   2027-06-28. The holiday list gains **2027-07-05 and 2027-09-06**, as the registrar found.
+   SPY overlap with `manifest_prices_universe_v001` is compared and fails loudly (DP-50(a)).
+8. **§5.1 wording:** "rarer-arm episodes" → **"gate-counting episodes in the arm with fewer
+   episodes"**. Floor B and floor D each take the minimum over arms *in their own unit*, and the two
+   minima need not fall on the same arm.
+9. **§5.1 / §10:** item 19's uncertainty paragraph is added verbatim in substance (Poisson interval,
+   ≈ 43% / ≈ 25% shortfall figures, labelled a planning approximation that tape persistence makes
+   optimistic).
+10. **Lock-date sensitivity:** every date assumes the lock commit lands on 2026-09-14 and the window
+    starts 2026-09-15 (item 13). If the commit slips, item 13's start and every date are recomputed by
+    this method, and none is carried.
+11. **Unchanged and re-checked:** item 11's `eval.py` deadline **Monday 2027-04-05** still precedes
+    Q027/Q029 (2027-04-12) and this decision date. §7 F2 → 17 and F1 → 28 as `G` rejoins; Q033's
+    unlocked §7 count restoration is owed by the registrar, as flagged. The registrar's six-cell
+    suppression addition (cells added only, closed) matches item 7.
+
+### Defaulted on Haci's behalf (re-entry)
+
+- #17 Truncated extension — chose **+30 sessions or no extension; hard stop = decision date when +30
+  passes the ceiling**; not taken: extension truncated to session 205, deciding 2027-09-13 — DP-43.
+  Overturn = successor question.
+- #19 Floor D on three observed episodes — chose **lock with disclosed ≈ 25% deferral risk, standard
+  extension, no trim**; not taken: defer now, forfeiting the prospective window — DP-43. Overturn =
+  successor question.
+
+### Routed requests (re-entry)
+
+#### data-steward — R3 (counts only) — **LOCK PRECONDITION** (item 21)
+
+Q032 is about to lock on floor D ("≥ 5 gate-counting tape-episodes **per arm**", PREREG §2.6 / §8
+clause 2). `STEWARD_Q032_limbs_true_partition.md` reports matured episodes only for the arm rarer by
+nights (BENIGN, 3). Please measure, on the same artefacts
+(`manifest_prices_universe_v001.json`, `manifest_v001.json`, `manifest_prices_v001.json`,
+`exclusions_v003.json`), never from a live query (DP-50(c)), and **counts only**. No touch, return,
+excursion, `E_t` or arm-versus-outcome cross-tab of any shape; a forward bar may be read only to
+establish that it exists.
+
+- **(1)** Gate-counting tape-episodes (§2.6: maximal same-label run on the session series;
+  excluded or unlabelled sessions do not break a run; counts only if it contains ≥ 1 t+40-matured
+  contributing night) **for BENIGN and for HOSTILE separately**, over the fully observable cohort
+  2026-04-01..2026-07-15, with each episode's first/last session and contributing-night count. Please
+  **state which episodes are truncated** by the 2026-04-01 panel start or the 2026-07-15 cutoff.
+- **(2)** Confirm the cohort is 72 elapsed sessions with all 10 `exclusions_v003` nights inside it, so
+  r₄₀ = 62/72.
+- **(3)** For disclosure only: per-arm label-run counts and run-length distributions over every SPY
+  session carrying a legal §2.2 label (from 2026-02-02, the first ≥ 250-session tercile, to
+  2026-09-10), with no contributing-night requirement.
+
+**What it decides, fixed before your count (DECISIONS item 21):** `e_min` = the smaller of the two
+counts in (1). `e_min ≥ 3` → the schedule in `## Schedule` stands. `e_min = 2` → window to
+2027-06-02, decision Monday 2027-08-09, no extension, hard stop 2027-08-09. `e_min ≤ 1` → Q032 is
+DEFERRED on DP-43's ceiling. Item (3) decides nothing. Please also write these per-arm counts into
+`research/questions/Q032_regime_conditionality/readiness.json` (DP-56). Report to
+`research/reports/STEWARD_Q032_episodes_per_arm.md`.
+
+#### data-steward — limb (f) — in progress (item 22)
+
+No new request. The sweep already under way closes the last lock limb. The only change is its
+DP-50(b) horizon: **2026-09-15..2027-05-17**, or 2027-06-28 if the extension fires.
+
 ## Schedule
 
-**DEFERRED — there is no schedule.** The lock-or-DEFER gate of item 15 **closed short on limb (g)** on
-2026-09-14, so Q032 never locks and no date exists to compute. The provisional block this section
-carried (decision ≈ 2027-06-28, extension ≈ 2027-08-09, window 2026-09-15..≈ 2027-04-22, binding floor
-B) is **struck in full** — it was derived from §5.1's placeholder arm share, it is superseded by the
-Steward's measurement, and **it is never inherited by a re-attempt or by any successor question**
-(the Q025 precedent). No `schedule.json` is written; `state.json` does not pass through
-`PREREG_LOCKED`.
+**Rewritten 2026-09-14 at re-entry; supersedes the struck DEFERRED block of 2026-09-14** (the reasons
+for that deferral remain in "## Record — 2026-09-14"). Built by item 14's method on item 3's rate basis
+(DP-53), on NYSE sessions with holidays 2026-11-26, 2026-12-25, 2027-01-01, 2027-01-18, 2027-02-15,
+2027-03-26, 2027-05-31, 2027-06-18, 2027-07-05, 2027-09-06. **Valid for `e_min ≥ 3` (item 21).**
+Lock preconditions still open: **R3 per-arm episode count (item 21)** and **limb (f) commit sweep
+(item 22)**.
 
-decision_date: **DEFERRED** · extension_date: **none** · hard_stop: **none** · rule: **none —
-provisioning blocker, not exposure-driven and not accrual-driven**
+decision_date: **2027-05-17** · extension_date: **2027-06-28** · hard_stop: **2027-06-28** · rule:
+**exposure-driven**
+
+```
+Window:         pick nights 2026-09-15 .. 2027-03-09 = 121 elapsed sessions (lock commit 2026-09-14)
+Binding floor:  A (80 contributing nights) at 0.6620/session (item 3 cap; r40 = 62/72 = 0.8611)
+Other floors:   B 65 (2026-12-15) · C 46 (2026-11-17) · D 120 (2027-03-08; 3/72, e_min pending)
+Maturity:       + 40 sessions        -> 2027-05-05 (Wed)
+Freeze margin:  + one calendar week  -> 2027-05-12 (Wed)
+Decision date:  first Monday on/after -> Monday 2027-05-17   (8.1 months from lock)
+Extension:      DP-13 +30 sessions -> pick nights .. 2027-04-21 (session 151);
+                t+40 2027-06-17; +1 week 2027-06-24 -> Monday 2027-06-28 (9.5 months)
+Hard stop:      Monday 2027-06-28 -> any gate still short = DEFERRED
+Ceiling:        latest admissible window end session 205 = 2027-07-09 (decision Monday 2027-09-13)
+Halves:         1-61 / 62-121 (extended 1-76 / 77-151)
+Interim:        none (DP-58 declined, item 20)
+DP-50(b):       flag-off to 2027-05-17 (2027-06-28 if extended)
+Branch e_min=2: window .. 2027-06-02, decision = hard stop Monday 2027-08-09, no extension (item 17)
+Branch e_min<=1: DEFERRED (DP-43 ceiling)
+```
+
+### Superseded — the 2026-09-14 deferral block (kept as history; none of it binds after re-entry)
+
+Its F1/F2 bookkeeping reverses as `G` rejoins (F2 17, F1 28). Its "re-measure before lock" list is
+satisfied by `STEWARD_Q032_spy_history_probe.md`, `STEWARD_Q032_limbs_true_partition.md`, R3
+(item 21) and limb (f) (item 22).
 
 - **Admission ground:** `DEFERRED.md`'s **first** — the objective cannot be measured with the artefacts
   the desk holds. **Not** the second (DP-43's 12-month ceiling): the measured proxy rates sit
@@ -512,3 +699,16 @@ DP-44, DP-45, DP-50, DP-51 and locked precedent (Q006, Q023, Q027, Q029, Q031).
   and can never confirm.** Q032's C1 and Q023's E1 are the same contrast on a ~95%-overlapping
   population. Stating the pattern once — same statistic, non-independent pair, one q, blocking only —
   would stop the next overlap being registered as a second primary.
+- **(re-entry, from item 17) A DP-13 extension is +30 sessions or none.** When the +30 extension's
+  decision date would pass DP-43's 12-month ceiling, the hard stop equals the decision date. The
+  extension is never truncated to fit.
+- **(re-entry, from item 21) A per-arm floor is scheduled on the minimum over arms in that floor's own
+  unit.** The arm rarer by nights is not necessarily rarer by episodes. A Steward report gives every
+  arm's count, not only the rarer arm's.
+- **(re-entry, from item 18) A Steward's scheduling rate states its matured cohort's own denominator.**
+  A maturity-truncated numerator over a full-span denominator is printed only beside that figure, so
+  a schedule cannot count maturity twice (DP-53).
+- **(re-entry, from item 19) Whether a gate built on a handful of observed events should be scheduled
+  at a stated probability of being met, not at the point rate.** Q032's floor D rests on 3 episodes:
+  the point rate gives ≈ 25% eventual deferral, and 187 sessions would give ≈ 11%. DP-43 says "measured
+  run-rate" and DP-57 does not name a quantile. Choosing one is Haci's call, not a default.

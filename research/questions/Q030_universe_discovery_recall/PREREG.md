@@ -1,21 +1,34 @@
 # Q030 — universe_discovery_recall: does the candidate universe find the big movers before they move?
 
-**Status:** PREREG_DRAFT (lock by committing this file). Open decisions are listed in §11 and are
-resolved by `@decision-maker decide Q030`, folded back by `@registrar apply Q030`, before the lock.
+**Status:** PREREG_DRAFT (lock by committing this file). Decisions folded in by `@registrar apply
+Q030` on 2026-09-14; the last section records what is still routed.
+**Decisions:** DECISIONS.md
+**Lock-or-DEFER gate (DECISIONS item 10): PASS on all three limbs.** Credentials present
+(`research/questions/DEFERRED.md`, Q030 TRIGGER MET, direct presence test); base-universe coverage
+**97.55%** (2,346 of 2,405 symbols with ≥ 60 daily bars, `research/reports/STEWARD_Q030_universe_coverage_probe.md`)
+against ≥ 90%; all-candidates contributing-night rate **0.6761/elapsed session**
+(`research/reports/STEWARD_Q027_exposure.md`) against ≥ 0.36. None is re-measured at lock.
 **Family:** **F8 System validity** (hypothesis **H-074**, Haci's H4 *Discovery*). DP-29 places it
 there without argument: the primary endpoint's subject is neither the path after selection (F4) nor
 the score's calibration (F2) — it is whether the step **before** selection, candidate generation,
 reaches the names that go on to make large moves. H-074 is counted **once**, here.
-**Manifest (R1 counts and the sealed post-hoc panel only):** research/data/manifest_v001.json
-(as_of: 2026-09-10; platform SHA fa70688bc252d14f8d67e371afafc194731c324e) and
-research/data/manifest_prices_v001.json (as_of: 2026-09-10).
-**Manifest (the question itself):** the **successor selection freeze** named in §5.3 (DP-23) —
-`manifest_v00N` (`sas_candidates` **for every candidate row, published and unpublished**, `sas_runs`,
-`market_regime_daily`) — and **`manifest_prices_universe_v001`**, a new price freeze covering **every
-symbol in the pinned base universe `B`** (§2.2) plus every in-window candidate symbol and the
+**Manifest (R1 counts, the R2(iii) dry run and the sealed post-hoc panel only):**
+research/data/manifest_v001.json (as_of: 2026-09-10; platform SHA fa70688bc252d14f8d67e371afafc194731c324e),
+research/data/manifest_prices_v001.json (as_of: 2026-09-10) and
+**research/data/manifest_prices_universe_v001.json** (as_of: 2026-09-10; daily bars
+**2025-01-02..2026-09-10**, `feed=sip`, split and raw, 2,412 symbols requested = 2,405 base + 431
+candidates + 5 benchmarks less overlap; 2,404 of 2,405 base symbols returned bars, `TSEOF` absent;
+`pu001_daily_split.parquet` sha256 `2e654281…fa95`, `pu001_daily_raw.parquet` sha256 `b6dc92c9…d100`).
+**It is history only and carries no registered forward night**: it supplies the ≥ 60 prior sessions
+before the window and the sealed panel's bars, never a verdict.
+**Manifest (the question itself — both built at the decision date, neither exists at this lock):**
+the **successor selection freeze** named in §5.3 R3 (DP-23) — `manifest_v00N` (`sas_candidates` **for
+every candidate row, published and unpublished**, `sas_runs`, `market_regime_daily`) — and **R2's
+forward cut** of the universe price freeze, the next free `manifest_prices_universe_vNNN`, covering
+**every symbol in the pinned base universe `B`** (§2.2) plus every in-window candidate symbol and the
 benchmarks, with ≥ 60 prior sessions before the first in-window night and 20 forward sessions beyond
 the last. **The primary window is entirely prospective: not one night that carries a verdict here
-exists in `manifest_v001`.**
+exists in `manifest_v001` or `manifest_prices_universe_v001`.**
 **Base-universe artifact (pinned, and it is data, not code):** volatilx `data/sp500_sectors.json`,
 key `mapping`, sha256 (LF-normalized) **`c4d12610ac95a8a83a0fc2365d02b4963d6a4169a9352acf2578164111390201`**
 — the Q022 / Q024 pin, **one commit ever** (`4171b1a`, 2026-05-17, `_meta.last_synced` 2026-05-17,
@@ -30,7 +43,9 @@ from the two values printed here.
 **unioned with the add-only successor exclusions file** issued with the successor selection freeze —
 identical three lists, identical criteria, covering nights after 2026-09-10, add-only: no night is
 ever removed from a v003 list. Both paths are `eval.py` inputs; no hard-coded file name, no
-hard-coded date. DP-04 applies mechanically on top.
+hard-coded date. DP-04 applies mechanically on top. A night on the successor file's fourth list,
+`payload_disabled_runs` (Q027 DECISIONS #11), is **retained, flagged and counted** here (§2.4;
+DECISIONS item 12).
 **Registered by:** registrar (autonomous run, DP-40..48) · **Approved by:** desk (DP-46) ·
 **Date:** 2026-09-14
 
@@ -59,9 +74,10 @@ whose population is the market outside the pool.
 
 - **E1 — the discovery lift.** The share of that night's *movers* (base-universe symbols that go on
   to travel **+3 of their own ATRs within 20 sessions**) that were in the candidate universe, divided
-  by the share a same-size random draw from the base universe would have captured. **MPE: lift ≥ 2.00**
-  (Haci's own number; §4.2 states its source and §11 item 2 routes the unit question), with the
-  two-sided mirror at **lift ≤ 0.50**.
+  by the share a same-size random draw from the base universe would have captured. **MPE: lift ≥ 2.00
+  together with the materiality floor `D ≥ +1.0 pp`** (Haci's own number, applied as registered;
+  DP-20 considered and not applied — DECISIONS items 2–3; §4.2 states the source), with the two-sided
+  mirror at **lift ≤ 0.50 and `D ≤ −1.0 pp`**.
 
 **Secondaries, none of which decides anything** (§4.3): the same statistic for **bear** movers at
 −3 ATR; **recall by source feed** (which of the seven source tags finds the movers); the
@@ -73,7 +89,8 @@ forward returns and 20-session touch rates for published picks (BACKLOG H-010, H
 lines; CLAUDE.md's standing findings). Those reads bear on the numerator of this statistic — how
 often names that reached the universe go on to make large moves — even though nothing anywhere has
 ever computed the denominator over the base universe. Under DP-45 that partial read is enough: the
-window is **prospective-only, pick nights ≥ 2026-09-15** (§6), and the sealed stretch is printed once
+window is **prospective-only, pick nights from the first session after the lock commit** (2026-09-15
+for a lock dated 2026-09-14; §6, DECISIONS item 8), and the sealed stretch is printed once
 as a labelled post-hoc panel that enters no verdict, no half, no stratum test, no CI comparison and
 no q. This is the Q023 / Q024 / Q027 pattern, applied for the same reason. A second, independent
 reason stands on its own: the candidate universe's **composition changed inside the sealed period**
@@ -98,7 +115,9 @@ generation, and §9 says what it licenses.
   §5.2's split rule);
   `market_regime_daily` — `trading_date`, `regime_version`, `market_regime`, `created_at` (rule-7
   stratum only; never a filter, never an arm).
-- **Source tables (`manifest_prices_universe_v001`, §5.3):** `prices_daily_split` (pick-night close,
+- **Source tables (the universe price freeze — `manifest_prices_universe_v001` for history before the
+  window and the sealed panel, R2's forward cut `manifest_prices_universe_vNNN` for the window, §5.3):**
+  `prices_daily_split` (pick-night close,
   ATR14, 20-session dollar volume, forward bars to t+20, SPY tape) for **every base-universe symbol
   and every in-window candidate symbol**; `prices_daily_raw` (split-factor snapping only).
   **No hourly bar is used and no primary or secondary depends on one.**
@@ -123,7 +142,7 @@ SELECT DISTINCT c.symbol
 FROM   sas_candidates c
 JOIN   sas_runs run ON run.trading_date = c.trading_date
 WHERE  c.trading_date >= DATE '2026-09-15'        -- §6 window start   (input, illustrative)
-  AND  c.trading_date <= DATE '2027-01-26'        -- §5.2 window end   (input, illustrative)
+  AND  c.trading_date <= DATE '2027-03-05'        -- §5.2 window end   (input, illustrative)
   AND  c.trading_date NOT IN (<exclusions_v003 ∪ the add-only successor file:
                                manual_runs ∪ non_session_runs
                                ∪ uncorroborated_publication_runs, read from the JSONs>)
@@ -143,21 +162,38 @@ candidate row (`:735-746`), so the candidate table is the universe, not a filter
 `sas_runs.stats_json.universe_count` is written as `len(scorecards)` (`:445`) and is the independent
 corroboration of that claim — §2.6 makes it a gate rather than a footnote.
 
-**`U_t^B` = `U_t ∩ B_t`** (§2.2) is the set the primary uses. `|U_t|` — the whole universe, including
-the ETFs and the non-`B` names — is carried as the as-filed companion denominator (§4.3, §11 item 1).
+**`U_t^B` = `U_t ∩ B_t`** (§2.2) is the set the primary uses, and **the random-draw size is
+`n_t = |U_t ∩ B_t|`** (DECISIONS item 1): a candidate outside `B` can never appear in `M_t`, so counting
+it in the draw would compare the engine against a random list it never drew. `|U_t|` — the whole
+universe, including the ETFs and the non-`B` names — is carried as the as-filed companion denominator,
+computed always and **blocking** (§4.3, §8 clause 7); because a larger `n_t` raises `e_t` and lowers
+the lift, requiring both to clear 2.00 is strictly the stricter test (DP-25 honoured, DP-45).
 
 ### 2.2 The base universe `B_t`, and the mover set `M_t`
 
 - **`B`** = the 2,405 symbols in the `mapping` key of the pinned blob (S&P 500 ∪ Russell 2000 as of
-  2026-05-17). **`B` is fixed for the whole question and is never re-synced mid-window**; a re-sync
-  would make the denominator a different population (§10 threat 1).
+  2026-05-17), **all of `B` as filed for the primary** (DECISIONS item 5, DP-25); the tradeable-B
+  restriction (`C_{s,t} ≥ $5`, `adv20 ≥ $5M`, fixed at lock, DP-26) is computed and blocking at lift
+  1.00 (§4.3, §8 clause 8). **`B` is fixed for the whole question and is never re-synced mid-window**;
+  a re-sync would make the denominator a different population (§10 threat 1). The blob is hashed from
+  its **committed** bytes at `4171b1a`, never from a working-tree checkout (a Windows checkout
+  rewrites LF to CRLF and hashes differently).
 - **`B_t`, the gradeable base universe on night t** = symbols of `B` with
   (a) ≥ 60 split-adjusted daily bars dated ≤ t (ATR14, `mom20`, `adv20` defined), and
   (b) a daily bar on the pick night t itself.
   Symbols failing either are **excluded and counted, per night, by reason** — never imputed.
 - **`C_{s,t}`** = symbol s's regular-session close on night t from `prices_daily_split`.
-  **`ATR_{s,t}`** = ATR14 from `prices_daily_split` bars dated ≤ t (never the platform's `atr_pct`,
-  corrupted around splits — DATA_NOTES / PI-003).
+- **`ATR_{s,t}` = Wilder-smoothed ATR14 on split-adjusted bars dated ≤ t**, fixed at lock (DP-26):
+  `TR_u = max(H_u − L_u, |H_u − C_{u−1}|, |L_u − C_{u−1}|)`, smoothed by
+  `ATR_u = ATR_{u−1} + (TR_u − ATR_{u−1}) / 14` — `alpha = 1/14`, `adjust=False`, `min_periods=14`,
+  byte-for-byte the construction `research/lib/q030_counts_dryrun.py` used for R2(iii). Simple-mean
+  ATR14 is not used anywhere in this question. §2.2(a)'s ≥ 60-bar requirement decays the seeding
+  transient by `(13/14)^46 ≈ 0.036` before any `T_{s,t}` is set. Never the platform's `atr_pct`
+  (corrupted around splits, DATA_NOTES / PI-003). *Why Wilder:* every count this lock rests on was
+  measured under Wilder, so a simple mean would lock a schedule calibrated on a mover level `eval.py`
+  would not compute; the choice is not outcome-informed (DP-26 holds); the platform's own ATR helpers
+  are simple means, but this section refuses platform ATR outright and 2,405 base symbols have no
+  platform ATR at all.
 - **The mover level**, bulls: `T_{s,t} = C_{s,t} + 3 × ATR_{s,t}`. Bears (secondary):
   `T^-_{s,t} = C_{s,t} − 3 × ATR_{s,t}`. **3 ATR is H-074's own distance and is registered as filed**
   (DP-25, DP-42 — the hypothesis names the level; the platform's L1–L6 ladder cannot be used here
@@ -165,7 +201,9 @@ the ETFs and the non-`B` names — is carried as the as-filed companion denomina
   recall statistic must avoid). The 2-ATR and 4-ATR versions are printed as a fixed sensitivity band
   (§4.3, DP-26) and decide nothing.
 - **`M_t` (bull movers)** = symbols `s ∈ B_t` whose **regular-session high touches `T_{s,t}` on some
-  session in t+1..t+20**. A gap through `T_{s,t}` at a session open is a touch.
+  session in t+1..t+20**. A gap through `T_{s,t}` at a session open, including the t+1 open, is a
+  touch — for **every** symbol in `B_t` alike, found and missed (DECISIONS item 4; the pick-night
+  close is the desk's standard reference, DP-11 / DP-03(a)).
   **This is a path definition, not a fixed-horizon one** (rule 5, DP-01): a symbol that travels 3 ATR
   by t+6 and gives it all back by t+20 *was* the opportunity, and a t+20 close-to-close test would
   miss it. The t+20 close-to-close version is printed and **decides nothing**.
@@ -194,19 +232,27 @@ For a contributing night t (§2.5), with `n_t = |U_t^B|`, `m_t = |M_t|`, `b_t = 
 **The entry reference is the pick-night close `C_t`** and the measurement window is t+1..t+20, for
 every symbol alike. This is the **discovery** framing, not a trade: a name that gaps +3 ATR at the
 t+1 open is exactly the "major opportunity" H4 asks whether the platform found *before* it moved, so
-it counts. Rule 5's *"a target already passed at entry is not a hit"* governs a pick's tradeable
-target and is honoured in the **tradeable companion** (§4.3): the same statistic from the session
-t+1 open with gap-throughs excluded, printed always, deciding nothing, and §9 forbids reading the
-primary as a tradeable claim.
+it counts (DECISIONS item 4). Rule 5's *"a target already passed at entry is not a hit"* governs a
+pick's tradeable target and is honoured — satisfied, not waived — in the **mandatory tradeable
+companion** (§4.3): the same statistic from the session t+1 open with gap-throughs excluded, printed
+always, deciding nothing, required beside any quoted lift by §8's language clause, and §9 forbids
+reading the primary as a tradeable claim. `n_t = |U_t ∩ B_t|` throughout (DECISIONS item 1).
 
 ### 2.4 Exclusions — each counted, printed in the results header, never silently dropped
 
 Every exclusion uses only inputs available by 16:05 ET on the pick night, the trading calendar, the
 pinned blob, or a measurement failure. None can move a symbol between `U_t` and its complement.
 
-- **Nights** in the union of `exclusions_v003.json` and the add-only successor file; any night whose
-  `finished_at` is later than the next session's open, or dated on a non-session day (DP-04); any
-  night with no SAS run.
+- **Nights** in the union of `exclusions_v003.json` and the add-only successor file — the three
+  registered lists (`manual_runs`, `non_session_runs`, `uncorroborated_publication_runs`) — plus
+  DP-04: any night whose `finished_at` is later than the next session's open, or dated on a
+  non-session day; any night with no SAS run.
+- **A night on the successor file's fourth list, `payload_disabled_runs`** (Q027 DECISIONS #11), is
+  **retained, flagged and counted** unless it independently fails §2.6's corroboration gate
+  (DECISIONS item 12, Correction 6). The criterion screens a published payload this question never
+  reads; Q030 reads candidate symbol sets built upstream of publication, and §2.6 is the direct test of
+  whether the universe was intact that night. The primary recomputed **excluding** those nights is on
+  §4.3's mandatory descriptive list, which closes at lock.
 - **Base symbols failing §2.2's (a) or (b)** → excluded from `B_t` and counted by reason. A symbol
   excluded from `B_t` is excluded from `M_t`, from `U_t^B` and from `b_t` **simultaneously** — it
   never sits in one term and not another.
@@ -215,7 +261,8 @@ pinned blob, or a measurement failure. None can move a symbol between `U_t` and 
 - **Candidate symbols outside `B`** (ETFs, ADRs, post-May-2026 listings) → not in `U_t^B`, counted
   every night with their symbols listed, and carried in the as-filed `|U_t|` companion (§4.3).
 - **Nights whose `stats_json` corroboration fails** (§2.6) → excluded and counted.
-- **Immature nights** — session t+20 after the last trading date of `manifest_prices_universe_v001` →
+- **Immature nights** — session t+20 after the last trading date of the pinned forward universe price
+  freeze (R2's forward cut, §5.3) →
   excluded and counted. Maturity comes from the trading calendar, never from whether a price exists.
 - **Nights with `m_t = 0` or `n_t = 0`** → `recall_t` or `e_t` undefined → **non-contributing**
   (§2.5), counted, not an exclusion.
@@ -297,9 +344,10 @@ the mover set, and the mean forward return of `U_t^B` against `B_t`, are printed
   found on a night with `e_t = 0.02` reads as a lift of 50). Both means are night-level statistics,
   the bootstrap resamples nights and recomputes the whole ratio, so the night remains the unit of
   inference (rule 6). **The mean of per-night lifts is printed beside it, descriptively.**
-- **MPE: `E1 ≥ 2.00`**, mirror `E1 ≤ 0.50`.
-- **Materiality floor (registered alongside the MPE, §8 clause 3b):**
-  `D = mean_t(recall_t − e_t) ≥ +1.0 pp` (mirror ≤ −1.0 pp), printed with its own two CIs.
+- **MPE: `E1 ≥ 2.00`**, mirror `E1 ≤ 0.50` (DECISIONS item 2).
+- **Materiality floor (registered alongside the MPE as an inseparable second condition, §8 clause
+  3b; DECISIONS item 3):** `D = mean_t(recall_t − e_t) ≥ +1.0 pp` (mirror ≤ −1.0 pp), printed with its
+  own two CIs. The MPE is **compound**: a CONFIRMED needs both.
 
 **On the MPE.** `≥ 2× lift` is **Haci's own number**, from the Master Hypothesis Program's H4 PASS
 line (`research/reports/INBOX_2026-09-14_master_hypothesis_program.md` §1, H4: *"Candidate-universe
@@ -308,9 +356,11 @@ registered, with "ideally" read as the threshold rather than as an aspiration (D
 reading). **DP-20 is considered and not applied**: it governs a **touch-rate** endpoint whose base
 rate sits at 40–70%, where +5.0 pp is a proportionate bar; here the null base rate is
 `e_t ≈ 57 / 2,405 ≈ 2.4%`, and +5.0 pp on that base would demand a lift above 3 — a different and
-unfiled hypothesis. **DP-44 carries no MPE unit for a ratio endpoint** and an autonomous run writes
-no DP entry from a DEFAULTED item, so **§11 item 2 puts "lift MPE unit" to the Decision-maker as a
-standing rule**. The materiality floor exists because a ratio alone can be large over nothing: a lift
+unfiled hypothesis. **DP-44 carries no MPE unit for a ratio endpoint**; its bar against inventing a
+number is met by taking Haci's (DP-25). No DP entry is written by this registration (DP-40); the
+general rule ("a lift MPE of 2.00 paired with an absolute floor sized to the endpoint's null base
+rate") is filed as a **proposal** under DECISIONS.md "Standing rules proposed" and binds nothing here
+beyond this question's own registered numbers. The materiality floor exists because a ratio alone can be large over nothing: a lift
 of 2 over a base rate of 0.4% would mean the universe captures under 1% of the market's movers, which
 no one could call discovery. **Neither the MPE nor the floor is lowered at the decision pass in any
 branch** (rule 6).
@@ -325,7 +375,7 @@ blocker.
 **Computed, and blocking:**
 
 - the **as-filed denominator** companion — E1 recomputed with `n_t = |U_t|`, the whole universe
-  including symbols outside `B` (§11 item 1). It is the arithmetically looser construction's mirror
+  including symbols outside `B` (DECISIONS item 1). It is the arithmetically looser construction's mirror
   image: a larger `n_t` raises `e_t` and lowers the lift, so requiring it to clear 2.00 as well makes
   the pair strictly the stricter test (clause 7);
 - **B2 sector-matched** and **B3 liquidity-matched** lifts (§3, clause 6);
@@ -366,14 +416,37 @@ blocker.
   `M_t ∩ U_t^B` versus `M_t \ U_t^B` — what the universe systematically misses, which is the
   operational half of a NULL;
 - the **published-slate footnote**: `|M_t ∩ (published picks)| / m_t`, printed for context only. It
-  is **not** a selection-edge statistic and §7 forbids reading it as one.
+  is **not** a selection-edge statistic and §7 forbids reading it as one;
+- the **`payload_disabled_runs` sensitivity** — the whole primary endpoint (E1, `D`, both CIs)
+  recomputed **excluding** nights on the successor exclusions file's `payload_disabled_runs` list,
+  with the count of such nights retained in the primary (§2.4; DECISIONS item 12, Correction 6).
 
-**Sub-cells — the list is FIXED at lock** (revised once at `record` from R1's measured counts, then
-closed). Reported only at ≥ 20 contributing nights; below that, SUPPRESSED (counts only):
-`market_regime_daily.market_regime` (rule 7, §6); the SPY `tape_t` stratum (§6); terciles of `m_t`
-(market breadth); terciles of `n_t`; bull and bear; sector of the mover. **All six `tape_t` cells are
-expected to be SUPPRESSED** (≈ 15 nights each at the registered window length) and are printed as
-counts; no suppression removes a blocker.
+**Sub-cells — the list is FIXED at lock and CLOSED** (DECISIONS item 11, Correction 7). Its single
+permitted revision is exercised at this apply from **R2(iii)'s** counts-only dry run
+(`research/reports/STEWARD_Q030_counts_dryrun.md`, pick nights 2026-06-01..2026-08-12) and the
+night-level stratum counts of `research/reports/STEWARD_Q027_exposure.md` (the same 48 matured,
+non-excluded nights, projected to 119 sessions), and not from R1(a), which measures nothing about `B`.
+**R1(b)/(c), when delivered, may only add a cell to the SUPPRESSED list, never remove one.** A cell
+suppressed here stays suppressed even if it clears 20 measured nights at the decision pass; a cell not
+suppressed here still needs **≥ 20 measured contributing nights** to be reported, and below that is
+SUPPRESSED (counts only). Suppression restricts affirmative reporting only: it never removes clauses
+6–11's blockers, and the halves, the monthly blocks and every blocking companion are **not** on the
+list and block at whatever count they have.
+
+| stratifier | cells | status at lock | basis |
+|---|---|---|---|
+| SPY `tape_t` (§6) | `up_low`, `down_high`, `up_high`, `down_mid`, `down_low` | **SUPPRESSED** | projected 16.8 / 13.4 / 8.4 / 6.7 / 5.0 nights at 119 sessions (Q027 report) |
+| SPY `tape_t` (§6) | `up_mid` | reportable at ≥ 20 measured | projected 30.2 |
+| `market_regime` v1.2 (rule 7, §6) | `bearish`, `neutral`, `risk_off` | **SUPPRESSED** | 0 of 48 nights observed |
+| `market_regime` v1.2 | `strongly_bullish`, `bullish` | reportable at ≥ 20 measured | projected 48.6 / 23.5 |
+| `market_regime` v1.2 | `unlabelled` | counts only, never a tested cell | informational |
+| terciles of `m_t` (breadth), terciles of `n_t` | 3 + 3 | reportable at ≥ 20 measured | a tercile holds ≈ ⅓ of ≈ 80 nights by construction; `m_t` 332 / 886 / 1,328 and `n_t` 45 / 61 / 68 (min / median / max) on R2(iii) |
+| direction | bull (primary), bear (secondary) | reportable at ≥ 20 measured | bear movers not counted by R2(iii) |
+| sector of the mover | 11 pinned sector ETFs | reportable at ≥ 20 measured | not measured |
+
+R2(iii) also shows the `m_t ≥ 10` restriction (§2.5) never bound on the sealed panel (minimum `m_t`
+= 332); it is still printed, and that reading is a count, not a registered expectation about the
+window.
 
 **Quotability:** 20-session basis, W20 research window → **every number in this question is
 `NON_QUOTABLE`** (rule 12). **No 40-session companion is computed**: it would add 20 sessions of
@@ -417,82 +490,118 @@ Night-level throughout. Random-draw control symbols never add to n (rule 6).
 
 ### 5.1 Exposure basis — and why no second Steward count is routed
 
-**The candidate-side contributing-night rate is taken from the Steward's Q027 exposure report**
-(`research/reports/STEWARD_Q027_exposure.md`, in preparation at this lock, measured counts-only on
-`manifest_v001` + `manifest_prices_v001` over pick nights 2026-06-01..2026-09-10 against
-`exclusions_v003.json`), **rather than routing a second count for the same nights.** That report
-measures the all-candidates funnel — Q027 §2.5's contributing night, a non-excluded matured night
-carrying ≥ 30 eligible candidate rows — which is **strictly narrower** than Q030's night rule: Q030
-needs only a valid non-excluded matured run with `n_t ≥ 1` and `m_t ≥ 1`, and imposes **no per-row
-screen on candidates at all** (it needs bars for base-universe symbols, not for candidates). Q027's
-measured rate is therefore a **lower bound** on Q030's, and using it is conservative in the only
-direction that matters (DP-43: dates move out, never in).
+**Counts-only scheduling funnel (DP-53, LEARNING_POLICY "Counts-only readiness and scheduling").**
+Every row is a count from a pinned freeze; no touch rate, recall, lift, return or intersection
+`|M_t ∩ U_t^B|` appears. Exclusions are kept in the denominators.
 
-What the desk already holds, all counts-only and all from pinned freezes:
-
-| quantity | measured | source |
+| funnel stage | Q030's own night rule — R2(iii) | Q027's all-candidates rule — R1(a) |
 |---|---|---|
-| contributing nights per elapsed session, published-pick funnel | **0.9538** (62/65) | `STEWARD_Q023_exposure.md` §5 |
-| eligible nights per elapsed session before the freeze-horizon maturity cut | **0.9783** (45/46) | `STEWARD_Q024_…` (a) |
-| candidate rows per night with ≥ 60 prior daily bars | min **56**, median **63**, max **68** | `STEWARD_Q024_…` (b) |
-| base-universe entries in the pinned blob | **2,405** | `STEWARD_Q024_…`, sector coverage |
-| all-candidates funnel rate | **to be measured** | `STEWARD_Q027_exposure.md` (R1a) |
+| source / count date | `manifest_prices_universe_v001` + `manifest_v001` + `exclusions_v003.json`; `STEWARD_Q030_counts_dryrun.md`, 2026-09-14 | `manifest_v001` + `manifest_prices_v001` + `exclusions_v003.json`; `STEWARD_Q027_exposure.md` |
+| pick nights | 2026-06-01..2026-08-12 (the fully observable cohort) | 2026-06-01..2026-09-10 |
+| elapsed sessions | **51** | **71** |
+| eligible (not on an exclusion list) | 48 (2 `manual_runs`: 07-02, 07-06; 1 `uncorroborated_publication_runs`: 06-26) | 68 |
+| old enough to mature (t+20 inside the freeze) | 48 (all 51 nights carry 20 forward sessions) | 48 (20 nights 2026-08-13..09-10 immature — a freeze-horizon artifact) |
+| gradeable (`B_t` ≥ 90% of 2,405; ungradeable ≤ 10%) | 48 — over all 51 nights coverage min **97.80%**, median **98.54%**; ungradeable max **0.76%**; never binding | not applicable (no `B` screen) |
+| night statistic defined | 48 (`n_t ≥ 1`, `m_t ≥ 1`) — `m_t = 0` on **0 of 51**; `b_t` **2,342 / 2,355 / 2,375**, `n_t` **45 / 61 / 68**, `m_t` **332 / 886 / 1,328** (min / median / max, all 51) | 48 (≥ 30 eligible rows and a defined `d*_t`) |
+| contributing | **48 → 48/51 = 0.9412 / elapsed session** | **48 → 48/71 = 0.6761 / elapsed session** |
+| post-lock contributing | 0 (sealed cohort; every window night is post-lock by construction) | 0 |
+| **not measured** | §2.6 corroboration gate (R1(b)); DP-04 `finished_at` test | — |
 
-**Planning rate used in §5.2: 0.9538 contributing nights per elapsed session**, stated as **borrowed**
-rather than dressed up with an invented haircut (the Q023 §5.1 finding: *"a haircut on a borrowed
-number is not a haircut"*), with an 8-session cushion carried in the window instead. R1 replaces it
-with the measured Q027 rate at `record`, and a measured rate can only move the dates **out**
-(DP-43, DP-45).
+The base-universe funnel that was "never measured" at drafting is now measured: base coverage
+**97.55%** (2,346 of 2,405 with ≥ 60 daily bars, `STEWARD_Q030_universe_coverage_probe.md`), and the
+R2(iii) rows above. Q030's night rule imposes **no per-row screen on candidates**, but it adds night
+gates Q027's does not have (`B_t` coverage, ungradeable share, §2.6 corroboration); the first two
+never bound on the cohort, the third is unmeasured.
 
-**What has never been measured, and is R2's job:** anything at all about `B`. No desk report has
-computed a single quantity over the 2,405-symbol base universe — not bar coverage, not a mover rate,
-not `|U_t ∩ B|`. That is why R2 is blocking for the lock (§5.3) and why §8's floors are stated on
-nights rather than on movers.
+**Planning scenarios, shown separately (DP-53).**
 
-### 5.2 Window, decision date, extension, DEFERRED fallback (DP-43, DP-13; no outcome is looked at)
+| scenario | rate | Floor A reached | window end | decision date |
+|---|---|---|---|---|
+| **registered** — DECISIONS item 9 | **0.6761** (Q027's all-candidates rate, borrowed) | session **119** | **2027-03-05** | **Monday 2027-04-12** |
+| cohort reading, recorded and **not used for dates** | 0.9412 (Q030's own R2(iii) cohort) | session 85 | 2027-01-14 | Monday 2027-02-22 |
 
-**Window: pick nights 2026-09-15 .. 2027-01-26 inclusive = 92 elapsed sessions.**
-**Decision date: Monday 2027-03-08.** Single DP-13 extension to pick nights **.. 2027-03-10**
-(122 sessions), decided **Monday 2027-04-19**, which is also the **hard stop**: still short there,
-Q030 goes to DEFERRED.
+**Why the registered schedule is not set on 0.9412.** Q030's own 0.9412 is measured on the fully
+observable cohort with exclusions retained, which is the DP-53 construction, but it is **not yet a
+complete Q030 funnel**: the §2.6 corroboration gate — the one gate built to fire on an incompletely
+persisted universe — and DP-04's `finished_at` test were not in the R2(iii) script, and R1(b) is still
+open. Against the cohort's 0.9412, the registered plan still reaches Floor A inside the primary window
+if those gates remove up to 28% of otherwise-contributing nights; a plan set on 0.9412 reaches it only
+if they remove none. **Disclosed without softening:** 0.6761's own denominator carries 20 nights that could
+not mature inside the freeze horizon (`STEWARD_Q027_exposure.md` Headline: *"entirely a maturity
+artifact"*), so as a pure attrition estimate it charges maturity once in the rate and again in the
+20-session lag — the construction LEARNING_POLICY warns against. It is registered as the planning
+scenario with room for the unmeasured gates, not as an attrition estimate, and the registered dates
+are DECISIONS item 9's. The 8-session cushion of the draft is struck (Correction 1): the window end is
+the Floor A projection at the registered rate, nothing added.
 
-| floor | planning rate | sessions needed | projected at 92 sessions |
+**Sample size against the MPE and dependence (DP-57).** The floors are necessary, not sufficient.
+Per-night `recall_t` is computed over hundreds of movers (`m_t` median 886 on the cohort), so within-
+night noise is small; the binding uncertainty is **across nights**, because each night's mover set
+spans the next 20 sessions and one symbol's run recurs on up to twenty consecutive nights (§2.5, §10
+threat 2). CI 2 is in effect symbol-clustered, and the information it draws on grows with the number of
+**non-overlapping 20-session mover windows** in the tape — about **6** at 119 sessions against about
+**4** at 85. That, together with the rule-7 cells (only `tape_t: up_mid` projects above 20 nights even
+at 119 sessions, §4.3), is what the longer registered window buys. No power calculation is registered;
+the compound MPE (`E1 ≥ 2.00` **and** `D ≥ +1.0 pp`) is large relative to the null base `e_t`, and
+DP-51's CI rule decides whether the realised precision was enough.
+
+### 5.2 Window, decision date, extension, DEFERRED fallback (DP-43, DP-13, DP-53; no outcome is looked at)
+
+**Window: pick nights 2026-09-15 .. 2027-03-05 inclusive = 119 elapsed sessions.**
+**Decision date: Monday 2027-04-12.** Single DP-13 extension to pick nights **.. 2027-04-19**
+(149 sessions), decided **Monday 2027-05-24**, which is also the **hard stop**: still short there,
+Q030 goes to DEFERRED. Planning rate **0.6761** contributing nights per elapsed session (§5.1,
+DECISIONS item 9); Q030's own measured **0.9412** is recorded in §5.1 and **not used for any date**.
+Rule: **exposure-driven**. `extended: false`.
+
+| floor | planning rate | sessions needed | projected at 119 sessions |
 |---|---|---|---|
-| **A:** ≥ 80 contributing nights (DP-21) | 0.9538/session | 84 (2027-01-13) | **87.7 nights** |
-| **B:** ≥ 30 contributing nights dated after the lock commit (DP-24) | 0.9538/session | 32 (2026-10-29) | **87.7** (all post-lock by construction) |
-| **C:** ≥ 20 contributing nights per *reported* sub-cell | — | — | decided cell by cell at the decision pass; suppression list §4.3 |
+| **A:** ≥ 80 contributing nights (DP-21) | 0.6761/session | `ceil(80 / 0.6761)` = **119** (2027-03-05) — **binds** | **80.5 nights** |
+| **B:** ≥ 30 contributing nights dated after the lock commit (DP-24) | 0.6761/session | `ceil(30 / 0.6761)` = 45 (2026-11-16) — non-binding | **80.5** (all post-lock by construction) |
+| **C:** ≥ 20 contributing nights per *reported* sub-cell | — | — | decided cell by cell at the decision pass on measured counts; suppression list §4.3 |
 
 **Arithmetic, session by session** (holidays 2026-11-26, 2026-12-25, 2027-01-01, 2027-01-18,
-2027-02-15, 2027-03-26): 2026-09-15 is session 1; Sep 12 + Oct 22 + Nov 20 + Dec 22 = 76 at
-2026-12-31; Jan 4–8, 11–15, 19–22, 25, 26 = **92 at 2027-01-26** (Tuesday). Floor A alone is met at
-session 84 = 2027-01-13; the window carries **8 further sessions** so the floor is met inside the
-primary window rather than only if the extension fires. **Decision date:** 2027-01-26 **+ 20
-sessions** maturity = **2027-02-24**; **+ one calendar week** freeze margin = 2027-03-03; first
-Monday on or after = **Monday 2027-03-08** — **5.8 months from the lock**, well inside DP-43's
-12-month ceiling. `eval.py` is written once (rule 9) and run **once**, then. **No interim looks.**
+2027-02-15, 2027-03-26 Good Friday — Easter 2027 is 03-28; Memorial Day 2027 is 05-31, so 2027-05-24
+is a session): 2026-09-15 is session 1; Sep 12 + Oct 22 + Nov 20 + Dec 22 = 76 at 2026-12-31; Jan
+4–8, 11–15, 19–22, 25–29 = 95 at 2027-01-29; Feb 1–5, 8–12, 16–19, 22–26 = 114 at 2027-02-26; Mar 1–5
+= **119 at 2027-03-05** (Friday). **Decision date:** 2027-03-05 **+ 20 sessions** maturity =
+**2027-04-05**; **+ one calendar week** freeze margin = 2027-04-12; first Monday on or after =
+**Monday 2027-04-12** — **6.9 months from a 2026-09-14 lock**, inside DP-43's 12-month ceiling
+(2027-09-14). `eval.py` is written once (rule 9) and run **once**, then.
+**No interim look is registered (DP-58). The primary is a ratio endpoint, outside DP-58's touch-rate /
+per-trade-ATR scope, and its compound MPE has no defined boundary under that entry; `eval.py` is run
+once, at the decision pass.**
 
-**This is deliberately the identical window, maturity and schedule as Q027**, so that one successor
-selection freeze and one price fetch can serve both: `manifest_prices_universe_v001` is a strict
-superset of Q027's R2 price freeze (it covers `B` ∪ every in-window candidate symbol), and the
-add-only successor exclusions file is the same file. The alignment is an efficiency for the Steward,
-not a statistical link — §7 states that the two questions share no endpoint and may not be read as
-confirming each other.
+**Every date above is conditional on the actual lock commit date** (DECISIONS Correction 5). The window
+opens on the **first trading session after the lock commit** (2026-09-15 only if that commit is dated
+2026-09-14); if the lock is dated later, this whole arithmetic is re-derived session by session from
+the real start and the dates move **out, never in**. §2.1's SQL takes the window start as an input, so
+the re-derivation is mechanical.
 
-- **Extension (DP-13; DP-43's +30 sessions).** If a floor is short at 2027-03-08 on `eval.py`'s
+**This is deliberately the identical window, maturity and schedule as Q027** (Q027 DECISIONS #8), so
+that one successor selection freeze and one price fetch can serve both: R2's forward cut of the
+universe price freeze is a strict superset of Q027's R2 price freeze (it covers `B` ∪ every in-window
+candidate symbol), and the add-only successor exclusions file is the same file. The alignment is an
+efficiency for the Steward, not a statistical link — §7 states that the two questions share no
+endpoint and may not be read as confirming each other.
+
+- **Extension (DP-13; DP-43's +30 sessions).** If a floor is short at 2027-04-12 on `eval.py`'s
   **own measured counts** (never on a projection or a run-rate), the window extends **once**,
-  automatically and with no new question, to pick nights **2026-09-15 .. 2027-03-10** (session 122),
-  decision **Monday 2027-04-19** (2027-03-10 + 20 sessions = 2027-04-08; + one week = 2027-04-15;
-  first Monday on or after). The extended run uses the **byte-identical, unmodified `eval.py`** and
-  the same floors. 7.2 months from lock, inside the ceiling.
+  automatically and with no new question, to pick nights **2026-09-15 .. 2027-04-19** (session 149:
+  Mar 8–12, 15–19, 22–25, 29–Apr 2, Apr 5–9, 12–16, 19), decision **Monday 2027-05-24**
+  (2027-04-19 + 20 sessions = 2027-05-17; + one week = 2027-05-24; first Monday on or after). The
+  extended run uses the **byte-identical, unmodified `eval.py`** and the same floors. 8.3 months from
+  a 2026-09-14 lock, inside the ceiling.
 - **DEFERRED fallback (the hard stop).** If a floor is still short after that single extension, Q030
   goes to `research/questions/DEFERRED.md` with the measured counts rather than running
   under-powered. **No second extension, no reduced floor, and a floor shortfall is never an
   INCONCLUSIVE verdict** (§8).
 - **Fixed at lock and not reopened at the decision pass:** the MPE and the materiality floor (§4.2,
   §8); the 3-ATR level and the 2/4-ATR sensitivity band; the 20-session clock; the 90% `B_t` coverage
-  and 10% ungradeable rules; the 2% corroboration tolerance; the 10-session block length; `m = 1`
-  (§7); the sub-cell suppression list (§4.3, revised once at `record` from R1 and then closed); the
-  §4.3 descriptive list, which closes at lock.
+  and 10% ungradeable rules; the 2% corroboration tolerance; the 10-session block length; the Wilder
+  ATR14 construction (§2.2); `m = 1` (§7); the sub-cell suppression list (§4.3, its single revision
+  exercised from R2(iii) at this apply and closed — R1(b)/(c) may only add); the §4.3 descriptive
+  list, which closes at lock.
 - **If the universe's composition changes mid-window**, `U_t` is **two different features** and the
   window is **cut at the ship date**: the post-ship segment becomes the question's window with this
   whole schedule recomputed from it — **out, never in**, subject to the same single extension and the
@@ -510,10 +619,12 @@ confirming each other.
 
 ### 5.3 Routed requests
 
-- **R1 → data-steward (counts only; blocking for the schedule, not for the lock).** No new work:
-  **take (a) from `research/reports/STEWARD_Q027_exposure.md`** as delivered — the all-candidates
-  contributing-night rate per elapsed session over 2026-06-01..2026-09-10, denominators in elapsed
-  sessions with exclusions not pre-removed (the Q019 / Q022 / Q023 convention) — and add only:
+- **R1 → data-steward (counts only). (a) CLOSED; (b)–(d) OPEN, not blocking for the lock.**
+  **(a) is answered:** 0.6761 all-candidates contributing nights per elapsed session (48/71) over
+  2026-06-01..2026-09-10, `research/reports/STEWARD_Q027_exposure.md`, denominators in elapsed
+  sessions with exclusions not pre-removed (the Q019 / Q022 / Q023 convention), borrowed as §5.2's
+  planning rate; **no second count of the same nights is requested**. Still owed, due before the
+  decision date:
   (b) the distinct-symbol count of `sas_candidates` per night **against `sas_runs.stats_json.universe_count`**,
   with the count of nights exceeding the 2% tolerance (§2.6) and the per-night `source_counts`;
   (c) the share of each night's candidate symbols present in the pinned blob's `mapping`, and the
@@ -522,40 +633,44 @@ confirming each other.
   (d) the **DP-50(a)/(b) commit sweep** since manifest SHA `fa70688` over
   `services/candidate_universe_builder.py`, `services/uoa_screener.py` and the projection-pick
   writers — with an explicit answer **even when it is "none"** — and a dated `DATA_NOTES.md` entry
-  for any repair that rewrote historical rows.
-  No outcome of any kind is read; no live query (DP-50(c)).
-- **R2 → data-steward (BLOCKING FOR THE LOCK — the universe price freeze).** Build
-  **`manifest_prices_universe_v001`**: daily bars, `adjustment=split` and `adjustment=raw`,
-  `feed=sip`, from the Alpaca market-data host, for **every one of the 2,405 symbols in the pinned
-  blob's `mapping`**, plus every in-window candidate symbol and the existing benchmarks, covering
-  **≥ 60 sessions before 2026-09-15** through **2027-02-24** (20 sessions beyond the last in-window
-  pick night), delivered before **Monday 2027-03-08**; a second cut **only if** the DP-13 extension
-  fires, through 2027-04-08, delivered before **Monday 2027-04-19**, built then and not before.
-  The existing tool takes its symbol list from a base manifest (`research/lib/freeze_prices.py`,
-  `BATCH = 50`, `:46`); extending it to take an explicit symbol list is a change under `research/`
-  and is **not** an enforcement file under rule 15. **No hourly bars are required.** Symbols with no
-  bars are **excluded and counted, never back-filled or imputed**.
-  **Three things R2 must report before the freeze is pinned, and they decide whether Q030 locks:**
-  **(i) feasibility** — whether `ALPACA_API_KEY` / `ALPACA_SECRET_KEY` are present in the Steward's
-  environment and the 2,405-symbol pull completes (the Q024 R1(d) failure is the known hazard: that
-  check *could not be run* for one benchmark symbol because no credentials were present);
-  **(ii) coverage** — the share of the 2,405 symbols returning ≥ 60 bars in a trailing 60-session
-  probe, which must be **≥ 90%** (§2.5's `B_t` rule applied to the freeze itself);
-  **(iii) a counts-only dry run on the sealed period** — `b_t`, `n_t`, `m_t` and nothing else (no
-  `recall_t`, no lift, no intersection count) for pick nights 2026-06-01..2026-08-12, so the desk
-  knows whether `m_t ≥ 1` is ever binding before it commits to a schedule.
-  **The lock-or-DEFER gate R2 decides:** feasibility **and** coverage ≥ 90% **and** an
-  all-candidates contributing-night rate (R1a) **≥ 0.36 per elapsed session** — the DP-43 ceiling
-  solved at this lock leaves ≈ 225 admissible elapsed sessions, so 80 nights requires 0.356 — → Q030
-  locks and §5.2's dates are recomputed on the measured rate, **moving out only**. Any limb failing →
-  Q030 goes to `research/questions/DEFERRED.md` with the measured numbers and the blocker named
-  (credential, coverage or rate), unregistered. Every neighbouring night-rate measurement sits
-  between 0.95 and 0.98, so the rate limb is a clear expected pass; **the credential limb is the real
-  risk and is the reason R2 blocks the lock rather than merely the decision date.**
+  for any repair that rewrote historical rows. For (d), `STEWARD_Q027_exposure.md` (g) establishes that
+  only four commits (`2d5776c`, `4775e49`, `22a2e1b`, `d19c9a9`, all 2026-09-13) separate `fa70688`
+  from that report's HEAD; the Steward states directly whether any touches the **universe-side**
+  files above.
+  No outcome of any kind is read; no live query (DP-50(c)). **R1(b) is the one open count that bears
+  on the schedule**: §2.6's corroboration gate is not in §5.1's funnel (§5.1). R1(b)/(c) may add a cell
+  to §4.3's SUPPRESSED list and may not remove one.
+- **R2 → data-steward (the universe price freeze). DELIVERED IN PART; the lock gate is CLOSED —
+  PASS on all three limbs.**
+  **Delivered:** **`research/data/manifest_prices_universe_v001.json`** — daily bars,
+  `adjustment=split` and `adjustment=raw`, `feed=sip`, for the 2,405 symbols in the pinned blob's
+  `mapping` (2,404 returned bars; `TSEOF` absent) plus 431 candidate symbols and 5 benchmarks,
+  covering **2025-01-02..2026-09-10**. **It is history only and carries no registered forward night.**
+  It supplies the ≥ 60 prior sessions for the first window nights and the sealed panel's bars (R4).
+  **The lock-or-DEFER gate, limb by limb** (DECISIONS item 10, Correction 3):
+  **(i) credentials — PASS**, present by a direct presence test (`research/questions/DEFERRED.md`,
+  Q030 TRIGGER MET); **(ii) coverage — PASS**, **97.55%** (2,346 of 2,405 with ≥ 60 daily bars over
+  2026-06-01..2026-09-11; 59 short or absent, named in `STEWARD_Q030_universe_coverage_probe.md`)
+  against ≥ 90%; **(iii) rate — PASS**, measured at 0.6761/elapsed session via R1(a) and **not
+  re-measured**. The rate limb is the **inequality** 80 contributing nights ÷ the elapsed sessions
+  still admissible under DP-43's 12-month ceiling **measured from the actual lock commit**, rounded
+  up: ≈ 225 sessions and **≥ 0.36** at a 2026-09-14 lock, **re-solved if the lock date moves** — the
+  gate tightens as the lock slips and never loosens. The counts-only dry run R2(iii)/(iv) is
+  delivered (`STEWARD_Q030_counts_dryrun.md`; §5.1, §4.3).
+  **Still owed — the forward cut**, the next free `manifest_prices_universe_vNNN` (DP-23), same symbol
+  rule (all 2,405 base symbols plus every in-window candidate symbol and the benchmarks), same
+  adjustments and feed, **no hourly bars**, symbols lacking bars **excluded and counted, never
+  back-filled or imputed**, covering **≥ 60 sessions before the window start** through
+  **2027-04-05** (t+20 of the last in-window pick night), delivered before **Monday 2027-04-12**; the
+  extension cut, **only if** DP-13 fires, through **2027-05-17**, delivered before **Monday
+  2027-05-24**, built then and not before (Correction 2). `research/lib/freeze_prices.py` taking an
+  explicit symbol list is a change under `research/`, not an enforcement file under rule 15.
 - **R3 → data-steward (due before the decision date; not a blocker for lock; DP-23).** The successor
-  **selection** freeze `manifest_v00N` (same SQL, same exclusion criteria) covering pick nights
-  2026-09-15..2027-01-26 (and ..2027-03-10 if the extension fires), with the **add-only successor
-  exclusions file** — the identical file Q027's R2 requires, built once. Where a successor freeze
+  **selection** freeze `manifest_v00N` (same SQL, same exclusion criteria, **`sas_candidates` for
+  every candidate row, published and unpublished**, plus `sas_runs` and `market_regime_daily`) covering
+  pick nights **2026-09-15..2027-03-05** (and ..**2027-04-19** only if the extension fires), delivered
+  before **Monday 2027-04-12** (extension pair before **Monday 2027-05-24**), with the **add-only
+  successor exclusions file** — the identical file Q027's R2 requires, built once. Where a successor freeze
   overlaps an earlier one on `sas_candidates`, the rows are compared and `eval.py` **fails loudly** on
   any disagreement in the symbol set of a night (a repair that changed which symbols were candidates
   would silently re-run this experiment — DP-50(a)). R1(d)'s commit sweep is **repeated for the
@@ -564,14 +679,16 @@ confirming each other.
 - **R4 → data-steward (optional, droppable, and it decides nothing): the sealed-period universe
   price freeze.** The same B-wide bars for pick nights 2026-06-01..2026-08-12 with forward bars to
   2026-09-10, so the same byte-identical `eval.py` can print §6's labelled post-hoc panel **at the
-  decision pass, never before**. If R2's fetch proves expensive or rate-limited, **R4 is the first
-  thing dropped** and the panel is simply not printed; no verdict, no clause and no date depends on
-  it.
+  decision pass, never before**. **Its bar range is contained in the delivered
+  `manifest_prices_universe_v001`**, so no further fetch is needed; the panel is still computed only
+  at the decision pass, and no verdict, no clause and no date depends on it.
 
 ## 6. Test window, split and stratification
 
-- **Test window: prospective only — pick nights 2026-09-15 .. 2027-01-26**, opening on the first
-  session after the lock commit dated 2026-09-14 (the window starts on 09-15 rather than 09-14 so
+- **Test window: prospective only — pick nights 2026-09-15 .. 2027-03-05** (119 elapsed sessions;
+  extension .. 2027-04-19), opening on the **first trading session after the lock commit** — 2026-09-15
+  only if that commit is dated 2026-09-14, and otherwise the whole §5.2 arithmetic is re-derived from
+  the real start, out only (DECISIONS item 8, Correction 5; the window starts after the lock day so
   that no night whose 16:05 ET run may precede the lock commit can enter), through §5.2's end.
   *Justification.* Two reasons, either sufficient: (a) the sealed period has been read against the
   numerator's ingredients — the weeklies have printed sealed forward returns and 20-session touch
@@ -580,7 +697,8 @@ confirming each other.
   nights (DP-45); (b) the universe's **composition changed inside the sealed period** — bear
   projection v1 rejoined the candidate universe on 2026-07-02 (`5b716a2`,
   `services/candidate_universe_builder.py:120-148`) — so `U_t` is not one feature across it.
-- **The sealed post-hoc panel** (R4; `manifest_v001` + the sealed universe bars, pick nights
+- **The sealed post-hoc panel** (R4; `manifest_v001` + the sealed universe bars in
+  `manifest_prices_universe_v001`, pick nights
   **2026-06-01 .. 2026-08-12** — after the DP-06 boundary and at the 20-session maturity cutoff of
   the sealed price horizon) prints every §4 endpoint **once**, labelled, and enters **no verdict, no
   CI comparison, no half, no stratum test, no q and no §9 rule**. It is split at **2026-07-02** into
@@ -593,8 +711,9 @@ confirming each other.
   The primary must carry the same side of 1.00 in both halves (§8 clause 10). The halves are a
   **stability clause, not a reported stratum**, and block at whatever count they have.
 - **Monthly blocks:** calendar months of the window with ≥ 10 contributing nights; the share with the
-  same side of 1.00 as the full-sample estimate is §8 clause 11. At the registered length that is
-  four to five blocks, so the clause reads as "at least 3 of 4" or "at least 3 of 5" — stated
+  same side of 1.00 as the full-sample estimate is §8 clause 11. At the registered length (September
+  2026 through early March 2027) that is five to six blocks, so the clause reads as "at least 3 of 5"
+  or "at least 4 of 6" — stated
   numerically at the decision pass from the measured block count, with the rule (≥ 60%, rounded up)
   fixed here.
 - **Regime stratification (rule 7).** Two stratifiers, both reported, both subject to §4.3's
@@ -608,7 +727,8 @@ confirming each other.
   - **`tape_t`**, the SPY proxy, trailing and legal at 16:05 ET: sign of SPY's trailing 20-session
     return × tercile of its trailing 20-session realized volatility, from `prices_daily_split` bars
     dated ≤ t, with **expanding-window** tercile cut points, so no later night's data sets an earlier
-    night's stratum. All six cells are expected to be SUPPRESSED and are printed as counts.
+    night's stratum. Five of the six cells are SUPPRESSED at lock and printed as counts; `up_mid` is
+    reported only at ≥ 20 measured contributing nights (§4.3).
 - **Knowledge time (rule 14) — every input declared. Q030 needs no rule-14 exception and requests
   none** (DP-05 untouched, DP-41 respected).
 
@@ -638,9 +758,11 @@ confirming each other.
 - **Across the family: F8 System validity.** F8's BH correction runs across the members carrying
   primaries — **H-074 (this question), H-081 and H-083**; H-069 (Q026), H-070 (DP-51), H-076 (Q028),
   H-077 and H-084 are diagnostics or syntheses with no primary and enter no correction set. At this
-  lock the F8 set is **Q030 (1)** and it **never shrinks below 1**; if H-081 or H-083 locks before
-  2027-03-08 its primaries join the set and the q's are recomputed on the larger m at the decision
-  pass. Threshold **q ≤ 0.10**, alongside raw p (rule 8).
+  lock the F8 set is **Q030 `E1` (1) + Q033 `A` (1, H-081, locked) = 2**, and it **never shrinks below
+  2**; H-083 was drafted as Q035 and is DEFERRED, so its primary is outside the set while deferred (the
+  H-062 / Q025 precedent). If any further F8 primary locks before 2027-04-12 (2027-05-24 on the
+  extension) it joins the set and the q's are recomputed on the larger m at the decision pass.
+  Threshold **q ≤ 0.10**, alongside raw p (rule 8).
 - **Overlaps, stated so nothing is double-counted as independent evidence:**
   - **Q006 (F1)** contrasts published picks against distance-matched unpublished controls *inside*
     the universe. Q030 asks whether the universe contains the movers at all. A confirmed Q030 says
@@ -658,8 +780,9 @@ confirming each other.
     artifact is not a shared test.
   - **Q028 (F8)** decomposes the layer subscores' structure and reads no price bar; it cannot
     contaminate this question and is not in the correction set.
-  - **H-081 and H-083 (F8, unregistered)** are the other two F8 members carrying primaries; their
-    primaries join this correction set when they lock, and neither is tested here.
+  - **H-081 (F8, locked as Q033)** and **H-083 (F8, drafted as Q035, DEFERRED)** are the other two F8
+    members carrying primaries. Q033's `A` is in this correction set now; Q035's primary joins only if
+    it re-enters and locks. Neither is tested here, and neither shares an endpoint with `E1`.
   - **EN-016** (a larger candidate universe) is the enhancement this question's NULL branch would
     prioritize. It is not evidence and it is not a test.
 
@@ -670,10 +793,15 @@ sessions to the mean nightly recall a same-size uniform random draw from the gra
 would achieve, over §2.5's contributing nights. Null value **1.00**. Two-sided. H-074 predicts
 `E1 > 1` and Haci's PASS line asks for `E1 ≥ 2`.
 
-**MPE — `E1 ≥ 2.00`** (Haci's number, Master Hypothesis Program H4; §4.2 states the source and §11
-item 2 routes the unit question), **mirror `E1 ≤ 0.50`**. **Materiality floor — `D ≥ +1.0 pp`**
-(mirror `≤ −1.0 pp`). **Neither is lowered at the decision pass in any branch**, including one where
-the CI excludes 1.00 and the point estimate sits at 1.9. That is what an MPE is for (rule 6).
+**MPE — `E1 ≥ 2.00`** (Haci's number, Master Hypothesis Program H4, applied as registered; DP-20
+considered and not applied; DECISIONS item 2, §4.2), **mirror `E1 ≤ 0.50`**. **Materiality floor —
+`D ≥ +1.0 pp`** (mirror `≤ −1.0 pp`; DECISIONS item 3), an inseparable second condition: the MPE is
+compound. **Neither is lowered at the decision pass in any branch**, including one where the CI
+excludes 1.00 and the point estimate sits at 1.9. That is what an MPE is for (rule 6).
+
+**No interim look is registered (DP-58). The primary is a ratio endpoint, outside DP-58's touch-rate /
+per-trade-ATR scope, and its compound MPE has no defined boundary under that entry; `eval.py` is run
+once, at the decision pass.**
 
 **HISTORICALLY_CONFIRMED** requires **all** of:
 
@@ -690,7 +818,8 @@ the CI excludes 1.00 and the point estimate sits at 1.9. That is what an MPE is 
    the date-clustered CI and not on the episode-clustered one is **INCONCLUSIVE, never CONFIRMED**;
 6. **neither matched baseline runs the other way**: neither the B2 sector-matched nor the B3
    liquidity-matched lift sits **below 1.00 with its own 95% CI excluding 1.00** (§3);
-7. the **as-filed `|U_t|` denominator** version of E1 also clears 2.00 (§4.3, §11 item 1);
+7. the **as-filed `|U_t|` denominator** version of E1 also clears 2.00 (§4.3; DECISIONS item 1 — the
+   primary uses `n_t = |U_t ∩ B_t|`);
 8. the **tradeable-B** version does not sit below 1.00 with its CI excluding 1.00 (§4.3);
 9. the **2-ATR and 4-ATR** versions do not sit beyond the mirror MPE in the opposite direction — a
    lift above 2 at 3 ATR while the universe *avoids* 2-ATR and 4-ATR movers is a threshold artefact,
@@ -774,8 +903,9 @@ PROSPECTIVELY_CONFIRMED (rule 10):
   the meantime.** There is one database, and a change to universe construction rewrites what this
   question reads. Any platform change to `services/candidate_universe_builder.py`, to
   `uoa_screener.max_symbols`, to the bulletin list sizes, to the insider-watch parameters or to which
-  projection tables feed the universe is **flag-off until Q030's decision date, 2027-03-08**
-  (2027-04-19 if the single DP-13 extension fires) — the PI-011 / Q010 pattern, checked before any
+  projection tables feed the universe is **flag-off until Q030's decision date, 2027-04-12**
+  (2027-05-24 if the single DP-13 extension fires; DECISIONS item 13, Correction 4) — the PI-011 /
+  Q010 pattern, checked before any
   fix brief is written. If such a change ships anyway it takes a dated `DATA_NOTES.md` entry naming
   the file, the date range and the ship SHA, and §5.2's window split applies (DP-06, DP-50(a)).
   **A scoring-side change does not trigger this clause** (§5.2).
@@ -790,7 +920,8 @@ PROSPECTIVELY_CONFIRMED (rule 10):
 ## 10. Known threats to validity (registrar's own list)
 
 1. **The base universe is a stale snapshot, and the staleness only grows.** `sp500_sectors.json` was
-   synced once, on 2026-05-17, and the window runs to 2027-01-26 — eight months of index additions,
+   synced once, on 2026-05-17, and the window runs to 2027-03-05 (2027-04-19 on the extension) —
+   nearly ten months of index additions,
    IPOs and delistings missing. The bias is **one-directional and structural**: names that listed or
    joined the indices after May 2026 are absent from `B` entirely, and those are disproportionately
    the high-momentum names a flow-led universe would find. They are excluded from `M_t` **and** from
@@ -842,8 +973,9 @@ PROSPECTIVELY_CONFIRMED (rule 10):
 10. **One database (DP-50).** A platform repair between freezes can rewrite which symbols were
     candidates on a past night. Rule 4's pinned manifests are what stands between that and a locked
     question, and R3's loud symbol-set comparison is what detects it.
-11. **The prospective window may not be representative.** Ninety-two sessions is one stretch of tape,
-    and rule 7's cells are expected to be thin (all six `tape_t` cells suppressed). Discovery is
+11. **The prospective window may not be representative.** A hundred and nineteen sessions is one stretch of tape,
+    and rule 7's cells are expected to be thin (five of six `tape_t` cells suppressed at lock; three
+    `market_regime` labels never observed on the measured history). Discovery is
     plausibly regime-dependent — a narrow tape has few movers and they are news-driven, which is
     where flow should shine — so a lift measured over one stretch is a real but narrow finding, and
     §9's language keeps it that way.
@@ -855,46 +987,29 @@ PROSPECTIVELY_CONFIRMED (rule 10):
 
 ---
 
-## Open decisions before lock
+### Internal learning output (DP-52/55)
 
-1. **The random-draw denominator** — Options: A `n_t = |U_t ∩ B_t|`, the candidates that are actually
-   in the base universe, with the as-filed `|U_t|` version as a **blocking** companion (§8 clause 7) /
-   B `n_t = |U_t|` as the BACKLOG filed it. Recommendation: **A**, because a candidate outside `B`
-   can never appear in `M_t`, so counting it in the draw size compares the engine against a random
-   list it never drew — and requiring the as-filed version to clear 2.00 as well keeps A strictly the
-   stricter test rather than the looser one. Changes: §2.1, §2.3, §4.3, §8 clause 7.
-2. **"Lift MPE unit" as a standing rule** — Options: A apply `≥ 2.00` here from Haci's H4 line plus
-   the `+1.0 pp` materiality floor, and route the *general* rule ("the MPE for a ratio/lift endpoint
-   is a lift of 2.0 together with a stated absolute floor") to the Decision-maker as a proposed
-   standing entry, since DP-44 has no ratio unit and this run writes no DP from a DEFAULTED item /
-   B apply DP-20's +5.0 pp to the difference `D` and derive the lift from it. Recommendation: **A**,
-   because DP-20 was set for touch rates on 40–70% bases and +5.0 pp on a 2.4% base silently demands
-   a lift above 3 — a different hypothesis from the one filed. Changes: §4.2, §8 clause 3, and a
-   proposed DP entry (written by the Decision-maker, not by the Registrar).
-3. **The materiality floor on `D`** — Options: A require `D ≥ +1.0 pp` alongside the lift (§8 clause
-   3b) / B lift only. Recommendation: **A**, because a lift of 2 over a base rate of 0.4% would mean
-   the universe captures under 1% of the market's movers, and no reading of "finds major opportunities"
-   survives that. Changes: §4.2, §8 clause 3.
-4. **The mover's reference price and gap-throughs** — Options: A level from the pick-night close
-   `C_t`, any touch in t+1..t+20 counting **including a gap through at the t+1 open**, with the
-   tradeable-from-t+1-open version printed / B the tradeable framing as the primary. Recommendation:
-   **A**, because H4 asks whether the platform found the name **before it moved** and a name that
-   gaps overnight is the archetype of that, while §8's language clause and §9 forbid reading A as a
-   tradeable claim. Changes: §2.3, §4.3, §8, §9.
-5. **The base universe for the primary** — Options: A all of `B` as filed, with the tradeable-B
-   version ($5 price, $5M `adv20`) printed and **blocking at lift ≥ 1.00** (§8 clause 8) / B
-   tradeable-B as the primary. Recommendation: **A**, because DP-25 registers the hypothesis as
-   filed and the tradeable restriction changes `b_t`, `m_t` and `e_t` together in a direction the
-   desk cannot sign in advance; the blocking clause is what stops A being the looser choice.
-   Changes: §2.2, §4.3, §8 clause 8.
-6. **The bear direction** — Options: A bull recall is the single primary and the −3 ATR statistic is
-   a fully computed secondary that decides nothing / B bull and bear as co-primaries, `m = 2`.
-   Recommendation: **A**, because H-074 names one primary and files bears as "separately"; the bear
-   statistic is computed identically and §9 routes a striking bear result to its own PREREG rather
-   than letting it be harvested here (the Q027 / H-012 convention). Changes: §4.3, §7, §9.
-7. **The sealed post-hoc panel** — Options: A request the sealed-period universe bars as **R4**, a
-   droppable routed item, and print the panel once at the decision pass from the same byte-identical
-   `eval.py` / B no sealed panel at all. Recommendation: **A**, because the panel is computed after
-   the primary run is fixed and cannot inform any choice, and it is the only read the desk will ever
-   have on whether the universe held the April–August movers — while remaining the first thing
-   dropped if R2's fetch is expensive. Changes: §5.3 R4, §6.
+**Evidence card — MECHANICAL, INTERNAL / NON_QUOTABLE, not a controller verdict.** *What permitted
+evidence can say now:* the question is measurable as registered — base-universe bar coverage is
+97.55% against a 90% gate; on the 51 sealed nights the night statistic is defined every night (`m_t`
+never 0, `n_t` 45–68, `b_t` 2,342–2,375), the coverage and ungradeable gates never bind, and 48 of 51
+nights would contribute before the unmeasured §2.6 gate. *Limits:* nothing about discovery is known or
+may be computed before the decision pass — no recall, no `e_t` series, no lift and no intersection
+`|M_t ∩ U_t^B|` has been produced; §2.6 corroboration (R1(b)) and DP-04 are unmeasured; the sealed
+panel is post-hoc only and prints at the decision pass. *Internal decision it supports:* lock and
+accrue; it supports no statement about the universe. *Next review:* on delivery of R1(b)–(d), or at
+the weekly card review, whichever is first.
+**Historical companion:** not prepared at this lock. Any companion is a separate
+`research/learning/` protocol on the admitted in-sample split (`trading_date <= 2026-05-29`), labelled
+EXPLORATORY, stating the universe's composition history and prior exposure; it never reads R4's sealed
+panel or any window night, and it cannot promote a verdict or a subscriber claim (DP-55).
+
+---
+
+## Decisions before lock
+Recorded in DECISIONS.md (2026-09-14). Routed items still open: R1(b)–(d) to data-steward (counts
+only, not blocking for the lock; R1(b) is the §2.6 corroboration count, the one open input to the
+schedule); R2's forward cut to data-steward (through 2027-04-05, before Monday 2027-04-12; extension
+cut through 2027-05-17, before Monday 2027-05-24, only if DP-13 fires); R3 successor selection freeze
+and add-only successor exclusions file to data-steward (same due dates). R2's lock-or-DEFER gate is
+closed, PASS on all three limbs; R4's bars are contained in `manifest_prices_universe_v001`.

@@ -10,19 +10,23 @@ Nothing here is inherited from the SMA50-only proxy: the partition below is the 
 
 - SPY bars: **423**, 2025-01-02 .. 2026-09-10. SMA200 defined from **2025-10-20**.
 
+## Correction to the first version of this report
+
+The first version divided the t+40-matured counts by **all** elapsed sessions in the panel (112), including the immature tail, and the schedule then added 40 sessions of maturity again — maturity counted twice, which DECISIONS item 3 and DP-53 forbid. Its rates (0.5536 / 0.2589 / 0.0268) were biased low and are **superseded**. Caught by the Decision-maker at `record` (DECISIONS item 18). This version divides matured counts by the matured calendar cohort, exclusions retained, and reports floor D's episodes **per arm**, since floor D is per arm (DECISIONS item 21).
+
 ## The three rate limbs
 
-Panel: **112** pick nights 2026-04-01..2026-09-10 over **112** elapsed sessions. t+40 maturity cutoff inside this freeze: **2026-07-15** (last bar 2026-09-10).
+Panel: **112** pick nights 2026-04-01..2026-09-10 over **112** elapsed sessions. t+40 maturity cutoff inside this freeze: **2026-07-15** (last bar 2026-09-10); **matured calendar cohort = 72 sessions**, 2026-04-01..2026-07-15.
 
-| limb | floor | t+40-matured | unmatured |
+| limb | floor | matured cohort (decides) | all-period, unmatured (proxy only) |
 |---|---|---|---|
-| (a) contributing nights / session | 0.4 | **0.5536** vs 0.4 — PASS | **0.9107** vs 0.4 — PASS |
-| (b) rarer-arm nights / session | 0.1 | **0.2589** vs 0.1 — PASS (rarer = BENIGN) | **0.4018** vs 0.1 — PASS (rarer = HOSTILE) |
-| (c) rarer-arm episodes / session | 0.025 | **0.0268** vs 0.025 — PASS | **0.0714** vs 0.025 — PASS |
+| (a) contributing nights / session | 0.4 | **0.8611** vs 0.4 — PASS (62/72) | **0.9107** vs 0.4 — PASS |
+| (b) rarer-arm nights / session | 0.1 | **0.4028** vs 0.1 — PASS (rarer by nights = BENIGN, 29/72) | **0.4018** vs 0.1 — PASS (rarer = HOSTILE) |
+| (c) fewer-episode arm's episodes / session | 0.025 | **0.0417** vs 0.025 — PASS (e_min = 3, arm BENIGN) | **0.0625** vs 0.025 — PASS |
 
-- Arm split, t+40-matured contributing nights: **BENIGN** 29, **HOSTILE** 33 (rarer = **BENIGN**)
+- Arm split, t+40-matured contributing nights: **BENIGN** 29, **HOSTILE** 33 (rarer by nights = **BENIGN**)
 - Arm split, unmatured: **BENIGN** 57, **HOSTILE** 45
-- Rarer-arm episodes: **3** matured, **8** unmatured
+- **Gate-counting tape-episodes per arm, matured cohort: BENIGN 3, HOSTILE 3 → e_min = 3** (DECISIONS item 21's branch variable). All-period: BENIGN 7, HOSTILE 8.
 - Nights excluded by exclusions_v003: **10**; unlabelled (no arm): **0**; not t+40-matured in this freeze: **40**
 
 ## (d) Nine-cell composition — contributing nights (t+40-matured)

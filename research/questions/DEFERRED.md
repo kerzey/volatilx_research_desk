@@ -669,6 +669,7 @@ file's preamble **nothing here may be reported, briefed or quoted.**
 
 
 > **TRIGGER MET 2026-09-14 — this deferral is lifted; the entry is kept as the record of why it was made.**
+> **RE-REGISTERED 2026-09-14** as Q030; this entry is now history only.
 > Both limbs were measured in a desk session, never inferred. **(1) Credentials present:** `ALPACA_API_KEY`
 > and `ALPACA_SECRET_KEY` are both present, asserted by a direct presence test (`research/lib/desk_env.py`,
 > which returns names and never values); they were always in `.env.research` and always loaded for headless
@@ -2136,4 +2137,149 @@ the printed ladder), a split-adjusted bar dated ≤ t, or a point-in-time regime
 DP-41 is not engaged**, and a successor inherits that clean position.
 
 Under this file's preamble **nothing here may be reported, briefed or quoted** until the trigger is
+met.
+
+---
+
+## H-014 — "A configuration change brackets the fall", re-specified: only changes that can move `overall_score`, tested as a local step at the change date — **no qualifying change exists after 2026-05-18, and the locked Q031 holds every qualifying field flag-off until 2027-06-07**
+
+**Deferred 2026-09-14 by the registrar, autonomous run (DP-40..48, DP-52..58), on this file's
+**second** admission ground (DP-43's 12-month ceiling), in the Q025 / Q036 form: the exposure is
+event-driven, and the event rate is **measured at zero** and **held at zero by a locked question**,
+so no decision date can be projected.** Not drafted: no `QNNN` directory was created, and no question
+number is consumed (the H-062 precedent). Not merged (DP-29): no locked PREREG tests this rule.
+Q031's per-night `config_json` panel (§4.3, `:329-332`) is descriptive and says so (`:689-690`).
+Q005 has already run and stands as run. Q028 §10 threat 5 (`:624-629`) only cuts at change dates.
+
+### What the question is, and why it is worth keeping
+
+Q005 §8 (`:206-210`) let any `config_json` difference whose date "brackets the fall" short-circuit
+the decomposition to HISTORICALLY_CONFIRMED — configuration. The run showed that a global
+before/after split can fire this rule on changes that cannot move a score. Q005's REPORT.md records
+that the Red Team set Channel 3a aside for this reason. H-014 asks for two fixes, written before any
+future decomposition runs:
+
+1. **Firing set.** Only fields that can mechanically move `overall_score` count: scoring weights and
+   timeframe multipliers (`services/super_agent_select_scoring.py:682-722`, `:1316-1322`), the
+   ATR-elite block and its caps (`:1401-1423`), `atr_sas_component_cap`,
+   `projection_score_ceiling`, `max_conflict_penalty`, `max_cross_layer_bonus`,
+   `missing_data_penalties`, and the scoring enable-flags that decide whether a layer gets context.
+   A field must hold for ≥ 20 non-excluded nights to count. A single-night toggle that reverts does
+   not count. Publication and qualification gates are excluded because they move who is published,
+   not the score: `publication_floor`, `bear_publish_threshold`, `bear_max_output_cap`,
+   `qualification_threshold`, `max_output_cap` and `min_completeness`. They can move the
+   elite-*published* series but not Q005's primary elite-*candidate* series.
+2. **Firing test.** The rule needs a **local step at the change date**, meaning a contrast between
+   the nights just before and just after that date. A global split does not count, because any
+   mid-sample date passes it when the series declines.
+3. **The +5 GEX-missingness offset, defined in advance from code.** "Fired" means the row's recorded
+   `score_details_json.gex_missing_offset_applied` is true (written at
+   `services/super_agent_select_service.py:320-321` from `super_agent_select_scoring.py:1390-1391`).
+   A row that predates the offset code, where the key is absent, counts as **not fired**. A null
+   `gex_alignment_score` is a GEX-coverage descriptor and is never used as a proxy for the offset.
+   The two measures diverge because the offset code postdates April, as H-014 itself notes.
+
+These three definitions are **method**. They carry forward into any successor, and to any future
+decomposition in the Q005 shape, without change.
+
+### Why it cannot be registered — the event count
+
+The unit of this test is a **qualifying change event** plus its local night windows. Rule 6 still
+counts nights. One event that is ±20 non-excluded nights clean supplies 40 contributing nights. The
+80-night floor per primary endpoint (DP-21) therefore needs two clean events at ±20 nights, or one
+event at ±40.
+
+**What the frozen history holds** (counts only, from config and code, with no outcome read). Sources
+are `research/reports/STEWARD_Q029_feasibility.md` §(e) (`:334-354`, full 102-night census, April
+onward) and `research/reports/STEWARD_Q027_exposure.md` R1(g) (`:290-310`, the 71 nights
+2026-06-01..2026-09-10, plus the code sweep since `fa70688`). Q031's lock (`:530-543`, HEAD
+`d19c9a9`) confirms both.
+
+| score-moving change in `manifest_v001` | effective | clean local window |
+|---|---|---|
+| `enable_fundamental_enrichment` False → True (single-night reversions 2026-05-04, 2026-06-02 do not count) | 2026-05-01 | **After side about 6 non-excluded nights.** The next score-moving change lands 2026-05-18, and 2026-05-11..14 are manual-run exclusions. |
+| v1.5 weight reallocation (technical / projection / catalyst / GEX 20/26/8/12 → 27/29/10/0) **and** the ATR-elite block (84.9 / 79.9 / 35.0), on the same date, so they cannot be separated | 2026-05-18 | **Before side about 6 clean nights** (back to 2026-05-01). After side: nothing changes to 2026-09-10. |
+| any score-moving field, 2026-05-19..2026-09-10 | — | **none.** Every scoring field is constant. The only changes are publication gates (`bear_publish_threshold`/`bear_max_output_cap` 2026-06-29, `publication_floor` 2026-07-08) and single-night enable-flag toggles (2026-06-02, and 2026-07-02, which is excluded). |
+
+- **Historical limb: fails the floor, and it is post-hoc.** One inseparable event (2026-05-18) has
+  about 6 clean nights before it. Adding the 05-01 change's nights mixes two configurations. Neither
+  reading reaches 80 contributing nights. The in-sample split ends 2026-05-29, so only 9
+  non-excluded in-sample nights follow the event. Everything after that is sealed history that Q005
+  has already decomposed month by month. The rule was also written *after* Q005's output was seen.
+  A registered verdict on that history would be the forking path rule 3 exists to prevent. DP-55
+  also says inspected history is not an independent holdout.
+- **Mechanical consequence, stated as config fact and not as a finding.** Under the re-specified
+  rule, Channel 3a **cannot fire on Q005's P1 fall (2026-07-01..09-10)**. The nearest score-moving
+  change is about 30 sessions before P1 opens, and nothing changed inside P1. This comes from the
+  Steward censuses alone. It is INTERNAL / NON_QUOTABLE and is not a verdict on Q005 or on the cause
+  of the fall.
+- **Prospective limb: projected event rate zero, and no honest date can be named.** DP-53's
+  forecast basis is the fully observable cohort since the last qualifying change: **0 qualifying
+  events in the 71 nights 2026-06-01..09-10**, and 0 scoring-file commits since `fa70688`. Going
+  forward, the locked **Q031 §9 (`:800-806`)** holds weights, multipliers, `qualification_threshold`,
+  ATR-elite caps, GEX offset and scoring enable-flags, including any v1.7 promotion, **flag-off until
+  2027-06-07**, or 2027-07-19 if its DP-13 extension fires. Q027 and Q029 hold the same fields to
+  2027-04-12 / 2027-05-24. No v1.7 ship date exists.
+  - The only path to a decision inside the DP-43 ceiling of **2027-09-14**: a qualifying change
+    ships flag-on on **2027-06-08**, the first eligible session, and holds cleanly. Then 40
+    after-nights end 2027-08-04, a one-week freeze margin gives 2027-08-11, and the decision date is
+    **Monday 2027-08-16**. That assumes no new exclusions and no maturity lag, since elite status is
+    known at 16:05 ET.
+  - If Q031's extension fires, the earliest ship is 2027-07-20, 40 sessions end 2027-09-14, and the
+    decision falls on 2027-09-27, **past the ceiling**.
+  - A decision date that depends on an unscheduled ship in a roughly six-week slot is not a
+    projection from a measured rate (DP-43, DP-53). No date is named, and no date is invented.
+- **Precision (DP-57), noted for re-entry.** The elite-candidate count is a small-count night series
+  (Q005 §10 threat 1). One event at ±40 nights may not reach usable precision at any honest MPE, so
+  the re-entry draft must size the event count on a Steward count. No DP covers an MPE for a step in a
+  nightly count series, so that MPE would be an open decision at re-entry. DP-58's interim look would
+  not apply because the endpoint is outside its touch-rate / per-trade-ATR scope.
+
+### What was considered and rejected before deferring
+
+- **Registering the historical limb as HISTORICAL_ONLY (DP-31)** with a prospective successor:
+  **rejected.** The historical limb is below the 80-night floor by construction and is post-hoc on
+  inspected data. The successor DP-31 would require has a projected event count of zero.
+- **Pooling the 05-01 and 05-18 changes into one "v1.5 build-out" event:** **rejected.** Enrichment
+  on and weights plus ATR cap are different mechanisms. Pooling them turns a local step test back
+  into a before/after split across a span, which is the defect H-014 exists to remove. It is still
+  post-hoc and still short.
+- **Treating publication-gate changes as events** (2026-06-29, 2026-07-08 fall inside P1):
+  **rejected.** Excluding them is H-014's own specification, and they cannot move `overall_score`.
+  A question about gates moving the elite-*published* count is a different hypothesis (DP-25).
+- **Asking for a scoring change so the question can run:** **refused.** This entry is never a reason
+  to ship one (the Q025(b) / Q036 precedent), and Q031's DP-50(b) constraint binds.
+
+### What would move it back into the backlog
+
+Two triggers. Either is enough, and both are measured, never projected:
+
+1. **A qualifying change is scheduled.** Haci or the platform plan sets a ship date for any field in
+   the firing set, such as a v1.7 promotion after the in-flight constraints lift. This is the
+   preferred trigger: re-enter at scheduling and **lock before the ship**, so both local windows are
+   collected blind.
+2. **A qualifying change ships.** The Steward's `config_json` census on a then-current freeze shows a
+   firing-set field changed flag-on and held ≥ 20 non-excluded nights, with no other score-moving
+   change within the local windows. Re-check at the first freeze after the ship.
+
+**Blindness constraint carried to re-entry.** Q031's "what else moved" panel (`:333-334`) prints
+the per-night elite (≥ 90) candidate count through its window, deciding 2027-06-07. A successor's
+before-window nights must not have been printed by a question that has already run. If they have,
+the successor says so in §6, and those nights may not be claimed as blind.
+
+### Bookkeeping while deferred
+
+No verdict, no `eval.py`, no `results/`, no schedule. The **F2 correction set is unchanged at 16**
+(Q031 §7 `:662-666`). No locked file was edited, and **no DP-50(b) constraint is owed by H-014**.
+**Rule 14:** no exception is needed. Every input is a 16:05 ET `sas_runs.config_json` or
+`sas_candidates` field. DP-41 is not engaged.
+
+**Exposure disclosure.** While checking for overlap, the registrar ran a repo-wide search for
+"H-014 / Channel 3a". It surfaced single lines from `Q005_elite_thinning/results/` (`SUMMARY.md:3`,
+`:51`; `NOTES.md` lines 79-153; `REDTEAM.md` finding titles). Those lines name the four
+publication-gate and toggle dates Q005's global rule flagged. They contain no outcome beyond what
+BACKLOG H-014 and the Steward reports already state, and no file under `results/` was opened. It is
+recorded so that a successor does not claim the Q005 history as unread.
+
+Under this file's preamble **nothing here may be reported, briefed or quoted** until a trigger is
 met.

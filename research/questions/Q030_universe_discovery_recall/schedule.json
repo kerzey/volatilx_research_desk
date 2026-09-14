@@ -1,0 +1,9 @@
+{
+  "decision_date": "2027-04-12",
+  "extension_date": "2027-05-24",
+  "hard_stop": "2027-05-24",
+  "rule": "exposure-driven",
+  "extended": false,
+  "note": "§5.2 Floor A at the measured 0.6761; 119 sessions, DP-13 extension to 149",
+  "pin_at_decision": true
+}
