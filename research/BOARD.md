@@ -53,6 +53,7 @@ _none yet — every question so far is NULL, INCONCLUSIVE, or still waiting for 
 | Q018 | for the same pick, does the day, the swing or the long-term lane plan make the most money — and does the answer depend o | PREREG_LOCKED | 2027-07-12 |
 | Q021 | Q021 — GEX pin risk and two-sided paths (does a pinned pick round-trip more often?) | DATASET_PINNED | 2027-08-09 (exposure check; hard stop 2027-09-20) |
 | Q015 | do picks scoring 85–90 reach the swing target and then hand it back more often than picks scoring 80–85, and does exitin | DATASET_PINNED | 2027-08-30 |
+| Q024 | Q024 — does SAS beat embarrassingly simple benchmarks, on the price path? | PREREG_DRAFT | — |
 
 ## 4. Platform issues
 
@@ -96,6 +97,7 @@ _Source: `research/ENHANCEMENTS.md`. `plumbing` items can be built now; `behavio
 | EN-013 | PROPOSED | — | Bear-pick handling in strong tapes: skip, size down, or label bear picks when the point-in-time regime is `strongly_bullish`. Source: H-062, |
 | EN-014 | PROPOSED | — | Earnings-within-3-sessions flag on the pick card, with a "no spread across the print" note. Source: H-064. |
 | EN-015 | READY | — | Knowledge-time stamp on every displayed number (computed at 16:05 on the pick night vs next morning), so subscribers and the desk can tell w |
+| EN-016 | PROPOSED | — | A larger per-night candidate universe retained in `sas_candidates` — the full scanned universe rather than the scored shortlist, or a per-se |
 
 ## 6. Trade ideas (yours; never subscriber-facing until prospective)
 
@@ -141,10 +143,16 @@ _Each was a question the desk would once have asked you. It took the recommended
 - **Q023** #6 Window start — chose **prospective-only, pick nights ≥ 2026-09-14**; not taken: read the sealed nights, decides now, not blind — DP-43. Overturn = successor question.
 - **Q023** #3 E2's clock — chose **the committed plan's own lane windows on a 60-session budget**; not taken: truncate at 20 sessions, decides ~2 months sooner — DP-43. Overturn = successor question.
 - **Q023** #13 Window end and decision date — chose **114 sessions, ending 2027-02-25, decision Monday 2027-06-07**; not taken: 100 sessions, decides 4 weeks sooner on a coin-flip floor — DP-43/DP-45. Overturn = successor question.
+- **Q024** #1 Window start — chose prospective-only from 2026-09-14; not taken: sealed start 2026-07-08, ~2 months sooner — DP-45 (the weeklies have already printed SAS's absolute sealed-period returns, so the SPY arm is not blind on those nights; Q018/Q023 precedent). Overturn = successor question.
+- **Q024** #7 Arm below the 80-night floor — chose removed from the deciding set but still printed descriptively at ≥ 20 nights, with the CONFIRMED sentence naming it; not taken: drop the arm silently and let `m` fall — DP-43. Overturn = successor question.
+- **Q024** #3 (at `record`) EW / RSP arm — chose **conditional registration**, settled by the Steward's freeze-time pinnability check before `eval.py` exists (`m = 6` if RSP pins, 5 if not); not taken: **defer EW now and lock at `m = 5`** — DP-45: six arms is the harder gate, and dropping an arm before anyone knows whether it can
+- **Q024** #9 (at `record`) Window end, decision date, extension — chose **2026-09-14..2027-04-07 (142 sessions), Monday 2027-05-17**, extension Monday 2027-06-28, sized on the measured 0.5652; not taken: **the drafted 2027-03-29, ten weeks sooner**, or the 0.9783 pre-maturity rate that would have been sooner still — DP-43/DP-45.
+- **Q025** #6 Window end and decision date — the DP-43 rule fired and **chose DEFERRED**: measured binding rate **0.000 contributing nights per elapsed session** against a 0.35 gate, so there is no honest date; not taken: a wider caliper or a soft sector block, which would have produced nights by weakening the control — DP-43, DP
+- **Q025** #6 Window end and decision date — chose **the DP-43 window computed at `record` from the Steward's measured rate, sized at its one-sided 90% lower bound (provisionally window to 2027-01-13, decision Monday 2027-02-22, one extension to 2027-02-26 decided Monday 2027-04-05), and DEFERRED if the binding rate is below 0.35
 
 ## 8. Backlog and calendar
 
-- Open hypotheses: **9** · registered: 26 · deferred (data missing): H-041, H-055, H-062
+- Open hypotheses: **9** · registered: 28 · deferred (data missing): H-041, H-055, H-062, H-067
 - Next to register (DP-47 order): H-011, H-010, H-012, H-014, H-002
 
 | decides on | Q |
