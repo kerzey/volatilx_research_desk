@@ -74,15 +74,28 @@ def resolve_agent(payload) -> str:
 
 
 def is_locked_prereg(root: str, rel: str) -> bool:
-    """A PREREG.md that is already committed is locked; only a new question dir may be written."""
+    """A committed PREREG.md is locked unless its question is a never-locked draft.
+
+    # patch8 (2026-09-14, Q030/Q032): a draft saved in git only as the record of a deferral (state
+    back at PREREG_DRAFT via the controller, never PREREG_LOCKED) stays writable. Anything
+    that was ever PREREG_LOCKED stays locked forever. Unreadable state.json -> locked.
+    """
     if not rel.endswith("PREREG.md"):
         return False
     try:
         out = subprocess.check_output(["git", "-C", root, "ls-files", "--error-unmatch", rel],
                                       text=True, stderr=subprocess.DEVNULL)
-        return bool(out.strip())
+        if not out.strip():
+            return False
     except Exception:
         return False
+    try:
+        with open(os.path.join(root, os.path.dirname(rel), "state.json"), encoding="utf-8") as f:
+            st = json.load(f)
+        ever_locked = any(h.get("state") == "PREREG_LOCKED" for h in st.get("history", []))
+        return ever_locked or st.get("state") != "PREREG_DRAFT"
+    except Exception:
+        return True
 
 
 def main() -> None:

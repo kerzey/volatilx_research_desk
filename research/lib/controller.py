@@ -194,10 +194,40 @@ def now():
     return datetime.now(timezone.utc).isoformat()
 
 
+def resume_deferred_error(d, st, args):
+    # patch8 (2026-09-14, Q030/Q032): the one way out of DEFERRED. A parked question may go back to
+    # PREREG_DRAFT only if it was never locked and DEFERRED.md records its trigger as met.
+    if args.by not in ("desk", "haci"):
+        return "requires --by desk or --by haci"
+    if any(h.get("state") == "PREREG_LOCKED" for h in st.get("history", [])):
+        return "this question was locked once; a locked question never reopens (DP-22)"
+    f = Path("research/questions/DEFERRED.md")
+    text = f.read_text(encoding="utf-8") if f.exists() else ""
+    section, inside = [], False
+    for line in text.splitlines():
+        if line.startswith("## "):
+            inside = line[3:].split()[:1] == [args.q]
+            continue
+        if inside:
+            section.append(line)
+    if not any("TRIGGER MET" in line for line in section):
+        return f"no 'TRIGGER MET' line under '## {args.q}' in DEFERRED.md"
+    return None
+
+
 def cmd_advance(args):
     d = qdir(args.q)
     st = load(d) or sys.exit("run init first")
     cur, nxt = st["state"], args.state
+    if cur == "DEFERRED" and nxt == "PREREG_DRAFT":   # patch8 (2026-09-14, Q030/Q032)
+        err = resume_deferred_error(d, st, args)
+        if err:
+            sys.exit(f"cannot resume {args.q} from DEFERRED: {err}")
+        st["state"] = nxt
+        st["history"].append({"state": nxt, "at": now(), "by": args.by, "note": args.note})
+        save(d, st)
+        print(f"{args.q}: {cur} -> {nxt} (deferral lifted)")
+        return
     if nxt in TERMINAL:
         st["state"] = nxt
     else:
