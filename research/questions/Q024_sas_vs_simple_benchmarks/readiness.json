@@ -1,0 +1,124 @@
+{
+  "as_of": "2026-09-14",
+  "sources": [
+    "research/questions/Q024_sas_vs_simple_benchmarks/PREREG.md (section 2, 3, 4, 5, 7, 8)",
+    "research/questions/Q024_sas_vs_simple_benchmarks/schedule.json",
+    "research/questions/Q024_sas_vs_simple_benchmarks/state.json",
+    "research/questions/Q024_sas_vs_simple_benchmarks/DECISIONS.md (Schedule section)",
+    "research/reports/STEWARD_Q024_sas_vs_simple_benchmarks_exposure.md (dated 2026-09-13; counts-only; cited, not recomputed)"
+  ],
+  "count_definition": "PREREG section 2.3: for each candidate night t in the window, computed at 16:05 ET before any forward bar is read: (1) drop the night entirely if it appears in exclusions_v003.json unioned with the add-only successor exclusions file (manual_runs union non_session_runs union uncorroborated_publication_runs), or if sas_runs.finished_at is later than the next session open (DP-04); (2) require k_t >= 1 after section 2.4 pick-level screens (no swing-lane target; outcome_target_invalid non-null or swing T1 on the wrong side of C_t; the price-scale screen target/C_t outside [0.5,2.0] or implied ATR distance above 12 ATR; fewer than 60 daily bars <= t or no C_t or no session t+1 open; not gradeable); (3) require the registered benchmark arm in question to be computable on that night (SPY/RSP bars for t and t+1; a candidate pool of at least k_t non-published rows with >= 60 prior daily bars for the rank arms; a mapped sector for at least one pick with at least one same-sector unpublished candidate for the sector arm) -- a night on which an arm is not computable is non-contributing for that arm only, never an exclusion; (4) require the night to be MATURED: session t+20 on or before the last trading date of the pinned price freeze -- immature nights are excluded and counted, never graded as a non-touch; (5) CONTRIBUTING NIGHT (the floor unit, DP-21): a night surviving 1-4 for the arm in question, carrying >= 1 gradeable pick.",
+  "window": {
+    "start": "2026-09-14",
+    "end": "2027-04-07",
+    "elapsed_sessions_at_end": 142,
+    "extension_end_if_DP13_fires": "2027-05-19",
+    "elapsed_sessions_at_extension_end": 172,
+    "basis": "PREREG section 5 / schedule.json: window sized on measured r_min=0.5652 contributing nights per elapsed session (ceil(80/0.5652)=142); single DP-13 extension +30 sessions if any arm is short at the decision date, then DEFERRED at the hard stop"
+  },
+  "decision_date": "2027-05-17",
+  "extension_decision_date_if_DP13_fires": "2027-06-28",
+  "hard_stop": "2027-06-28",
+  "elapsed_sessions": 0,
+  "endpoints": [
+    {
+      "endpoint": "E_SPY",
+      "arm": "B1 -- SPY (buy the index)",
+      "status": "registered",
+      "eligible_nights": 0,
+      "mature_nights": 0,
+      "contributing_nights": 0,
+      "required_nights": 80,
+      "post_lock_contributing_nights": 0,
+      "required_post_lock_nights": 30
+    },
+    {
+      "endpoint": "E_EW",
+      "arm": "B2 -- equal-weight S&P 500 (RSP)",
+      "status": "conditionally registered -- settled by the Steward freeze-time RSP pinnability check, R2 first action, before manifest_prices_v002 is pinned and before eval.py exists (PREREG section 3 B2, 5, 7); pinnable -> m=6, not pinnable -> arm deferred as an arm, m=5, no proxy substituted",
+      "eligible_nights": 0,
+      "mature_nights": 0,
+      "contributing_nights": 0,
+      "required_nights": 80,
+      "post_lock_contributing_nights": 0,
+      "required_post_lock_nights": 30
+    },
+    {
+      "endpoint": "E_SECRAND",
+      "arm": "B3 -- sector-adjusted random",
+      "status": "registered",
+      "eligible_nights": 0,
+      "mature_nights": 0,
+      "contributing_nights": 0,
+      "required_nights": 80,
+      "post_lock_contributing_nights": 0,
+      "required_post_lock_nights": 30
+    },
+    {
+      "endpoint": "E_MOM20",
+      "arm": "B4 -- 20-session momentum rank",
+      "status": "registered",
+      "eligible_nights": 0,
+      "mature_nights": 0,
+      "contributing_nights": 0,
+      "required_nights": 80,
+      "post_lock_contributing_nights": 0,
+      "required_post_lock_nights": 30
+    },
+    {
+      "endpoint": "E_MOM60",
+      "arm": "B5 -- 60-session momentum rank",
+      "status": "registered",
+      "eligible_nights": 0,
+      "mature_nights": 0,
+      "contributing_nights": 0,
+      "required_nights": 80,
+      "post_lock_contributing_nights": 0,
+      "required_post_lock_nights": 30
+    },
+    {
+      "endpoint": "E_TECH",
+      "arm": "B6 -- simple technical rank",
+      "status": "registered",
+      "eligible_nights": 0,
+      "mature_nights": 0,
+      "contributing_nights": 0,
+      "required_nights": 80,
+      "post_lock_contributing_nights": 0,
+      "required_post_lock_nights": 30
+    }
+  ],
+  "data_dependency": {
+    "missing_manifests": [
+      "research/data/manifest_v002.json (selections successor freeze -- not yet built)",
+      "research/data/manifest_prices_v002.json (prices/outcomes successor freeze -- not yet built)"
+    ],
+    "named_by": "PREREG.md header (Manifest selections / Manifest prices-outcomes lines) and section 5 request R2",
+    "scope": "pick nights 2026-09-14..2027-04-07 (and a second pair only if the DP-13 extension fires, ..2027-05-19)",
+    "build_timing": "PREREG section 5 / DECISIONS.md Schedule section: built after 2027-05-05 (the 2027-04-07 window end 20-session maturity), delivered by Monday 2027-05-10, one week before the 2027-05-17 decision pass; extension pair (if DP-13 fires) built after 2027-06-17, delivered by Monday 2027-06-21",
+    "first_action_of_R2": "the RSP pinnability check (PREREG section 3 B2) -- reported as a dated standalone line before any freeze bar is fetched and before eval.py exists; settles whether E_EW is a registered primary (m=6) or deferred as an arm (m=5)",
+    "note": "The population for every endpoint enters only through these successor freezes (PREREG header: every pick night that enters this question is later than v001 as_of). manifest_v001 / manifest_prices_v001 (as_of 2026-09-10) exist but cover no in-window night and are provenance-only for this question."
+  },
+  "sealed_reference": {
+    "label": "NOT IN THE DECIDING WINDOW -- POST_HOC panel per PREREG section 6, printed once, enters no estimate/CI/q/verdict for Q024",
+    "report_date": "2026-09-13",
+    "source": "research/reports/STEWARD_Q024_sas_vs_simple_benchmarks_exposure.md",
+    "panel_dates": "2026-07-08..2026-08-12 (26 matured nights on manifest_v001/manifest_prices_v001); 2026-08-13..2026-09-10 print as counts only (immature on the v001 horizon)",
+    "elapsed_sessions_measured": 46,
+    "eligible_nights": 45,
+    "mature_nights": 26,
+    "contributing_nights_per_arm": {
+      "SPY": 26,
+      "SECRAND": 26,
+      "MOM20": 26,
+      "MOM60": 26,
+      "TECH": 26,
+      "EW_RSP": "unmeasurable -- RSP absent from manifest_prices_v001; R1(d) not executed (no Alpaca credentials in Steward environment); carried to R2 as its first action"
+    },
+    "measured_rate_per_elapsed_session": 0.5652,
+    "pre_maturity_eligible_rate_upper_bound": 0.9783,
+    "note": "This is the feasibility measurement the PREREG schedule was sized on at lock (section 5); it is not a count of in-window nights and does not feed elapsed_sessions, mature_nights, contributing_nights or post_lock_contributing_nights above."
+  },
+  "readiness_label": "unmeasured",
+  "notes": "Q024 is PREREG_LOCKED with pin_at_decision=true and a prospective-only window starting 2026-09-14 (today), section 6: the whole window sits entirely after this file lock commit. No pick night in the deciding window has occurred yet, no successor freeze (manifest_v002 / manifest_prices_v002) is pinned, and rule 4 forbids querying live tables for a study count -- so every eligible/mature/contributing count above is 0 by construction, not by a measured shortfall. This is an absent snapshot in LEARNING_POLICY.md terms (Counts-only readiness and scheduling), hence readiness_label=unmeasured. The schedule (decision_date 2027-05-17, extension 2027-06-28, hard stop 2027-06-28) and the 80-contributing-night-per-arm / 30-post-lock floor are already fixed at lock on the Steward R1 feasibility measurement (see sealed_reference above), not on any in-window count. No hit rate, touch rate, return, effect, p-value or comparison is recorded in this file. This readiness snapshot does not authorize an early run; the registered eval.py independently checks all gates at the decision pass."
+}

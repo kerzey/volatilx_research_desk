@@ -1,0 +1,87 @@
+{
+  "as_of": "2026-09-14",
+  "sources": [
+    "research/questions/Q027_score_ranking_validity/PREREG.md section 2 (Population, 2.1-2.5) and section 5 (Sample floors and expected n, 5.1-5.3)",
+    "research/questions/Q027_score_ranking_validity/schedule.json",
+    "research/questions/Q027_score_ranking_validity/state.json",
+    "research/questions/Q027_score_ranking_validity/DECISIONS.md, section titled Schedule",
+    "research/reports/STEWARD_Q027_exposure.md (R1, counts only, delivered 2026-09-14; cited, not recomputed)"
+  ],
+  "count_definition": "PREREG.md section 2.5, Contributing night (the floor unit, DP-21; identical for E1 and E2): a non-excluded night in the window, matured to t+20, carrying >= 30 eligible rows with both terciles non-empty and a defined d*_t (directly, or by section 2.2's trailing-20-night fallback on a 1-2-survivor night; a zero-survivor night is not a non-contributing night, it is excluded whole under payload_disabled_runs). A night that survives the night-level filters but carries fewer than 30 eligible rows is a non-contributing night, not an exclusion, printed in the funnel. Eligible row filter is section 2.1 (overall_score not null, dominant_direction in bullish/bearish, >= 60 prior split-adjusted daily bars, session t+1 open exists, bars cover t+1..t+20 without a gap), applied after the section 2.4 exclusions union (manual_runs, non_session_runs, uncorroborated_publication_runs, payload_disabled_runs) and the mixed-direction and >25%-mixed / >10%-ungradeable whole-night exclusions.",
+  "endpoints": [
+    {
+      "endpoint": "E1_information_coefficient",
+      "description": "PREREG section 4.2: E1 = mean over contributing nights of IC_t (per-night Spearman rho, overall_score vs path-outcome rank u_i). MPE abs(rho_bar) >= 0.05.",
+      "eligible_nights": 0,
+      "mature_nights": 0,
+      "contributing_nights": 0,
+      "required_nights": 80,
+      "post_lock_contributing_nights": 0,
+      "required_post_lock_nights": 30
+    },
+    {
+      "endpoint": "E2_tercile_contrast",
+      "description": "PREREG section 4.2: E2 = mean over contributing nights of G_t (top-tercile minus bottom-tercile touch rate at d*_t). MPE +/-5.0 pp. Shares the identical contributing-night definition and count as E1 (section 2.5).",
+      "eligible_nights": 0,
+      "mature_nights": 0,
+      "contributing_nights": 0,
+      "required_nights": 80,
+      "post_lock_contributing_nights": 0,
+      "required_post_lock_nights": 30
+    }
+  ],
+  "elapsed_sessions": 0,
+  "window": {
+    "start": "2026-09-15",
+    "end": "2027-03-05",
+    "extended_end_if_dp13_fires": "2027-04-19",
+    "note": "PREREG section 6 / section 5.2: prospective-only window, pick nights 2026-09-15..2027-03-05 (119 elapsed sessions, Floor A binding). As of as_of date the window has not opened; elapsed_sessions=0 for this readiness snapshot."
+  },
+  "decision_date": "2027-04-12",
+  "readiness_label": "unmeasured",
+  "data_dependency": {
+    "status": "no successor freeze exists yet; all in-window counts are structurally 0 today",
+    "required_manifests": [
+      {
+        "manifest": "manifest_v00N (selections)",
+        "scope": "sas_candidates (every candidate row, published and unpublished) plus sas_runs plus market_regime_daily, same SQL and exclusion criteria as v001",
+        "coverage": "pick nights 2026-09-15..2027-03-05, >=60 prior sessions before 2026-09-15",
+        "built_when": "at the decision date, before Monday 2027-04-12 (pin_at_decision: true, PREREG section 5.3 R2 / schedule.json)",
+        "prereg_ref": "PREREG.md section 5.3 Routed requests, R2; DECISIONS.md Successor freezes item 9"
+      },
+      {
+        "manifest": "manifest_prices_v00N (prices)",
+        "scope": "prices_daily_split plus prices_daily_raw, same Alpaca queries as v001, every candidate symbol on every in-window night",
+        "coverage": "daily bars through 2027-04-05 (session t+20 of the last included pick night)",
+        "built_when": "at the decision date, before Monday 2027-04-12 (pin_at_decision: true)",
+        "prereg_ref": "PREREG.md section 5.3 Routed requests, R2"
+      },
+      {
+        "manifest": "extension pair (manifest_v00N_plus1 / manifest_prices_v00N_plus1), only if the single DP-13 extension fires",
+        "scope": "same SQL and queries, extended scope",
+        "coverage": "pick nights through 2027-04-19, daily bars through 2027-05-17",
+        "built_when": "due before Monday 2027-05-24, built then and not before",
+        "prereg_ref": "PREREG.md section 5.3 Routed requests, R2 (extension pair)"
+      }
+    ],
+    "add_only_exclusions_file": "successor exclusions file (manual_runs, non_session_runs, uncorroborated_publication_runs, payload_disabled_runs) issued alongside manifest_v00N, add-only, may never remove a night from exclusions_v003.json (PREREG section 1 and 2.4, DECISIONS item 11)"
+  },
+  "sealed_reference": {
+    "label": "NOT in the deciding window - sealed post-hoc / R1 exposure measurement only, enters no verdict, no CI comparison, no half, no stratum test, no q (PREREG section 1, section 6)",
+    "measured_on": "manifest_v001.json + manifest_prices_v001.json vs exclusions_v003.json, pick nights 2026-06-01..2026-09-10 (71 elapsed sessions)",
+    "contributing_nights": 48,
+    "elapsed_sessions": 71,
+    "rate_per_elapsed_session": 0.6761,
+    "eligible_night_rate_upper_bound_not_used_for_schedule": 0.9577,
+    "report": "research/reports/STEWARD_Q027_exposure.md",
+    "report_date": "2026-09-14"
+  },
+  "notes": [
+    "No live query was run for this snapshot (rule 4, DP-50(c)); every number above is either taken from the pinned STEWARD_Q027_exposure.md report or is a structural zero because the prospective window (2026-09-15..2027-03-05) has not started as of as_of=2026-09-14 and no successor manifest (manifest_v00N) is pinned yet.",
+    "readiness_label = unmeasured: elapsed_sessions=0, no in-window manifest exists, and the question's own population enters only through the successor freezes named in PREREG section 5.3 R2 (pin_at_decision, the Q024 pattern); there is nothing yet to call sample-short, maturation-short or coverage-short.",
+    "No effect, hit rate, touch rate, return, excursion, p-value, q-value or score-vs-outcome comparison appears anywhere in this file, per LEARNING_POLICY.md Counts-only readiness and scheduling section and the task instruction.",
+    "This file does not authorize an early run; the registered eval.py independently checks all gates (>=80 contributing nights per primary, >=30 post-lock, >=30 eligible rows per contributing night, >=20 measured contributing nights per closed sub-cell) at the decision pass.",
+    "required_nights=80 is PREREG section 5's stricter reading (DP-21): >=80 contributing nights per primary endpoint, not the weaker 80-eligible-with-20-contributing reading. required_post_lock_nights=30 is DP-24, non-binding here because every contributing night in this prospective-only window is post-lock by construction.",
+    "Neither primary (E1, E2) is demotable (PREREG section 5, DECISIONS item 10): they share the identical contributing-night definition and count, so both endpoints show identical counts at every observation date."
+  ]
+}
