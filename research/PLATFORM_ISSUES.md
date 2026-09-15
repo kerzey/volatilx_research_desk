@@ -255,6 +255,19 @@ ship before ≈ **2027-03-08** is survivable and one after it is not. **The desk
 fix to be held**: a live surface with one of its two arms silent is worse than a research question
 that may have to restart. The cost is written here so the choice is made with it in view.
 
+**Addendum 2026-09-15 (census, `research/reports/monitor_counts_2026-09-15/REPORT.md`).** Two consequences
+the original entry did not spell out:
+- **HOLD is unreachable.** `overall_tier = _worst_tier([polarity_tier, technical_overall_tier])`
+  (`services/conviction_monitor_service.py:792-805`); with `polarity_tier` fixed at WATCH the floor is WATCH,
+  so the tier that means "conviction intact" cannot be printed. **0 HOLD `overall_tier` rows since 2026-06-01**
+  (2,921 rows; the 1,221 HOLD values in `age_adjusted_severity` are decayed WATCHes). The subscriber sees a
+  two-state monitor that rates 67% of picks EXIT within five sessions.
+- **Possible input cause shared with PI-020.** `coverage_ratio = decomp_premium_total / contract_premium_total`
+  is built from `uoa_contract_daily.buy_premium / sell_premium / premium_total`
+  (`services/symbol_context_builder.py:136-175`). PI-020 stores zero-trade rows (`buy_premium` 0) for every
+  contract the truncated trades page did not reach, which empties the decomposition on the most liquid names.
+  PI-020 predates June, so it is not the whole cause; the fix brief for PI-014 should check the two together.
+
 ### PI-015 — the projection layer, v1.6's largest weight, is unscored on three of every four picks
 **Filed 2026-09-14 by the registrar (autonomous run, DP-40..48), on the decision-maker's
 recommendation at `research/questions/Q035_setup_architecture/DECISIONS.md`, "Platform issue

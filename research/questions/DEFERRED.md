@@ -2526,6 +2526,8 @@ may be reported, briefed or quoted** until both triggers are met.
 
 ---
 
+> **2026-09-15 — blocker may be lifting, not lifted.** Haci granted the desk his Financial Modeling Prep key (`FMP_API_KEY`; rule 1 listing pending Haci's edit; `research/data/DATA_NOTES.md` "External source: FMP"). FMP's insider-trading search endpoints are named above as a candidate source. Before any TRIGGER MET line: the Steward verifies, read-only, that the history endpoint returns Form 4 rows with an acceptance / filing timestamp for the study window and the candidate universe, freezes them with a manifest, and records the availability rule; only then does the registrar reassess. Not resumed by this note.
+
 ## H-086 (F9) — "Do the multi-agent technical setups work, per timeframe?" — **no frozen dataset of the reports exists, no sub-hourly or crypto price freeze exists, and the historical corpus cannot supply the same-day distance-matched control the hypothesis names**
 
 **Deferred 2026-09-14 by the registrar, autonomous run (DP-40..48, DP-52..58), on this file's

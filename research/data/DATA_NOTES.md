@@ -341,3 +341,30 @@ still showed it mid-fetch. **`freeze_prices_universe.py` checks for an existing 
 only**, so that check cannot catch a concurrent run — it is not a lock. Until it takes one, never
 start a second freeze at the same `--version`, and pipe freeze output to a file rather than through
 `tail`. The delivered files were verified by SHA-256 against the manifest after the kill.
+
+## External source: Financial Modeling Prep (Haci, 2026-09-15)
+
+Haci granted the desk his FMP subscription key on 2026-09-15 (`FMP_API_KEY` in `.env.research`, loaded only
+through `research/lib/desk_env.py`, never printed). **Rule 1 names the desk's credentials and CLAUDE.md is a
+guarded file the desk cannot edit; until Haci adds `FMP_API_KEY` to rule 1's list, agents treat it as
+granted-but-unlisted and use it for Steward feasibility checks only, not for a freeze a PREREG cites.** Docs: https://site.financialmodelingprep.com/developer/docs.
+It is **read-only reference and fundamental data**, and it is also what the platform's own enrichment path
+already calls (`ai_agents/fmp_client.py`), so it changes nothing about rule 1's read-only stance.
+
+What it is for, and the rules that travel with it:
+
+- **Rule 4 still binds.** Any FMP field a PREREG cites is frozen first into `research/data/` with a manifest
+  (`manifest_fmp_vNNN.json`: endpoint, parameters, fetch time, row hashes). No study number comes from a live
+  call.
+- **Rule 14 is the hard part.** FMP rows are *records*, not point-in-time observations: an estimate revision,
+  a news item or an insider filing must carry a publish / acceptance timestamp that the freeze keeps, and a
+  feature is usable only when that timestamp ≤ 16:05 ET on the pick night. Endpoints without a reliable
+  publish time (most "profile" and "ratios" snapshots) are **descriptive only**. The Steward records the
+  availability per endpoint in `freeze_config.availability` before any question uses it.
+- **Candidate uses, in order:** (1) H-022's blocker — Form 4 insider-transaction *history* with acceptance
+  timestamps (`insider-trading` search endpoints); the Steward checks coverage and as-of fields before the
+  registrar may lift the deferral. (2) Analyst estimate and price-target revision history, for the smart-money
+  and catalyst layers. (3) Stock news with publish times, for a news-catalyst arm. (4) Earnings-call transcript
+  metadata for the earnings engine. Anything else is out of scope until a hypothesis names it.
+- **Not for:** live checks during a study, price data (Alpaca remains the price source), or anything a
+  subscriber-facing claim would cite before it is frozen and prospective.
