@@ -133,20 +133,39 @@ and a consensus. The decision layer is `day_trading_agent.py:668-917`.
   Fibonacci and ATR structure that can mark real support and resistance — why noise: entry is spot,
   short-timeframe targets sit inside ordinary intraday noise (the sample's 15m target is 0.38% away with
   risk/reward 0.82, the 1d risk/reward 0.38), and 12–27% of calls carry no target at all. Source: INBOX 2026-09-14.
-- [ ] H-087 (F9) — **Timeframe alignment.** Reports where ≥ 6 of 7 timeframes agree in direction vs mixed
+- [x] H-087 — **DEFERRED 2026-09-14** (the arm cannot be assigned: 1d/1wk/1mo present on only 597–654 of
+  697 reports so "≥ 6 of 7" has no fixed denominator, the payload's consensus disagrees with the
+  timeframe count on 50.1%, and H-086's blockers (1)(3)(4)(5) apply verbatim — `research/questions/DEFERRED.md`).
+  Re-entry adds three counts to H-086's triggers: timeframe completeness ≥ 95%, alignment supply
+  ≥ 80 days / ≥ 20 per horizon cell with same-day controls, and ≥ 0.90 agreement between the
+  final-call and raw-bias arms. No question number consumed.
+  (F9) — **Timeframe alignment.** Reports where ≥ 6 of 7 timeframes agree in direction vs mixed
   reports: first touch of +k ATR vs −k ATR at the day, swing and long horizons — baseline: mixed and HOLD
   reports on the same day, distance-matched — n: TBD — why real: multi-timeframe confluence is standard
   practice and is what Haci trades on — why noise: full alignment is rare by construction (the consensus
   needs ≥ 60% of timeframes) and concentrates in names already trending, so it may be momentum, not the
   analysis. Source: INBOX 2026-09-14.
-- [ ] H-088 (F9) — **Divergence and the order of hits.** Short timeframes (15m–4h) bullish with the daily
+- [x] H-088 — **DEFERRED 2026-09-14** (the primary endpoint is the *order* of two touches, which one-hour
+  bars cannot resolve for 15m–4h calls — DP-27 would decide it by convention on most episodes — and an
+  ordered-pair endpoint needs more independent DP-51 episodes than the corpus's low dozens across
+  fewer than ten names; H-086's blockers (1)(3)(4)(5) apply verbatim — `research/questions/DEFERRED.md`).
+  Re-entry makes H-086's 15-minute price freeze **mandatory** and adds ≥ 80 divergence-arm days and
+  ≥ 80 episodes **within the arm** from ≥ 30 symbols. No question number consumed.
+  (F9) — **Divergence and the order of hits.** Short timeframes (15m–4h) bullish with the daily
   bearish (and the mirror): does price touch the short-horizon up level first and then the counter level
   before the daily horizon — i.e. "up first, then down"; are day and swing targets hit while the long
   target is not — reported as the order in which levels are first touched — baseline: aligned-bullish
   reports, distance-matched — n: TBD — why real: the bounce-inside-a-downtrend is a named, traded pattern
   — why noise: the exact pattern may be too rare to reach any floor, and order-of-hit statistics need
   many independent episodes. Source: INBOX 2026-09-14.
-- [ ] H-089 (F9, **Explorer first — not a PREREG**) — **Which indicator states carry information about the
+- [x] H-089 — **DEFERRED 2026-09-14** (the Explorer task itself, not a PREREG: no frozen F9 corpus exists,
+  so there is no admissible in-sample split for it to mine — LEARNING_POLICY's default admission is the
+  v001 in-sample DB split, which no blob store enters; mining the live 697 would also exhaust the only
+  split the design depends on — `research/questions/DEFERRED.md`). Re-entry needs H-086's triggers (1)
+  and (2) only (no exposure probe — the Explorer registers nothing), then the named **EXPLORE (F9,
+  in-sample only)** task whose survivors become separate PREREGs with BH across F9. No question number
+  consumed; H-089 enters no family correction while exploratory.
+  (F9, **Explorer first — not a PREREG**) — **Which indicator states carry information about the
   path beyond the call?** OBV trend, volume vs its average, Supertrend direction and distance, Kalman
   slope and invalidation, MACD cross, RSI oversold/overbought, Bollinger position, Fibonacci trend and
   distance to level, Elliott pattern and confidence — each per timeframe — against the forward path. Seven
@@ -155,9 +174,32 @@ and a consensus. The decision layer is `day_trading_agent.py:668-917`.
   indicators may hold signal that the decision layer throws away (PI-018). Why noise: most single-
   indicator correlations on daily moves are near zero, and anything found in-sample must survive a
   prospective window. Source: INBOX 2026-09-14.
-- [ ] H-090 (F9) — **Calibration of strength and confidence.** Does per-timeframe strength (and consensus
+- [x] H-090 — **DEFERRED 2026-09-14** (the band edges cannot be written: no frozen distribution of
+  `strength` or `confidence` exists anywhere, the bands are entangled with PI-018's Fibonacci override
+  — 76.1% of directional calls — and the within-day demeaned baseline needs two same-day symbols in
+  different bands against a measured 2.07 distinct symbols per active day; H-086's blockers
+  (1)(3)(4)(5) apply verbatim — `research/questions/DEFERRED.md`). Re-entry adds the frozen
+  strength/confidence value counts, ≥ 3 bands × ≥ 20 days with ≥ 80 for the primary, and ≥ 80 days
+  carrying two symbols in different bands. No question number consumed.
+  (F9) — **Calibration of strength and confidence.** Does per-timeframe strength (and consensus
   strength / confidence) rank target-touch rates monotonically — baseline: adjacent strength bands,
   demeaned within day — n: TBD — why real: strength is shown to subscribers as a quality number — why
   noise: strength is a vote share with a few discrete values, and the confidence gate interacts with the
   Fibonacci override (PI-018). Source: INBOX 2026-09-14.
-- [ ] H-094 (F9) — **Grade the plan a trader actually reads, not only the decision layer.** Every multi-agent report carries two plans that can disagree: the per-timeframe BUY/SELL/HOLD decisions with spot entry (graded by H-086), and the GPT plan in `principal_plan.data.strategies` with a trigger, entry, stop, two targets and a no-trade zone, which is what the Action Center shows. For each lane's `buy_setup` and `sell_setup`: did the trigger fire, and after it fired was target 1 (then target 2) touched before the stop, within a registered horizon per lane (day → same and next session, swing → 10 sessions, long → 60) — baseline: the opposite setup in the same report (a plan whose buy and sell sides are equally likely to work carries no direction), and same-day reports on other symbols with triggers and targets at identical ATR distances — n: TBD — why real: the plan is what subscribers act on, and its triggers wait for confirmation instead of chasing spot — why noise: the no-trade zone and symmetric triggers can make the plan non-directional by construction (SNDK 2026-09-11: buy above 1638.36, sell below 1624.55, both levels copied from the decision layer's stop and target). **Descriptive companion, no outcome needed:** how often the GPT plan contradicts the decision layer in the same report (SNDK: 15m decision BUY at spot, plan says no trade inside the range). The same trigger-then-target grading applies to the SAS report's lane plans, whose targets are already L1–L6 but whose triggers the ladder does not use; the registrar decides whether that half belongs here or in F6. Decidable only on EN-019's forward collection; historical reports are exploratory (`research/reports/STEWARD_F9_blob_inventory.md`). Source: INBOX 2026-09-14.
+- [x] H-094 — **DEFERRED 2026-09-14** (the trigger is a free-text sentence — `"trigger": "string"`,
+  `principal_agent.py:568-576`, prompted as "if price closes above" `:549` — so "did the trigger fire"
+  would need a parser, a judgment layer rule 9 forbids; a deterministic fallback at `:897-934`
+  fabricates symmetric ±0.5%/±1.0% setups **identical across all three lanes** with no field recording
+  which path ran; one history blob is one **lane** not one report (`app.py:481-504`), so the 697 is an
+  unmeasured multiple of the analysis count; `principal_plan` presence and field completeness were
+  never measured; H-086's blockers (1)(3)(4)(5) apply verbatim — `research/questions/DEFERRED.md`).
+  **Registrar's decision on the SAS half, recorded there: it stays with H-094 in F9 and does not go to
+  F6** — the SAS lane plans' *targets* already reach `sas_selection_excursion` and belong to
+  Q006/Q009/Q010 (DP-29); only the printed *trigger* is new, and it lives solely in the 1,945 unfrozen
+  `SAS_*` blobs. The **descriptive companion** (how often the plan contradicts the decision layer)
+  needs no price path and is recommended for the Steward's next counts-only inventory pass,
+  INTERNAL / NON_QUOTABLE; it does not un-defer the question. Re-entry needs a machine-readable
+  `trigger_price`/`trigger_direction`/`trigger_basis`, a `plan_source` field with fallback share
+  ≤ 10%, `job_id`-level counts and ≥ 90% plan-field completeness, plus the supply counts. No question
+  number consumed.
+  (F9) — **Grade the plan a trader actually reads, not only the decision layer.** Every multi-agent report carries two plans that can disagree: the per-timeframe BUY/SELL/HOLD decisions with spot entry (graded by H-086), and the GPT plan in `principal_plan.data.strategies` with a trigger, entry, stop, two targets and a no-trade zone, which is what the Action Center shows. For each lane's `buy_setup` and `sell_setup`: did the trigger fire, and after it fired was target 1 (then target 2) touched before the stop, within a registered horizon per lane (day → same and next session, swing → 10 sessions, long → 60) — baseline: the opposite setup in the same report (a plan whose buy and sell sides are equally likely to work carries no direction), and same-day reports on other symbols with triggers and targets at identical ATR distances — n: TBD — why real: the plan is what subscribers act on, and its triggers wait for confirmation instead of chasing spot — why noise: the no-trade zone and symmetric triggers can make the plan non-directional by construction (SNDK 2026-09-11: buy above 1638.36, sell below 1624.55, both levels copied from the decision layer's stop and target). **Descriptive companion, no outcome needed:** how often the GPT plan contradicts the decision layer in the same report (SNDK: 15m decision BUY at spot, plan says no trade inside the range). The same trigger-then-target grading applies to the SAS report's lane plans, whose targets are already L1–L6 but whose triggers the ladder does not use; the registrar decides whether that half belongs here or in F6. Decidable only on EN-019's forward collection; historical reports are exploratory (`research/reports/STEWARD_F9_blob_inventory.md`). Source: INBOX 2026-09-14.

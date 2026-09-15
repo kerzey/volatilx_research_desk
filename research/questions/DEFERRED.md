@@ -2714,3 +2714,568 @@ selection facts and its output is exploratory, never a registrable finding on it
 those are counts of the engine's own output, they need no price path, and they are already filed.
 Under this file's preamble **nothing here may be reported, briefed or quoted** until all three
 triggers are met.
+
+---
+
+## H-087 (F9) — "Do reports where ≥ 6 of 7 timeframes agree beat mixed reports?" — **the arm itself cannot be assigned: the timeframe set is not constant across reports, the payload's own consensus disagrees with it on half the corpus, and the named same-day baseline does not exist**
+
+**Deferred 2026-09-14 by the registrar, autonomous run (DP-40..48, DP-52..58), on this file's
+first admission ground.** It inherits **H-086's blockers (1), (3), (4) and (5) verbatim** — no
+frozen dataset of the reports, the wrong symbol universe with no crypto bars, no same-day
+distance-matched control pool, and floors/DP-51 unreachable on a 120-day operator-curated corpus —
+**and blocker (2) for its day-horizon endpoint**, which needs the +k ATR and −k ATR touches ordered
+inside a session. What follows is only what is **specific to H-087** and is not in the H-086 entry.
+Not drafted: **no `QNNN` directory and no question number consumed; Q037 stays free.** Not merged
+(DP-29): no PREREG under `research/questions/` reads a multi-agent technical report.
+
+Evidence: `research/reports/STEWARD_F9_blob_inventory.md` §2, §4, §6, §7, §8;
+`research/questions/DEFERRED.md` H-086; `research/BACKLOG.md` F9 preamble;
+`research/PLATFORM_ISSUES.md` PI-018 / PI-019; volatilx `ai_agents/day_trading_agent.py:668-917`.
+
+### What the question is, and why it is worth keeping
+
+Haci's INBOX line of 2026-09-14, and the one F9 hypothesis closest to how he actually trades:
+multi-timeframe confluence. Reports where ≥ 6 of the 7 timeframes call the same direction, against
+mixed reports, graded on which side of a symmetric ±k ATR band is first touched at the day, swing
+and long horizons. Both signs are useful — if confluence is momentum in disguise, the platform
+should stop presenting alignment as a quality signal. It is kept, not killed.
+
+### Why it cannot be registered — what is specific to H-087
+
+**(a) "7 timeframes" is not one thing, so "≥ 6 of 7" has no fixed denominator.** Three measured
+facts from the inventory, each moving the denominator: **1d/1wk/1mo are present on only 597–654 of
+697 reports** (§4) — a report missing one of them cannot reach 6 of 7 and would be assigned to the
+*mixed* arm by the absence of data rather than by disagreement, which biases the contrast in the
+direction of the hypothesis; **28 legacy reports carry `5m` instead of `15m`** (§4), so their seven
+are a different seven; and **15m/30m sit on 673, 1h/4h on 694** (§4). A denominator that varies with
+coverage cannot be written into a population filter, and "≥ 6 of the timeframes actually present"
+is a different, easier arm than the one filed (DP-25).
+
+**(b) The report's own consensus field cannot assign the arm.** The **consensus tally disagrees with
+the number of timeframes on 349 of 697 reports (50.1%)** (§8). So the arm must be recomputed from the
+per-timeframe decisions — and per **PI-018** those decisions are not a clean read of the technicals:
+**495 of 3,933 directional calls (12.6%) oppose their own timeframe's `overall_bias`**, and **"near
+Fibonacci" appears in 2,992 of 3,933 (76.1%)**. The F9 preamble therefore requires the raw indicator
+bias and the final call to be registered as **separate** inputs, which makes two alignment arms, not
+one — doubling the cell count against floors that H-086 already showed are unreachable.
+
+**(c) The alignment rate is unmeasured, and it is the arm's whole supply.** The inventory counted
+decisions and biases but never the per-report count of agreeing timeframes. Full alignment is rare
+by construction (the consensus needs ≥ 60% of timeframes) and, on the corpus's own composition —
+**seven symbols are 419 of 697 reports (60%), TSLA 134** (§2) — whatever alignment exists will
+concentrate in a handful of trending names, which is the hypothesis's own "why noise" line realised
+in the sample. The all-history ceiling is **120 active days**, split by PI-019's 2026-04-06 zone
+change into 201 reports read as UTC and 494 as US Eastern; DP-21 asks 80 contributing days per
+primary endpoint and 20 per cell, and the aligned arm is a minority of a corpus whose ceiling
+already fails.
+
+**(d) `k` and the three horizons are unset in the filed line.** Under DP-26 the registrar may fix
+them, and would (they are conventions, not findings) — but they are fixed **at lock against a frozen
+field distribution**, and there is none. Recorded here so a re-attempt sets them once, in the open
+decisions, rather than treating them as settled.
+
+### What was considered and rejected before deferring
+
+- **Assigning the arm on "≥ 6 of the timeframes present".** Rejected. It converts a coverage gap
+  into an alignment signal and makes the aligned arm easier to reach exactly where data is thinnest
+  (DP-45, DP-25).
+- **Using the payload's `consensus` field as the arm.** Rejected on (b)'s measured 50.1% disagreement:
+  the field would be a third variable, not the hypothesis's.
+- **Pooling the 28 legacy reports by mapping 5m onto the 15m slot.** Rejected. Different bar,
+  different indicator states; it is a re-spec, and it buys 28 reports.
+- **Dropping to the swing and long horizons only, where daily bars suffice.** Rejected for the same
+  reason it was rejected for H-086: it drops the horizons the hypothesis is most suspicious of, after
+  seeing the constraint, and fixes none of (1), (3), (4) or (5).
+- **Using the within-report opposite-side ±k ATR level as the only baseline.** Rejected. It measures
+  path symmetry, not whether alignment carried information (the H-086 precedent).
+- **Waiting / DP-13.** Rejected. Days arriving do not add distinct same-day symbols (H-086 (4)), do
+  not add timeframes to reports that lack them, and do not create a freeze.
+
+### What would move it back into the backlog
+
+**H-086's three re-entry triggers are required in full and are not restated here** (EN-019's forward
+collection on a fixed, pre-declared universe with an explicit zone and a `trigger` field; the report
+freeze (2a) and the ≥ 15-minute price freeze (2b); the counts-only exposure probe clearing DP-43's
+re-solved day rate, ≥ 30 distinct contributing symbols with no symbol above 10%, and ≥ 80 independent
+DP-51 episodes). **Three additional counts, measured by the Steward on the same pinned freeze, with
+no outcome read:**
+
+1. **Timeframe completeness ≥ 95%** — the share of reports carrying all seven registered timeframes.
+   Below that, the denominator is still coverage-dependent and the arm is still biased.
+2. **Alignment supply:** the number of days carrying ≥ 1 aligned report **and** ≥ 3 same-day
+   distance-matched controls, at **≥ 80** for the pooled primary and **≥ 20** in each registered
+   horizon cell — counted on the arm as recomputed from per-timeframe decisions, never the
+   `consensus` field.
+3. **Arm agreement between the two inputs ≥ 0.90** — final-call alignment vs raw-`overall_bias`
+   alignment on the same reports. Below 0.90 the question registers **both** arms with BH across F9
+   and needs the supply in (2) **twice**.
+
+`k`, the three horizons, and which of the two arms is primary are **open decisions at re-entry**,
+fixed at that lock and not inherited from this entry.
+
+### Bookkeeping while deferred
+
+No verdict, no `eval.py`, no `results/`, no `schedule.json`, no `PREREG.md`, and **no outcome of any
+kind read** — not a touch, not a first-touch date, not a return, not an arm difference. **No question
+number is consumed: Q037 remains the next free number.** **F9's correction set is empty and stays
+empty** (the H-062 precedent). No locked file was edited. DP-41 is not engaged: nothing here asks for
+a later clock. Under this file's preamble **nothing here may be reported, briefed or quoted** until
+H-086's three triggers and the three counts above are met.
+
+---
+
+## H-088 (F9) — "Short timeframes bullish against a bearish daily: up first, then down?" — **the order of two touches is the endpoint, and it needs both sub-hourly bars and far more independent episodes than the corpus can ever hold**
+
+**Deferred 2026-09-14 by the registrar, autonomous run (DP-40..48, DP-52..58), on this file's
+first admission ground.** It inherits **H-086's blockers (1), (3), (4) and (5) verbatim**, and
+**blocker (2) is not peripheral here but fatal to the primary endpoint itself**. What follows is only
+what is specific to H-088. Not drafted: **no `QNNN` directory and no question number consumed; Q037
+stays free.** Not merged (DP-29): no PREREG reads a multi-agent technical report, and no locked
+question grades an order-of-touch endpoint on this engine.
+
+Evidence: `research/reports/STEWARD_F9_blob_inventory.md` §2, §4, §7, §8;
+`research/questions/DEFERRED.md` H-086; `research/BACKLOG.md` F9 preamble;
+`research/PLATFORM_ISSUES.md` PI-018; DP-27, DP-51.
+
+### What the question is, and why it is worth keeping
+
+The bounce-inside-a-downtrend, stated as a path: short timeframes (15m–4h) bullish while the daily is
+bearish (and the mirror) — does price touch the short-horizon up level **first** and the counter
+level **after**, and are the day and swing targets hit while the long target is not. It is the one F9
+hypothesis whose endpoint is the **order** of first touches, which is rule 5's own language (`the
+order in which levels were hit`) and is the thing a trader in that setup needs to know. Kept.
+
+### Why it cannot be registered — what is specific to H-088
+
+**(a) The endpoint is an ordered pair of touches, and the desk's finest frozen bar is one hour.**
+H-086's blocker (2) says the short-timeframe *levels* sit inside a single hourly bar. Here the
+consequence is worse: DP-27's tie rule exists to resolve a residual ambiguity conservatively, and on
+this population it would decide **the primary endpoint's own value** — "which came first" — by
+convention on most episodes. A registered "up first, then down" rate computed that way is an artefact
+of bar resolution wearing the clothes of a path statistic. Under DP-45 the desk takes the option less
+likely to reach CONFIRMED; here that is not to register at all. **Without freeze (2b) at 15 minutes
+or finer this endpoint is struck, not graded.**
+
+**(b) The conjunction is the rarest cell of the rarest arm, and it is unmeasured.** The arm needs
+short timeframes bullish **and** the daily bearish in the same report. The daily leg is the one the
+corpus most often lacks — **1d present on only 597–654 of 697 reports** (§4) — and the direction
+fields are contaminated by PI-018 (12.6% of calls oppose their own bias; the Fibonacci proximity rule
+is in the reasoning of 76.1%), so the arm must be assigned twice, on the final call and on the raw
+bias, as the F9 preamble requires. Nothing in the inventory counts how often the conjunction occurs;
+what is counted is the ceiling it sits inside: **120 active days**, split by PI-019 at 2026-04-06.
+
+**(c) An order-of-hits endpoint needs more independent episodes than a touch rate, and the corpus has
+fewer.** A joint ordered event over two levels is a higher-variance statistic per episode than a
+single touch indicator, so its CI needs *more* independent units, not the same number. The corpus
+supplies the opposite: another report on the same symbol lands within 5 trading days on **56.5%** of
+symbol-days and within 10 on **63.7%** (§7), and **seven symbols are 60% of the corpus** (§2), so
+independent DP-51 episodes are in the **low dozens across fewer than ten names**. DP-51 is a gate:
+an endpoint that clears the MPE on the night-clustered CI and not on the episode-clustered one is
+INCONCLUSIVE, never CONFIRMED — so on this structure the question's best attainable verdict is
+INCONCLUSIVE by construction, which is a reason not to spend a family slot on it, not a reason to
+run it.
+
+**(d) The second limb — "day and swing targets hit while the long target is not" — is a three-level
+joint event** on reports of which 6–14% lack the long timeframe entirely (§4). It multiplies (c)
+rather than offering an easier fallback.
+
+### What was considered and rejected before deferring
+
+- **Grading the order on hourly bars with DP-27 breaking the ties.** Rejected under DP-45, and more
+  firmly than in H-086: there the convention would have decided the *hit*; here it decides the
+  *order*, which is the hypothesis.
+- **Restricting to 4h-and-above so hourly bars can order the touches.** Rejected. The named arm is
+  "15m–4h bullish"; dropping 15m/30m/1h after seeing the bar constraint is a re-spec (DP-25), and it
+  does not fix the daily leg's coverage or the episode supply.
+- **Using the daily-only mirror (daily bullish, shorts bearish) to double the arm.** Rejected. It is
+  a different setup with a different trader story, pooled only to reach a floor.
+- **Reporting the order descriptively on the historical corpus while a freeze is built.** Rejected.
+  There is no freeze to pin (H-086 (1)), the read would be live (DP-50(c)), and an exploratory
+  order-of-hits number on ten names is the kind of figure that survives into a brief.
+- **Waiting / DP-13.** Rejected: elapsed time supplies none of (a)–(d).
+
+### What would move it back into the backlog
+
+**H-086's three re-entry triggers in full** (not restated), **with (2b) mandatory rather than
+optional — a 15-minute-or-finer freeze including pre/post-market; without it H-088 does not return in
+any reduced form.** Plus **two counts**, measured by the Steward on the pinned freeze, no outcome
+read:
+
+1. **Conjunction supply: ≥ 80 days** carrying a report in the divergence arm with a gradeable up
+   level, a gradeable counter level **and** ≥ 3 same-day distance-matched controls, and **≥ 20** in
+   each registered horizon cell — with the arm assigned on the final call and again on the raw bias.
+2. **≥ 80 independent DP-51 episodes *within the divergence arm itself*** (not in the corpus as a
+   whole, which is H-086's condition), contributed by **≥ 30 distinct symbols** with no symbol above
+   10% — because an ordered-pair endpoint on clustered episodes is the case DP-51 was written for.
+
+Which of the two limbs is primary, the horizons, and the level distances are **open decisions at
+re-entry**.
+
+### Bookkeeping while deferred
+
+No verdict, no `eval.py`, no `results/`, no `schedule.json`, no `PREREG.md`, and **no outcome of any
+kind read**. **No question number is consumed: Q037 remains the next free number.** **F9's correction
+set is empty and stays empty.** No locked file was edited. DP-41 is not engaged. Under this file's
+preamble **nothing here may be reported, briefed or quoted** until those triggers are met.
+
+---
+
+## H-089 (F9, Explorer-only — never a PREREG) — "Which indicator states carry information beyond the call?" — **the Explorer cannot run: there is no frozen F9 corpus, therefore no admissible in-sample split for it to mine**
+
+**Deferred 2026-09-14 by the registrar, autonomous run (DP-40..48, DP-52..58).** H-089 is marked
+**"Explorer first — not a PREREG"** in `research/BACKLOG.md`, and **no PREREG is drafted for it in
+this pass or any other while it stays exploratory** — this entry defers the **Explorer task**, names
+it as the re-entry action, and consumes no question number. **Q037 stays free.**
+
+Evidence: `research/reports/STEWARD_F9_blob_inventory.md` §2, §4, §7, §8;
+`research/LEARNING_POLICY.md` "Historical companions"; `research/questions/DEFERRED.md` H-086;
+`research/BACKLOG.md` F9 preamble; `research/PLATFORM_ISSUES.md` PI-018.
+
+### What the task is, and why it is worth keeping
+
+Behind each timeframe's BUY/SELL/HOLD call sits the indicator detail the decision layer compressed
+away: OBV trend, volume vs average, Supertrend direction and distance, Kalman slope and invalidation,
+MACD cross, RSI state, Bollinger position, Fibonacci trend and distance to level, Elliott pattern and
+confidence. PI-018 is the reason to look: the decision layer demonstrably discards and overrides its
+own inputs (**495 of 3,933 calls, 12.6%, oppose their own timeframe's bias**; **"near Fibonacci" in
+76.1%** of directional calls). If the raw states hold signal the call throws away, that is a scoring
+change worth registering. Kept.
+
+### Why the Explorer cannot run — three grounds, the first decisive
+
+**(1) There is no admissible corpus.** `research/LEARNING_POLICY.md` requires, before *any*
+companion or exploratory computation: the internal decision, an exact input whitelist, **manifest
+hashes**, admitted selection dates, prior exposure, engine versions, and the output label. Default
+admission is the existing **in-sample split** (`trading_date <= 2026-05-29` in v001) loaded through
+the existing in-sample helper. That helper and that split are defined over **frozen database tables**;
+the F9 reports are **blobs in no manifest at all** (H-086 (1)), so there is no F9 in-sample split to
+admit and nothing for the helper to load. Mining them today would be a **live read** of an unpinned,
+append-only-but-unpinned store (DP-50(c)), whose retention the desk's data-plane token cannot even
+inspect (inventory §9).
+
+**(2) The forward-path side has no bars at the resolution the states are defined on.** The indicator
+states are **per timeframe**; the 15m, 30m and 1h states have no matching frozen bar (H-086 (2)), the
+72-symbol F9 universe's overlap with the desk's frozen stock sets is unmeasured, and **5 of the 72 are
+crypto with no data source in any manifest** (H-086 (3)). An Explorer pass could rank states against
+a path it cannot measure for the timeframes where the states are most numerous.
+
+**(3) The surface is ~70 cells and the independent units are in the low dozens.** Seven timeframes ×
+about ten indicator states is the forking-paths surface the backlog line itself names, and the
+corpus that would be mined has **independent DP-51 episodes in the low dozens across fewer than ten
+names** (§7, §2: same symbol within 5 sessions on 56.5% of symbol-days; seven symbols are 60% of the
+corpus; TSLA 134). Survivors of a 70-way mine on that structure are noise with near-certainty — and,
+worse for the family, **mining the corpus now exhausts it**: `LEARNING_POLICY.md` is explicit that
+"frozen does not mean untouched" and that reanalysing the same history adds no independent
+replication, so an exploratory pass over the same reports the eventual prospective window's engine
+wrote would spend the only in-sample split H-089's design depends on.
+
+### What was considered and rejected before deferring
+
+- **Running the Explorer on the historical 697 with an "exploratory, non-registrable" label.**
+  Rejected on (1) and on (3)'s exhaustion argument. The label does not undo the exposure, and the
+  design H-089 files — mine in-sample, pre-register the survivors with BH — needs a split that is
+  still clean when the survivors are registered.
+- **Mining only the `user_id != 1` reports as a cleaner sub-corpus.** Rejected for H-086's reason:
+  184 reports over 36 users, themselves top-heavy, and provenance is an inference from `user_id`
+  (PI-019), which is the selection variable under suspicion.
+- **Mining only the 1d/1wk states, where daily bars exist.** Rejected. It keeps the timeframes with
+  the *worst* coverage (1d/1wk/1mo present on only 597–654 of 697, §4) and discards the ones PI-018
+  makes most interesting, after seeing the constraint.
+- **Declaring a synthetic in-sample split over the historical corpus by date (e.g. reports before
+  2026-05-29).** Rejected. A split is admissible when it is declared in a **pinned manifest** before
+  the data is read; declaring one inside this entry, over blobs nobody has frozen, is a split in name
+  only — and PI-019's 2026-04-06 zone change would sit inside it.
+
+### What would move it back — the re-entry action, named
+
+**H-086's triggers (1) and (2) are required** — EN-019's forward collection on a fixed, pre-declared
+universe with an explicit zone offset and a recorded `trigger`, and both pinned freezes: the report
+freeze (2a) and the ≥ 15-minute price freeze (2b). H-086's trigger (3), the exposure probe, is **not**
+required for the Explorer, which registers nothing and needs no floor.
+
+**The re-entry action is then a single, bounded Explorer task, and it is what this entry defers:**
+
+> **EXPLORE (F9, in-sample only):** on the frozen report corpus, restricted to the **in-sample split
+> declared in the freeze manifest itself** (fixed before any state is read, on the LEARNING_POLICY
+> pattern), rank the indicator states listed in H-089 — per timeframe, and pooled — against the
+> forward path measured on the matching frozen bars. Output: a ranked list with counts, episode
+> counts (DP-51) and distinct-symbol counts per state, **no p-value promoted, no q, no verdict,
+> INTERNAL / NON_QUOTABLE**. Survivors become **separate PREREGs**, each with its own MPE and BH
+> across F9, run on the **out-of-sample** remainder plus prospective nights, never on the mined split.
+
+Two conditions ride with it, both the registrar's reading and open at re-entry: the mined split is
+**disjoint** from every later F9 question's window, and a state is only reported where it is present
+on ≥ 30 distinct symbols, so the ranking is not a list of TSLA's habits.
+
+### Bookkeeping while deferred
+
+No verdict, no `eval.py`, no `results/`, no `PREREG.md`, no `EXPLORE_NNN` artefact, and **no outcome
+of any kind read**. **No question number is consumed: Q037 remains the next free number.** H-089
+**never enters a family correction while it is exploratory** — only its registered survivors do, and
+they carry their own ids. No locked file was edited. DP-41 is not engaged. Under this file's preamble
+**nothing here may be reported, briefed or quoted** until those triggers are met.
+
+---
+
+## H-090 (F9) — "Do strength and confidence rank touch rates monotonically?" — **the band edges cannot be written: no frozen distribution of `strength` or `confidence` exists, the bands are entangled with the PI-018 override, and the within-day baseline needs same-day symbols the corpus does not have**
+
+**Deferred 2026-09-14 by the registrar, autonomous run (DP-40..48, DP-52..58), on this file's
+first admission ground.** It inherits **H-086's blockers (1), (3), (4) and (5) verbatim**, and
+**blocker (2)** for every band measured below the 1h timeframe. What follows is specific to H-090.
+Not drafted: **no `QNNN` directory and no question number consumed; Q037 stays free.** Not merged
+(DP-29): no locked PREREG grades a multi-agent report's strength; Q011's conviction-label question is
+a different engine's label and is itself deferred as Q036.
+
+Evidence: `research/reports/STEWARD_F9_blob_inventory.md` §4, §5, §7, §8;
+`research/questions/DEFERRED.md` H-086; `research/PLATFORM_ISSUES.md` PI-018;
+volatilx `ai_agents/day_trading_agent.py:749-791`.
+
+### What the question is, and why it is worth keeping
+
+Strength is printed to subscribers as a quality number. The question is whether it behaves like one:
+do higher strength bands (and consensus strength / confidence) rank target-touch rates monotonically,
+against adjacent bands demeaned within the day. It is a calibration question of exactly the kind the
+desk keeps returning to (Q011, Q027), and a NULL is directly actionable — stop printing the number,
+or stop printing it as a ranking. Kept.
+
+### Why it cannot be registered — what is specific to H-090
+
+**(a) The band edges cannot be written with exact filters, because nothing has measured the field.**
+A PREREG must state its population at SQL level on a frozen manifest. The inventory measured
+decisions, target availability, bias conflicts, timestamps and re-analysis structure — it measured
+**no distribution of `strength` or `confidence` at all**. H-090's entire cell structure *is* its band
+edges, and the backlog line itself warns that strength "is a vote share with a few discrete values":
+where the mass sits decides whether there are three usable bands or one. DP-26 lets the registrar
+choose bands provided they were not derived from sealed outcomes — it does not let the registrar
+choose them against a distribution that does not exist, and choosing them from the corpus that will
+then be tested is the thing rule 3 prevents.
+
+**(b) The band variable is entangled with the decision layer's own override (PI-018).** At
+`day_trading_agent.py:749-791` a **strength ≥ 70 with "medium" confidence falls through both
+branches**, and "price within 2% of a Fibonacci support" then converts the HOLD into a BUY — support
+checked before resistance, so ties go to BUY. The inventory measured that route at scale: **"near
+Fibonacci" appears in 2,992 of 3,933 (76.1%)** directional calls and **12.6% of calls oppose their own
+timeframe's bias**. So a monotonicity test on strength, run against the *final call's* target, is in
+part a test of the override rather than of strength. The F9 preamble's standing requirement — raw
+indicator strength and the final call registered as separate inputs — therefore doubles the band grid
+here, on floors H-086 already showed are unreachable.
+
+**(c) The named baseline needs two same-day symbols in different bands, and the corpus averages two
+same-day symbols in total.** "Adjacent strength bands, demeaned within day" is a within-day contrast.
+The corpus holds **248 distinct symbol-days over 120 active days — 2.07 distinct symbols per active
+day**, and **2.81 reports per symbol-day**, i.e. most of the within-day multiplicity is *the same
+name re-run*, whose forward paths are the same path and cannot supply a within-day contrast at all.
+H-086's blocker (4) is about control availability; here the same arithmetic removes the **baseline's
+construction**, not merely its size.
+
+**(d) The floors multiply where this question needs them least.** DP-21 asks 20 contributing days per
+cell. Monotonicity needs ≥ 3 bands; with two inputs (b), seven timeframes plus the consensus, and the
+PI-019 split at 2026-04-06 (201 reports UTC / 494 Eastern), the 120-active-day ceiling is consumed
+several times over before target availability is applied (**`take_profit` on 78.0–87.5% of BUY and
+73.1–100% of SELL, varying by timeframe**, §5) and before the long-horizon gaps (**1d/1wk/1mo on only
+597–654 of 697**, §4).
+
+### What was considered and rejected before deferring
+
+- **Registering with bands fixed by the registrar at round numbers (e.g. <60 / 60–75 / ≥ 75).**
+  Rejected. With the distribution unmeasured, round edges can leave a band empty or hold 90% of the
+  mass; the question would then be decided by an arbitrary cut rather than by strength.
+- **Having the Steward measure the distribution live first, then registering.** Rejected: the
+  measurement is fine (counts and metadata only, the inventory's own basis), but it does **not**
+  create the frozen manifest the PREREG must pin (H-086 (1)), and a PREREG citing a live number is
+  exactly DP-50(c)'s prohibition. It is folded into the re-entry counts below instead.
+- **Using rank-correlation across all strength values instead of bands, to dodge the cut points.**
+  Rejected. It is a different endpoint (a monotone association rather than the filed band ranking,
+  DP-25) and it does not fix (b), (c) or (d); on a few discrete values it is also mostly a tie-handling
+  convention.
+- **Demeaning within symbol instead of within day.** Rejected. It swaps the baseline the hypothesis
+  names for one the corpus happens to support, and on a corpus where seven symbols are 60% of the
+  reports it would mostly be TSLA's strength scale.
+- **Waiting / DP-13.** Rejected: nothing in (a)–(d) is cured by elapsed time.
+
+### What would move it back into the backlog
+
+**H-086's three re-entry triggers in full** (not restated), plus **three counts**, measured by the
+Steward on the pinned freeze, over a trailing quarter, with **no touch rate, hit rate, return or any
+outcome read**:
+
+1. **The frozen distribution of `strength` and of `confidence`**, per timeframe and for the
+   consensus — value counts only — sufficient to write band edges into a population filter **before**
+   any outcome is read.
+2. **≥ 3 bands each carrying ≥ 20 contributing days** in the registered primary's cell, and **≥ 80
+   contributing days** for the primary, after target availability and control availability are
+   applied.
+3. **≥ 80 days carrying ≥ 2 distinct symbols in different bands**, without which the within-day
+   demeaned baseline cannot be constructed at all.
+
+Band edges, whether the primary runs on raw strength or the final call, and whether consensus
+strength is a separate primary are **open decisions at re-entry**, fixed at that lock.
+
+### Bookkeeping while deferred
+
+No verdict, no `eval.py`, no `results/`, no `schedule.json`, no `PREREG.md`, and **no outcome of any
+kind read**. **No question number is consumed: Q037 remains the next free number.** **F9's correction
+set is empty and stays empty.** No locked file was edited. DP-41 is not engaged. Under this file's
+preamble **nothing here may be reported, briefed or quoted** until those triggers are met.
+
+---
+
+## H-094 (F9) — "Grade the GPT plan a trader actually reads: trigger, then target before stop" — **the trigger is a free-text sentence, a deterministic fallback fabricates symmetric plans that no field distinguishes, and one blob is one lane rather than one report**
+
+**Deferred 2026-09-14 by the registrar, autonomous run (DP-40..48, DP-52..58), on this file's
+first admission ground.** It inherits **H-086's blockers (1), (3), (4) and (5) verbatim**, and
+**blocker (2)** for the day lane, whose "same and next session" grading needs the trigger's firing
+and the subsequent target/stop race ordered intraday. Its own backlog line already records "decidable
+only on EN-019's forward collection". What follows is what is **specific to H-094**, and it is
+substantial — three of the five items below are not in the H-086 entry at all and were read from the
+platform source in this pass. Not drafted: **no `QNNN` directory and no question number consumed;
+Q037 stays free.**
+
+Evidence: volatilx `ai_agents/principal_agent.py:544-582` (the plan schema and the prompt),
+`:668-724` (the rendered plan), `:897-934` (the fallback template), `app.py:463-515` (what is written
+to a blob), `docs/SAS_EXCURSION_BACKFILL.md:46-54`, `services/sas_excursion.py:335-354`;
+`research/reports/STEWARD_F9_blob_inventory.md` §1, §2, §4, §7, §9;
+`research/questions/DEFERRED.md` H-086; `research/PLATFORM_ISSUES.md` PI-018 / PI-019.
+
+### What the question is, and why it is worth keeping
+
+Every multi-agent report carries **two plans that can disagree**: the per-timeframe BUY/SELL/HOLD
+decisions with a spot entry (H-086's subject), and the GPT plan in
+`principal_plan.data.strategies.<lane>.{buy_setup|sell_setup}` — trigger, entry, stop, two targets,
+invalidation, plus a `no_trade_zone` — which is what the Action Center shows. The plan is what a
+subscriber acts on, and unlike the decision layer it **waits for confirmation instead of chasing
+spot**. Grading it as it is read — did the trigger fire, and after it fired was target 1 (then target
+2) touched before the stop — is the most product-relevant question in F9. Kept, emphatically.
+
+### Why it cannot be registered — what is specific to H-094
+
+**(a) The trigger is free text, not a condition.** The plan schema is generated by prompt, and the
+trigger field is declared as **`"trigger": "string"`** (`principal_agent.py:568-576`), with the prompt
+instructing the model to "describe conditional triggers (e.g., 'if price closes above')"
+(`:549`). There is **no `trigger_price`, no direction, no basis (close vs touch), no bar size**.
+"Did the trigger fire" would therefore require a parser converting English sentences into price rules
+— a judgment layer inserted into the inner loop, which rule 9 forbids, with an error rate nobody has
+measured and a failure mode (a mis-parsed trigger that "fires" early) that biases the endpoint in the
+hypothesis's favour. This blocker is **independent of every H-086 blocker**: it would survive a
+perfect freeze and perfect bars.
+
+**(b) A deterministic fallback fabricates a symmetric, lane-invariant plan, and no field says which
+path ran.** `principal_agent.py:897-934`: when structured expert output is missing, `default_setup`
+writes targets at **entry ± 0.5% and ± 1.0%**, a stop at **∓ 0.5%**, the literal trigger string
+**"Only act if price confirms beyond the entry level."**, a `no_trade_zone` spanning the buy and sell
+entries — and returns **the identical template for `day_trading`, `swing_trading` and
+`longterm_trading`**. That is H-094's own "why noise" line ("the no-trade zone and symmetric triggers
+can make the plan non-directional by construction") realised in code, and worse: on that path the
+three lanes are not three plans. **No field records which path produced a plan**; separating them
+would need a heuristic (targets at exactly ±0.5%/±1.0%, or the literal default string) that the
+registrar would be inventing, and DP-45 takes the option less likely to reach CONFIRMED. The share of
+reports on the fallback path is **unmeasured**.
+
+**(c) One history blob is one *lane*, not one report — so the corpus count the family has been using
+may be up to 3× the number of analyses.** `app.py:481-504`: when `strategies` is a dict, the platform
+**writes a separate blob per lane**, each with `strategies` restricted to that single lane; only the
+no-structured-output fallback (`:505-515`) writes one blob. The inventory records **697 history
+reports "(one per analysis run — the unit)"** (§1) and **2.81 reports per symbol-day** (§4, §7) — but
+it counted blobs and did not distinguish lane blobs from analyses. The count of distinct analyses
+(`job_id` is in the blob name) is therefore **unmeasured**, and every F9 floor and DP-51 episode
+count inherits that uncertainty. H-094's unit — the (analysis, lane, side) setup — is the one most
+exposed to it, and the direction of the error is against the desk. Recorded here as a **correction
+the whole family must carry**, not as a criticism of the inventory, which was explicit about what it
+counted.
+
+**(d) `principal_plan`'s presence and field completeness were never measured.** The inventory
+established `technical_snapshot` on 697 of 697 and per-timeframe `take_profit` availability (§4, §5);
+it measured **nothing** about `principal_plan`, `buy_setup` / `sell_setup`, `targets`, `stop`,
+`invalidation` or `no_trade_zone`. The single-blob fallback writes `principal_plan: principal_wrapper`
+unconditionally (`app.py:512`), and that wrapper is `None` or unsuccessful on the failure path
+(`:294`, `:408-413`) — so an unknown share of blobs carry no plan at all. The `no_trade_zone` shape
+also varies (dict **or** list, `principal_agent.py:717-720`), so even the descriptive companion needs
+a shape-normalising rule written against a frozen sample that does not exist.
+
+**(e) The corpus may not be durable, and on the SAS side that is observed rather than hypothesised.**
+The inventory could not rule an Azure lifecycle policy in or out (§9). The platform's own backfill
+doc is less ambiguous about the sibling store: `docs/SAS_EXCURSION_BACKFILL.md:50-52` names a
+`synthetic_stops` tier used when the **"blob aged out of its dated container"** while the DB
+`lane_plans` row survived. Any re-entry freeze must therefore be **forward-only and continuous**, and
+any historical plan corpus treated as survivorship over what has not yet expired.
+
+### The SAS half — the registrar's decision, made here
+
+H-094's backlog line asks whether the same trigger-then-target grading of the **SAS report's** lane
+plans belongs in F9 or F6. **It stays with H-094 in F9, and it is deferred with it.** Three reasons:
+the SAS lane plans' **targets** already reach the frozen database — `sas_selection_excursion`'s
+counter levels are read from `principal_plan.data.strategies.<lane>.{sell_setup|buy_setup}.targets`
+(`SAS_EXCURSION_BACKFILL.md:46-54`, `services/sas_excursion.py:335-354`) — and are already the subject
+of Q006, Q009 and Q010, so grading them again would count the same statistic twice (DP-29); the
+**only** new object is the printed **trigger**, which exists nowhere but the SAS report blob, and no
+manifest pins the **1,945 `SAS_*` blobs** the inventory found (§1), so the SAS half carries H-086's
+blocker (1) identically; and every F6 question holds the published ladder fixed and varies an **exit
+rule** on frozen DB columns, whereas this is an **entry-condition** question on an unfrozen blob
+field — it is not an F6 question today, and filing it there would put an unbuildable endpoint into a
+live family's correction set.
+
+### The descriptive companion is not blocked, and is not a rescue
+
+"How often the GPT plan contradicts the decision layer in the same report" needs **no price path, no
+bar and no outcome** — it is a counts-and-metadata read of the engine's own output, the same basis as
+PI-018's three measured counts. It is therefore **recommended as an addition to the Steward's next
+counts-only F9 inventory pass**, INTERNAL / NON_QUOTABLE, alongside the `principal_plan` presence,
+fallback-share and `job_id` counts named below. The registrar files no ENHANCEMENTS or
+PLATFORM_ISSUES entry in this pass; the counts belong to EN-019's and PI-019's existing scope. **It
+does not un-defer H-094**: a contradiction rate says the two plans disagree, not which one is right.
+
+### What was considered and rejected before deferring
+
+- **Registering on the numeric fields only — entry, stop, targets — and ignoring the trigger.**
+  Rejected. Without the trigger the plan is graded from spot, which is H-086's question with
+  different levels; the trigger is the entire reason H-094 exists ("its triggers wait for
+  confirmation instead of chasing spot"). DP-25.
+- **Writing a regex/LLM parser for the trigger and validating it on a hand-labelled sample.**
+  Rejected under rule 9 and DP-45: it puts a judgment layer, with an unmeasured and
+  hypothesis-favouring error mode, inside the deterministic script. The right fix is a recorded
+  numeric trigger field in the payload (below), not a parser in `eval.py`.
+- **Excluding fallback plans by matching the ±0.5% / ±1.0% signature or the default trigger string.**
+  Rejected. It is a registrar-invented heuristic against an unmeasured share, on a corpus where the
+  excluded rows would not be random.
+- **Using the within-report opposite setup as the only baseline.** Rejected: on the fallback path the
+  two sides are symmetric **by construction** (b), so that contrast would be measuring the template.
+  It is a useful companion, not a baseline.
+- **Grading the swing and long lanes only, where daily bars can order the race.** Rejected for the
+  H-086 reason and one more: (b) shows the three lanes are the **same object** on the fallback path,
+  so a lane restriction does not isolate a lane.
+- **Waiting / DP-13.** Rejected: none of (a)–(e) is an accrual problem.
+
+### What would move it back into the backlog
+
+**H-086's three re-entry triggers in full** (not restated), **and four additions, three of which are
+platform changes rather than desk work** — recommended as scope for EN-019 / PI-019, and each one a
+measured count on the pinned freeze before H-094 returns:
+
+1. **A machine-readable trigger.** Every setup carries `trigger_price` (number), `trigger_direction`
+   (above / below) and `trigger_basis` (close / touch), written alongside the free-text sentence.
+   **Without this H-094 does not return in any form** — the parser route is closed (rule 9).
+2. **A recorded plan provenance field** — `plan_source` = `llm` / `fallback_template` (or equivalent)
+   — plus the measured **fallback share**, which must be **≤ 10%** of gradeable setups, since
+   fallback plans are non-directional by construction and lane-invariant.
+3. **Analysis-level counts, not blob counts:** distinct `job_id` per day, lanes per analysis, and
+   `principal_plan` presence and per-field completeness (`trigger`, `entry`, `stop`, `targets[0..1]`,
+   `invalidation`, `no_trade_zone`) at **≥ 90%** on the declared universe — with the DP-51 episode
+   count recomputed on **analyses**, not blobs.
+4. **The supply counts:** **≥ 80 days** carrying ≥ 1 gradeable setup (trigger + stop + both targets)
+   **and** ≥ 3 same-day distance-matched controls, **≥ 20** per lane cell, from **≥ 30 distinct
+   symbols** with no symbol above 10%.
+
+The horizons per lane, which target is primary, how a trigger that never fires is scored (a
+no-trade is not a loss, and is not excluded either), and the treatment of the `no_trade_zone` are
+**open decisions at re-entry**, fixed at that lock and not inherited from this entry.
+
+### Bookkeeping while deferred
+
+No verdict, no `eval.py`, no `results/`, no `schedule.json`, no `PREREG.md`, and **no outcome of any
+kind read** — not a trigger firing, not a touch, not a return. Every count above comes from the
+Steward's counts-and-metadata inventory, from committed manifests, or from the platform source
+read-only. **No question number is consumed: Q037 remains the next free number.** **F9's correction
+set is empty and stays empty**, and the SAS half explicitly does **not** join F6's. No locked file was
+edited; nothing here changes Q006, Q009 or Q010, whose ladder endpoints are unaffected. DP-41 is not
+engaged. Under this file's preamble **nothing here may be reported, briefed or quoted** until those
+triggers are met.
