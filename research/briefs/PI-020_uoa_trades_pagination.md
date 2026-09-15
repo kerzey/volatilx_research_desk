@@ -3,91 +3,79 @@
 **Type:** fix brief (platform issue, not a research finding)
 **Register row:** `research/PLATFORM_ISSUES.md` PI-020, severity high, `HACI_DECIDED:fix`
 **Written:** 2026-09-15 by the Brief Writer, on Haci's `/desk-run prompt PI-020` (DP-48: asking is the decision)
+**Rewritten:** 2026-09-15 under **DP-59** — fixes ship directly: no feature flag, no shadow mode, no inertness
+proof, no flip step returned to Haci. The change below is **always on from the merge**. Haci: *"Every brief wants to
+create a flag. I don't want it, it's hard to keep. Fix is fix. We will check here if it is working fine. I am the
+only user in the platform."*
 **Platform repo:** `C:\Users\sahin\Projects\volatilx`
-**Platform SHA all `path:line` citations are taken at:** `c311e819dbe492b18ef52d137000c1d8709919db`
-(`c311e81`, "SAS ladder nightly: stamp trading-day steps, not only hit dates"). The platform working tree also
-holds **uncommitted EN-019 work** at that SHA (`azure_storage.py` modified; `services/report_provenance.py`,
-`services/fixed_universe_batch.py`, `scripts/run_fixed_universe_report_batch.py`,
-`app_data/jobs/triggered/fixed_universe_report_batch/`, `docs/FIXED_UNIVERSE_REPORT_BATCH.md`,
-`tests/test_report_provenance.py` untracked). None of them is touched here; do not stage them in this commit.
-**Research repo SHA:** `ffda4d9`
+**Platform SHA all `path:line` citations are taken at:** `380336725f3d8e69f977ee0e6bd11898f13bed23`
+(`3803367`, merge of `main` into `feat/en-019-fixed-universe-report-batch`; working tree clean). Every line number
+below was re-verified at this SHA and is unchanged from the first draft's `c311e81`.
+**Research repo SHA:** `f1a82f5`
 
-**Feature flags (both default OFF, read from the environment at call time — the local convention of
-`services/uoa_screener.py:1460-1465` and `core/feature_flags.py:11-23`):**
-- `UOA_TRADES_PAGINATION_ENABLED` — score from the paginated fetch. **Flipping it changes published numbers.**
-- `UOA_TRADES_PAGINATION_SHADOW_ENABLED` — keep scoring from the single page; for symbols whose page was cut
-  short, also fetch every page and write the totals to `uoa_runs.stats_json` only. Ignored when the first flag is on.
+**No feature flag, and why that is correct here (DP-59).** Reading every page is what this code was meant to do, and
+nobody chose to drop puts. DP-59 says a fix that changes published numbers still ships; the brief names which
+numbers change (next section) and the desk logs the ship date and SHA in `research/data/DATA_NOTES.md` so locked
+questions split there (DP-50 unchanged). There is no `UOA_TRADES_PAGINATION_ENABLED`, no shadow mode, no
+`record_trades_shadow`, no byte-identical hash of the old path and no flag-off/flag-on test pair. Telemetry is kept
+— `uoa_runs.stats_json.trades_fetch` — because it tells the desk whether the fix is working; it gates nothing.
 
-Runtime settings (not gates): `UOA_TRADES_PAGE_LIMIT` (default 10000, clamped 1000..10000),
-`UOA_TRADES_MAX_PAGES_PER_BATCH` (default 10, clamped 1..50).
+## What changes for the desk
 
-**Why this fix ships behind a flag (read this first).** The Brief Writer's charter gives a fix that restores
-intended behaviour no flag, and says a fix that *changes a published number* goes back to Haci. This one does
-both. Reading every page is what the code was meant to do, and nobody chose to drop puts. It also changes, for
-the most liquid names, `uoa_symbol_daily.call_premium_total / put_premium_total / dir_ratio`, and through
-cross-sectional percentiles `score_* / bias_* / label_*` for **every** symbol. Those feed the UOA bulletin lists,
-the SAS flow layer (weight 24; `services/super_agent_select_scoring.py:769-790`), the flow direction vote
-(`:537-560`) and the SAS candidate universe (`services/candidate_universe_builder.py:38-48`). So it changes which
-picks are published. This brief therefore ships the code **dark**, and the deploy moves no published number
-(§4 proves it). The flag flip is **returned to Haci** as a DP-50(b) decision, with the constraints below.
+From the ship date `D0` (the first trading date whose nightly runs the merged SHA):
 
-**Ship-timing check (DP-50(b)), done before writing:**
-- **Deploy (both flags unset):** no historical row is rewritten, and no scoring input, published number or subscriber field
-  changes. The only data change is an additive `trades_fetch` key in `uoa_runs.stats_json`. **No
-  `research/data/DATA_NOTES.md` repair-log row** (`DATA_NOTES.md:32-33`: forward-only changes take none).
-- **Shadow on:** no published number changes. The nightly takes longer (extra Alpaca requests for about 70
-  symbols a night), and UOA runs before SAS in the pipeline (`scripts/run_nightly_pipeline.py:272-275`), so
-  `super_agent_select_runs.finished_at` can move later. DATA_NOTES treats `finished_at` as the earliest actionable moment
-  (`DATA_NOTES.md:156-165`). The Data Steward measures the shift (§8 V6). No DATA_NOTES row.
-- **Pagination on (the flip) — Haci's decision, not taken by this brief.** It changes columns locked questions read:
-  - **Q014** `uoa_persistence` (DATASET_PINNED, decision **2027-04-05**) reads `uoa_symbol.score_* / label_*` from
-    manifest_v001 **and its successor freeze** through window end 2027-02-25 (`Q014 PREREG.md:44-51`, `:424-436`).
-  - **Q029** `layer_value_ablation` (PREREG_LOCKED, decision **2027-04-12**) tests `flow_strength` on the
-    prospective window 2026-09-15..2027-03-05 (`Q029 PREREG.md:20-32`, `:191`).
-  - **Q019** `conviction_monitor_exit` (DATASET_PINNED, decision **2027-05-24**). Its polarity arm reads the
-    `uoa_contract_daily` buy/sell decomposition (`services/symbol_context_builder.py:136-175`), the PI-014 link.
-  - **Q030** `universe_discovery_recall` (PREREG_LOCKED, decision **2027-03-01**) rebuilds the universe from
-    the bulletin lists. The flip is not one of the composition changes Q030 enumerates (`Q030 PREREG.md:653-658`),
-    but it changes which symbols those lists carry. The Registrar rules on it before the flip.
-  - Every locked question whose prospective window reads the published slate or `overall_score` (for example
-    Q027, decision 2027-04-12; Q024, decision 2027-05-17, whose threat 8 at `Q024 PREREG.md:248` is exactly this).
-    For them the flip is a publication-path ship. The latest decision date on the board is **2027-08-30** (Q015).
+- `uoa_symbol_daily.call_premium_total / put_premium_total / total_premium / call_buy_premium / put_buy_premium /
+  net_directional_premium / dir_ratio / prem_day / prem_swing / prem_long` **change for liquid names**, and through
+  cross-sectional percentiles (`services/uoa_screener.py:1699-1705`) `unusual_* / quality_* / conc_* / score_* /
+  bias_* / label_* / why_json` move a little for **every** symbol.
+- Downstream: the UOA bulletin lists (`uoa_bulletins.lists_json / markdown`), the SAS flow layer (weight 24,
+  `services/super_agent_select_scoring.py:769-790`), the flow **direction vote** (`:537-560`) and the SAS candidate
+  universe (`services/candidate_universe_builder.py:38-48`). So it can change which picks are published, and the
+  bullish tilt on capped names should fall. That is the point of the fix.
+- **No historical row is rewritten by this fix.** It is forward-only: nights before `D0` stay capped. Re-scoring
+  history is a separate decision and is out of scope (§7).
+- **The desk logs the ship SHA and `D0`** in `research/data/DATA_NOTES.md` (text in §8, Step 3). Under DP-50(a) a
+  question whose window spans `D0` treats flow before and after as two different features. Named now, so the
+  Registrar has it in writing: **Q014** `uoa_persistence` (DATASET_PINNED, decision 2027-04-05; reads
+  `uoa_symbol.score_* / label_*` in the successor freeze through 2027-02-25 — `Q014 PREREG.md:44-51`, `:424-436`),
+  **Q029** `layer_value_ablation` (PREREG_LOCKED, 2027-04-12; `flow_strength` on the prospective window
+  2026-09-15..2027-03-05 — `Q029 PREREG.md:20-32`, `:191`), **Q019** `conviction_monitor_exit` (DATASET_PINNED,
+  2027-05-24; the polarity arm reads the `uoa_contract_daily` buy/sell decomposition,
+  `services/symbol_context_builder.py:136-175`), **Q030** `universe_discovery_recall` (PREREG_LOCKED, 2027-03-01;
+  rebuilds the universe from the bulletin lists, `Q030 PREREG.md:653-658`), and every locked question whose
+  prospective window reads the published slate or `overall_score` (Q027; Q024, whose threat 8 at
+  `Q024 PREREG.md:248` is exactly this defect). None of them is a reason to delay the fix; they are the reason the
+  split date must be recorded on the day it ships.
 
-  The choice is the PI-011 / Q010 pattern, and PI-014 put the same choice to Haci. **Either** keep pagination
-  off until the affected decision dates. **Or** flip it with a dated DATA_NOTES entry (text in §8, Step 4) and let
-  each question spanning the flip split there (DP-50(a)), after a Registrar sweep. The desk does not recommend
-  holding a known bias in a live signal for a year. The cost of each option is written here so the choice is made
-  with it in view. A historical backfill is a third, separate decision (§7).
+You are the coding agent working in the platform repo. This brief is self-contained: do not ask questions, do not
+redesign, do not widen the scope. Implement §3, run §4, add §5, report the SHA.
 
-You are the coding agent working in the platform repo. This brief is self-contained: do not ask questions,
-do not redesign, do not widen the scope. Implement §3, run §4, add §5, report the SHA.
+**Nothing in this brief runs against a database.** Under DP-49 you get no DB step at all: your credential on that
+Postgres is the platform's read-write role on live production. Two specific prohibitions:
 
-**Nothing in this brief runs against a database.** Under DP-49 you get no DB step at all: your credential on
-that Postgres is the platform's read-write role on live production. Two specific prohibitions:
-
-- **Do not run `pytest` in this repo** (research PI-021). `conftest.py:31-35` runs `create_tables()` (DDL).
-  The autouse fixture at `conftest.py:38-57` deletes every row of `UserActivityEvent` and `User` before and after
+- **Do not run `pytest` in this repo** (research PI-021). `conftest.py:31-35` runs `create_tables()` (DDL), and the
+  autouse fixture at `conftest.py:38-57` deletes every row of `UserActivityEvent` and `User` before and after
   **every test**, in whatever database `DATABASE_URL` names. Run the §5 test as
   `python tests/test_uoa_trades_pagination.py` with `DATABASE_URL` unset. It loads no conftest.
-- **Do not run the UOA nightly, any `scripts/run_uoa_*.py`, `scripts/run_nightly_pipeline.py` or the app**, with
-  or without flags. There is no DB-free dry run of the screener: `run_uoa_nightly` queries `uoa_bulletins` at
+- **Do not run the UOA nightly, any `scripts/run_uoa_*.py`, `scripts/run_nightly_pipeline.py` or the app.** There is
+  no DB-free dry run of the screener: `run_uoa_nightly` queries `uoa_bulletins` at
   `services/uoa_screener.py:1311-1316` before doing anything else.
 
-Whose step is whose: the coding agent's work ends at §4 and §5, which are repo-only. Deploying and setting flags are **Haci's**.
-The §8 queries are the **Data Steward's**, on the read-only role.
+Whose step is whose: the coding agent's work ends at §4 and §5, which are repo-only. Merging and deploying are
+**Haci's**. The §8 queries are the **Data Steward's**, on the read-only role, after deploy.
 
-**Indentation:** `services/uoa_screener.py` is **tab-indented**. The snippets for it below are shown with tabs;
-keep them tabs. `ai_agents/options_client.py`, `tests/` are 4-space indented.
+**Indentation:** `services/uoa_screener.py` is **tab-indented**. The snippets for it below are shown with tabs; keep
+them tabs. `ai_agents/options_client.py` and `tests/` are 4-space indented.
 
 ---
 
 ## 1. Symptom — what is wrong, and the evidence
 
-The UOA screener reads at most **1,000 option trades per 50-contract request** and never asks for the next
-page. On liquid names a busy request holds far more than 1,000 prints. Alpaca returns the page ordered by
-contract symbol, and an OCC symbol sorts by expiry, then `C` before `P`, then strike. So the page fills with the
-nearest expiry's calls, and every put comes back with zero trades. The screener then stores a zero-trade row for
-each such contract and builds `dir_ratio` from the truncated totals.
+The UOA screener reads at most **1,000 option trades per 50-contract request** and never asks for the next page. On
+liquid names a busy request holds far more than 1,000 prints. Alpaca returns the page ordered by contract symbol,
+and an OCC symbol sorts by expiry, then `C` before `P`, then strike. So the page fills with the nearest expiry's
+calls, and every put comes back with zero trades. The screener then stores a zero-trade row for each such contract
+and builds `dir_ratio` from the truncated totals.
 
 **The traced night (research `reports/case_SNDK_2026-09-15/`, read-only DB plus Alpaca market data).** SNDK
 2026-09-08: `uoa_contract_daily` holds 60 contracts and 2,000 trades, with trades on calls only and 0 puts. The
@@ -123,8 +111,8 @@ manifest_v001). The imbalance is the signature, not a count of truncated rows.
 | 2026-08 | 10,461 | 1,213 | 263 |
 | 2026-09 (to 09-10) | 3,489 | 350 | 142 |
 
-**Scale (live read-only counts, 2026-09-15, `truncation_scale.py`).** Counting rule: a symbol-day is "capped"
-when `sum(uoa_contract_daily.trade_count) >= 1000`. That is a floor, because the batch split is not stored.
+**Scale (live read-only counts, 2026-09-15, `truncation_scale.py`).** Counting rule: a symbol-day is "capped" when
+`sum(uoa_contract_daily.trade_count) >= 1000`. That is a floor, because the batch split is not stored.
 
 | month | symbol-days | capped | capped with zero put premium |
 |---|---:|---:|---:|
@@ -134,9 +122,9 @@ when `sum(uoa_contract_daily.trade_count) >= 1000`. That is a floor, because the
 | 2026-08 | 10,461 | 1,483 | 164 |
 
 Since 2026-06-01, **317 of 604** published SAS picks had a capped UOA row on their pick night (64 with zero put
-premium). GOOG, GOOGL, MSFT, AMZN, NFLX, ORCL, CRM, NOW, KO, WMT, BAC, BA, PFE, GLW and SNDK are capped every
-session. These rows predate the fix and the fix rewrites none of them, so the same query on those months must
-return the same numbers at verification (§8 V1).
+premium). **GOOG, GOOGL, MSFT, AMZN, NFLX, ORCL, CRM, NOW, KO, WMT, BAC, BA, PFE, GLW and SNDK are capped every
+session** — those fifteen names are the after-deploy check in §8. Their rows predate the fix and the fix rewrites
+none of them, so the same query on past months must return the same numbers after deploy (§8 W5).
 
 ### Reproducing queries — **Data Steward only**, read-only role on `$RESEARCH_DB_URL`
 
@@ -150,7 +138,7 @@ SELECT count(*)                                                            AS co
        sum(CASE WHEN option_type = 'put'  AND trade_count > 0 THEN 1 ELSE 0 END) AS puts_with_trades
 FROM uoa_contract_daily
 WHERE underlying_symbol = 'SNDK' AND trading_date = DATE '2026-09-08';
--- Expected today: 60 | 2000 | >0 | 0
+-- Expected today and after the fix (a historical row, never rewritten): 60 | 2000 | >0 | 0
 
 -- R2. Capped symbol-days per month (truncation_scale.py's definition).
 WITH c AS (
@@ -190,7 +178,7 @@ Pagination is not missing from the file, only from this method. The contract lis
 (`_fetch_underlying_snapshots`, token at `:914`, bounded by `_MAX_SNAPSHOT_PAGES` at `:33`). The fix reuses that
 pattern: send `page_token`, read `next_page_token`, stop at a bounded page count.
 
-**`services/uoa_screener.py`, the only nightly caller:**
+**`services/uoa_screener.py`, the nightly caller:**
 - `:1453` `contract_symbols` come from `selected`, which `_pick_contracts` ranks by bucket, snapshot volume, OI,
   spread and ATM distance (`:1177-1189`). Calls and puts are interleaved, so each 50-contract batch mixes both.
 - `:1504-1509` calls `get_option_trades(contract_symbols, start=start_iso, end=end_iso, limit=cfg.trades_limit)`,
@@ -199,9 +187,9 @@ pattern: send `page_token`, read `next_page_token`, stop at a bounded page count
 - `:1602-1605` builds `dir_ratio` from the truncated call and put totals. `:1609-1622` builds `prem_day/swing/long`
   from them too.
 
-Other callers of `get_option_trades`, untouched by this brief: `ai_agents/omega_agent.py:1655-1673` (an LLM tool;
-it clamps `limit` to 10,000 at `:1669`, which also shows the endpoint's page maximum) and
-`ai_agents/option_flow_monitor.py:92-97` (a live 10-minute window).
+The other two callers are `ai_agents/omega_agent.py:1655-1673` (an LLM tool; it clamps `limit` to 10,000 at `:1669`,
+which also shows the endpoint's page maximum) and `ai_agents/option_flow_monitor.py:92-97` (a live 10-minute
+window). Both have the same defect, and both are fixed by this change because the fix is in the method they call.
 
 ---
 
@@ -209,89 +197,82 @@ it clamps `limit` to 10,000 at `:1669`, which also shows the endpoint's page max
 
 ### Design choices, justified from the code
 
-1. **A new client method, and the old one untouched.** `get_option_trades` keeps its exact body, so the omega tool
-   and the flow monitor are unaffected. A diff proves it (§4(c)). The screener calls the new
-   `get_option_trades_paged` on **both** flag states. With `max_pages_per_batch=1, split_by_type=False,
-   page_limit=cfg.trades_limit` it sends the same requests, in the same order, with the same parameters, and
-   returns the same `trades` mapping as `get_option_trades` (§5 T1, T2). The one addition is reading whether a batch came back with
-   a `next_page_token`. That signal is free and tells the Data Steward how often truncation happens, with nothing
-   switched on. The alternative, keeping the flag-off path on the untouched method, loses that telemetry and gives
-   the shadow nothing to trigger on.
-2. **Calls and puts in separate batches when paginating.** A page ceiling on a mixed batch still returns calls
-   first, so any cap would keep crowding out puts. Batched apart, each side gets its own page budget, and a
-   ceiling hit on the call side cannot cost the put side a single print (§5 T5). A residual bias remains inside a
-   side when a ceiling is hit: later expiries and higher strikes are read last. That is recorded
-   (`truncated_sides`), not hidden. Per-contract requests were rejected: 60 requests per symbol is about 30,000 a
-   night. Per-(type, expiry) batches were also rejected: more requests, and a recorded ceiling already covers the case.
-3. **Page size 10,000 and at most 10 pages per side-batch by default.** 10,000 is the endpoint's maximum
-   (`omega_agent.py:1669`; `verify_trades.py:31` paged with it). Ten pages is 100,000 prints per side, about seven
-   times SNDK's call side on 2026-09-08. Worst-case memory is 3 side-batches × 10 pages × 10,000 prints for one
-   symbol, released before the next. A ceiling hit is written to `stats_json`. If the Steward sees it on names that
-   matter, Haci raises `UOA_TRADES_MAX_PAGES_PER_BATCH` (up to 50) without a deploy.
-4. **Stored in `uoa_runs.stats_json`, no schema change.** `stats_json` is a Text JSON column (`models.py:399`,
+1. **`get_option_trades` itself paginates. One method, no second path.** The old body is replaced, not kept beside a
+   new one. Every caller — the nightly screener, the omega tool, the flow monitor — gets complete prints. There is
+   nothing to switch on and nothing to keep in step.
+2. **Calls and puts go in separate batches, always.** A page ceiling on a mixed batch still returns calls first, so
+   any ceiling would keep crowding out puts. Batched apart, each side gets its own page budget, and a ceiling hit on
+   the call side cannot cost the put side a single print (§5 T4). A residual bias remains *inside* a side when a
+   ceiling is hit: later expiries and higher strikes are read last. That is recorded (`truncated_sides`), not hidden.
+   Per-contract requests were rejected: 60 requests per symbol is about 30,000 a night. Per-(type, expiry) batches
+   were also rejected: more requests, and a recorded ceiling already covers the case.
+3. **A generous, recorded ceiling.** `_MAX_TRADE_PAGES = 20` pages per side-batch, in the `_MAX_SNAPSHOT_PAGES` shape
+   already at `options_client.py:33`, so a runaway night can be bounded without a deploy. It is a safety bound, not a
+   gate: pagination happens at every value. With page size 10,000 (the endpoint's maximum — `omega_agent.py:1669`;
+   `verify_trades.py:31` paged with it) that is 200,000 prints per side, about **fourteen times** SNDK's call side on
+   2026-09-08. Worst-case memory is 2 side-batches × 20 pages × 10,000 prints for one symbol, released before the
+   next. Every ceiling hit lands in `uoa_runs.stats_json` with the symbol and the side, so the Steward sees it
+   (§8 W2) instead of guessing.
+4. **`UoaConfig.trades_limit` 1000 → 10000 (`:806`).** With pagination the parameter is the *page size*, not a cap on
+   what is read. 10,000 is the endpoint's maximum and it keeps the request count down: SNDK's call side becomes 2
+   pages instead of 16. It is used in exactly one place (`git grep trades_limit` at this SHA returns `:806`, `:1508`
+   and one line of `reports/pipeline_repair.md`).
+5. **Telemetry in `uoa_runs.stats_json`, no schema change.** `stats_json` is a Text JSON column (`models.py:399`,
    `set_stats` `:413-414`), written at `services/uoa_screener.py:2006`. It is read only by the diagnostic passthrough
-   `routers/uoa_screener.py:869-880` (behind login, compares nothing) and `scripts/diagnose_uoa_oi.py:92`.
-   `uoa_symbol_daily.why_json` was rejected. It is served to users (`routers/uoa_screener.py:1119`), fed to SAS
-   context (`services/symbol_context_builder.py:323`, `:392`) and to the MCP server
-   (`fmp_mcp_server/server.py:1556`, `:1643`), so a new key there would change a served payload with the flag off.
-   Nothing in `models.py` changes. No migration exists, and **none is to be written or run**.
-5. **Cost.** About 1,500 capped symbol-days a month over about 21 sessions is about 70 symbols a night, out of about 500.
-   Today each symbol already costs about 25–30 Alpaca requests: a contract-list page, 12 snapshot batches for 600
-   contracts (`options_client.py:705-708`, `:854-858`), up to 14 contract lookups (`uoa_screener.py:1466-1467`,
-   `:1627`) and 2 trade requests. On a SNDK-like name pagination adds about 2 requests (2 pages per side instead of 1
-   mixed page), about +150–300 a night in total. The ceiling bounds the worst case at +2,100. 429s are already
-   retried with `Retry-After` (`options_client.py:77-93`, `:102-105`). The account's per-minute limit is not
-   visible from the repo, and page latency is the unknown, so both fetches record elapsed seconds.
+   `routers/uoa_screener.py:869-880` (behind login) and `scripts/diagnose_uoa_oi.py:92`. `uoa_symbol_daily.why_json`
+   was rejected as the home for it: it is served to users (`routers/uoa_screener.py:1119`), fed to SAS context
+   (`services/symbol_context_builder.py:323`, `:392`) and to the MCP server (`fmp_mcp_server/server.py:1556`,
+   `:1643`). Nothing in `models.py` changes. No migration exists, and **none is to be written or run**.
+6. **Cost.** About 1,500 capped symbol-days a month over about 21 sessions is about 70 symbols a night, out of about
+   500. Today each symbol already costs about 25–30 Alpaca requests: a contract-list page, 12 snapshot batches for
+   600 contracts (`options_client.py:705-708`, `:854-858`), up to 14 contract lookups (`uoa_screener.py:1466-1467`,
+   `:1627`) and 2 trade requests. After the fix a typical symbol still sends 2 trade requests (one per side, both a
+   single page at limit 10,000); a SNDK-like name sends 4. Expect roughly +150–300 requests a night, with the ceiling
+   bounding the worst case. 429s are already retried with `Retry-After` (`options_client.py:77-93`, `:102-105`). Page
+   latency is the unknown, so the run block records elapsed seconds and §8 W4 reads the publication-time shift.
 
-### What changes, byte for byte
+### 3.1 `ai_agents/options_client.py` — module constant
 
-| state | contract & symbol premium columns | `unusual_*`, `score_*`, `bias_*`, `label_*`, bulletin, SAS | `uoa_runs.stats_json` |
-|---|---|---|---|
-| deployed, flags unset | identical | identical | + `trades_fetch` block |
-| shadow on | identical | identical | + `shadow_full` entries |
-| pagination on, symbol whose every legacy batch was one complete page | **identical** (same prints per contract, same order; §5 T3, T8) | **may change**: percentiles are cross-sectional over all symbols (`:1699-1705`) | + block |
-| pagination on, capped symbol | **changes — the fix** | changes | + block |
-
-"Identical" for under-cap symbols follows from the paging arithmetic. A legacy batch that returned no token held
-≤ 1,000 prints, so each side-batch holds ≤ 1,000 ≤ `page_limit` prints and returns in one complete page. The claim
-assumes Alpaca returns a contract's prints in the same (timestamp) order whatever the batch composition, which is
-how its page tokens work. The §5 fake encodes that assumption.
-
-### 3.1 `ai_agents/options_client.py` — new method (4 spaces)
-
-Insert immediately **after** `get_option_trades` ends (`return {"trades": aggregated}` at `:1018`) and **before**
-`def get_option_latest_quote(` at `:1020`. Do not edit `get_option_trades` or anything else in the file.
+After `_MAX_SNAPSHOT_PAGES = int(os.getenv("ALPACA_OPTION_SNAPSHOT_PAGES", "5"))` at `:33`, add:
 
 ```python
-    def get_option_trades_paged(
+_MAX_TRADE_PAGES = int(os.getenv("ALPACA_OPTION_TRADE_PAGES", "20"))  # safety bound, research PI-020
+```
+
+### 3.2 `ai_agents/options_client.py` — `get_option_trades` paginates (4 spaces)
+
+Replace the whole method, `:985-1018` (from `def get_option_trades(` through `return {"trades": aggregated}`), with:
+
+```python
+    def get_option_trades(
         self,
         contract_symbols: List[str],
         start: Optional[str] = None,
         end: Optional[str] = None,
+        limit: int = 1000,
         *,
-        page_limit: int = 1000,
-        max_pages_per_batch: int = 1,
-        split_by_type: bool = False,
+        max_pages: int = _MAX_TRADE_PAGES,
     ) -> Dict[str, Any]:
-        """Trade prints for option contracts, following next_page_token (research PI-020).
+        """Return trade prints for the requested option contracts (research PI-020).
 
-        Alpaca orders a multi-contract /trades response by contract symbol, and an OCC symbol
-        sorts by expiry, then C before P, then strike. One page for a busy batch therefore holds
-        only the nearest expiry's calls; get_option_trades reads that one page and drops the token.
+        Alpaca orders a multi-contract /trades response by contract symbol, and an OCC symbol sorts
+        by expiry, then C before P, then strike. One page of a busy batch therefore holds only the
+        nearest expiry's calls. This method follows next_page_token until the batch is exhausted
+        (or max_pages is reached, which is recorded), and requests calls and puts in separate
+        batches so a ceiling on one side can never spend the other side's budget.
 
-        max_pages_per_batch=1, split_by_type=False: exactly the requests get_option_trades sends,
-        and the same "trades" mapping, plus a "fetch" block saying whether any batch was cut short.
-        split_by_type=True batches calls and puts separately, so a page ceiling on one side can
-        never spend the other side's budget.
+        `limit` is the page size (Alpaca's maximum is 10000), not a cap on what is returned.
+        Returns {"trades": {contract: [row, ...]}, "fetch": {...}}; "fetch" is telemetry only.
         """
         fetch: Dict[str, Any] = {
-            "split_by_type": bool(split_by_type),
-            "page_limit": int(page_limit),
-            "max_pages_per_batch": max(int(max_pages_per_batch), 1),
+            "page_limit": int(limit),
+            "max_pages_per_batch": max(int(max_pages), 1),
             "batches": 0,
+            "pages": 0,
             "requests": 0,
             "failed_requests": 0,
             "failed_batches": 0,
+            "truncated": False,
             "truncated_batches": 0,
             "truncated_sides": [],
             "trades_returned": {"call": 0, "put": 0},
@@ -308,16 +289,12 @@ Insert immediately **after** `get_option_trades` ends (`return {"trades": aggreg
         if not valid:
             return {"trades": {}, "fetch": fetch}
 
-        if split_by_type:
-            # _sanitize_contract_symbols guarantees ROOT + YYMMDD + C|P + 8-digit strike.
-            groups = [
-                ("call", [s for s in valid if s[-9] == "C"]),
-                ("put", [s for s in valid if s[-9] == "P"]),
-            ]
-        else:
-            groups = [("mixed", valid)]
-
-        max_pages = fetch["max_pages_per_batch"]
+        # _sanitize_contract_symbols guarantees ROOT + YYMMDD + C|P + 8-digit strike (_CONTRACT_SYMBOL_RE, :31).
+        groups = [
+            ("call", [s for s in valid if s[-9] == "C"]),
+            ("put", [s for s in valid if s[-9] == "P"]),
+        ]
+        page_cap = fetch["max_pages_per_batch"]
         aggregated: Dict[str, Any] = {}
         truncated_sides = set()
         for side, symbols in groups:
@@ -330,7 +307,7 @@ Insert immediately **after** `get_option_trades` ends (`return {"trades": aggreg
                 while True:
                     params: Dict[str, Any] = {
                         "symbols": ",".join(batch),
-                        "limit": page_limit,
+                        "limit": limit,
                     }
                     if start:
                         params["start"] = start
@@ -349,6 +326,7 @@ Insert immediately **after** `get_option_trades` ends (`return {"trades": aggreg
                             cut_short = True
                         break
                     pages_ok += 1
+                    fetch["pages"] += 1
                     for sym, rows in (payload.get("trades") or {}).items():
                         if isinstance(rows, list):
                             batch_trades.setdefault(sym, []).extend(rows)
@@ -358,7 +336,7 @@ Insert immediately **after** `get_option_trades` ends (`return {"trades": aggreg
                     next_token = payload.get("next_page_token") or payload.get("nextPageToken")
                     if not next_token:
                         break
-                    if pages_ok >= max_pages:
+                    if pages_ok >= page_cap:
                         cut_short = True
                         break
                 aggregated.update(batch_trades)
@@ -366,147 +344,62 @@ Insert immediately **after** `get_option_trades` ends (`return {"trades": aggreg
                     fetch["truncated_batches"] += 1
                     truncated_sides.add(side)
         fetch["truncated_sides"] = sorted(truncated_sides)
+        fetch["truncated"] = bool(truncated_sides)
         return {"trades": aggregated, "fetch": fetch}
 ```
 
-### 3.2 `services/uoa_screener.py` — settings, summary and run-record helpers (tabs)
+The two non-screener callers need no edit: `ai_agents/option_flow_monitor.py:92-98` and
+`ai_agents/omega_agent.py:1655-1681` both read `payload.get("trades", {})`, so the added `"fetch"` key is additive
+for them and they now see complete prints. The omega tool's result stays bounded by its own `max_limit` clamp
+(`:1669`) times `_MAX_TRADE_PAGES`.
+
+### 3.3 `services/uoa_screener.py` — page size (tabs)
+
+`:806`, in `UoaConfig`:
+
+```python
+	trades_limit: int = 10000  # PI-020: /trades page size (Alpaca max); pagination reads every page
+```
+
+### 3.4 `services/uoa_screener.py` — two pure helpers (tabs)
 
 Insert immediately **after** `_aggregate_trades_for_contract` ends (its `return {...}` closes at `:1271`) and
 **before** `def _label_for_bucket(` at `:1274`:
 
 ```python
-# --- Option-trade pagination (research PI-020) --------------------------------
-# get_option_trades reads one page (limit=1000) per 50-contract batch and drops next_page_token.
+# --- Option-trade fetch telemetry (research PI-020) ----------------------------
+# get_option_trades used to read one page (limit=1000) per 50-contract batch and drop next_page_token.
 # Alpaca orders a multi-contract response by OCC symbol (expiry, then C before P, then strike), so on
-# busy names the page holds only near-dated calls and the puts come back empty.
-_UOA_FLAG_TRUE = {"1", "true", "yes", "on"}
-UOA_TRADES_PAGE_LIMIT_DEFAULT = 10000  # the endpoint's maximum page size
-UOA_TRADES_MAX_PAGES_DEFAULT = 10
+# busy names the page held only near-dated calls and the puts came back empty. It now pages to the end,
+# calls and puts apart. These helpers record what each night's fetch cost and where a ceiling was hit.
+# They gate nothing: scoring always reads the paginated trades map.
 
 
-def _env_int_clamped(name: str, default: int, lo: int, hi: int) -> int:
-	raw = os.getenv(name)
-	try:
-		value = int(str(raw).strip()) if raw is not None and str(raw).strip() else int(default)
-	except Exception:
-		value = int(default)
-	return max(int(lo), min(int(hi), value))
-
-
-def uoa_trades_fetch_settings() -> Dict[str, Any]:
-	"""PI-020 runtime settings, read from the environment at call time. Pure: no DB, no I/O.
-
-	UOA_TRADES_PAGINATION_ENABLED (default off): score from the paginated fetch.
-	UOA_TRADES_PAGINATION_SHADOW_ENABLED (default off; ignored when pagination is on): score from
-	the single page as before; for symbols whose page was cut short, also fetch every page and
-	record the totals in uoa_runs.stats_json only.
-	"""
-	paginate = str(os.getenv("UOA_TRADES_PAGINATION_ENABLED", "")).strip().lower() in _UOA_FLAG_TRUE
-	shadow = str(os.getenv("UOA_TRADES_PAGINATION_SHADOW_ENABLED", "")).strip().lower() in _UOA_FLAG_TRUE
+def new_trades_fetch_stats(config: UoaConfig) -> Dict[str, Any]:
+	"""The uoa_runs.stats_json["trades_fetch"] block for one run. Pure: no DB, no I/O."""
 	return {
-		"mode": "paginated" if paginate else "single_page",
-		"shadow_enabled": bool(shadow and not paginate),
-		"page_limit": _env_int_clamped("UOA_TRADES_PAGE_LIMIT", UOA_TRADES_PAGE_LIMIT_DEFAULT, 1000, 10000),
-		"max_pages_per_batch": _env_int_clamped("UOA_TRADES_MAX_PAGES_PER_BATCH", UOA_TRADES_MAX_PAGES_DEFAULT, 1, 50),
-	}
-
-
-def summarize_symbol_flow(
-	selected: Sequence[Mapping[str, Any]],
-	trades_map: Mapping[str, Any],
-	config: UoaConfig,
-) -> Dict[str, Any]:
-	"""Symbol-level totals from a trades map, with run_uoa_nightly's own arithmetic.
-
-	Same order and formulas as the per-contract loop, dir_ratio and prem_* blocks of
-	run_uoa_nightly. Used only for the PI-020 shadow record; scoring never calls it.
-	Pure: no DB, no I/O.
-	"""
-	call_trades = 0
-	put_trades = 0
-	call_premium = 0.0
-	put_premium = 0.0
-	call_buy = 0.0
-	put_buy = 0.0
-	prem_day = 0.0
-	prem_swing = 0.0
-	prem_long = 0.0
-	for meta in selected:
-		rows = trades_map.get(meta.get("symbol")) or []
-		if not isinstance(rows, list) or not rows:
-			continue
-		agg = _aggregate_trades_for_contract(rows, bid=meta.get("bid"), ask=meta.get("ask"), config=config)
-		prem = float(agg["premium_total"])
-		if meta.get("type") == "call":
-			call_trades += int(agg["trade_count"])
-			call_premium += prem
-			if config.aggressor_proxy_enabled:
-				call_buy += float(agg.get("buy_premium") or 0.0)
-		elif meta.get("type") == "put":
-			put_trades += int(agg["trade_count"])
-			put_premium += prem
-			if config.aggressor_proxy_enabled:
-				put_buy += float(agg.get("buy_premium") or 0.0)
-		if prem > 0:
-			buckets = meta.get("buckets") or []
-			if "day" in buckets:
-				prem_day += prem
-			if "swing" in buckets:
-				prem_swing += prem
-			if "long" in buckets:
-				prem_long += prem
-	call_dir = call_buy if config.aggressor_proxy_enabled else call_premium
-	put_dir = put_buy if config.aggressor_proxy_enabled else put_premium
-	return {
-		"call_trades": call_trades,
-		"put_trades": put_trades,
-		"call_premium": call_premium,
-		"put_premium": put_premium,
-		"call_buy_premium": call_buy if config.aggressor_proxy_enabled else None,
-		"put_buy_premium": put_buy if config.aggressor_proxy_enabled else None,
-		"dir_ratio": (call_dir - put_dir) / (call_dir + put_dir + 1.0),
-		"prem_day": prem_day,
-		"prem_swing": prem_swing,
-		"prem_long": prem_long,
-	}
-
-
-def new_trades_fetch_stats(settings: Mapping[str, Any], config: UoaConfig) -> Dict[str, Any]:
-	"""The uoa_runs.stats_json["trades_fetch"] block for one run. Pure."""
-	paginated = settings.get("mode") == "paginated"
-	shadow = bool(settings.get("shadow_enabled"))
-	return {
-		"mode": "paginated" if paginated else "single_page",
-		"shadow_enabled": shadow,
-		"page_limit": int(settings["page_limit"]) if paginated else int(config.trades_limit),
-		"max_pages_per_batch": int(settings["max_pages_per_batch"]) if paginated else 1,
-		"split_by_type": paginated,
+		"page_limit": int(config.trades_limit),
+		"split_by_type": True,
 		"symbols_fetched": 0,
 		"symbols_multi_page": 0,
 		"symbols_truncated": 0,
 		"requests": 0,
+		"pages": 0,
 		"failed_requests": 0,
 		"fetch_seconds": 0.0,
 		"truncated": {},
-		"shadow_page_limit": int(settings["page_limit"]) if shadow else None,
-		"shadow_max_pages_per_batch": int(settings["max_pages_per_batch"]) if shadow else None,
-		"shadow_symbols": 0,
-		"shadow_requests": 0,
-		"shadow_truncated": 0,
-		"shadow_errors": 0,
-		"shadow_seconds": 0.0,
-		"shadow_full": {},
 	}
 
 
 def record_trades_fetch(acc: Dict[str, Any], symbol: str, fetch_meta: Any, seconds: float) -> None:
-	"""Fold one symbol's scoring fetch into the run block. A symbol is named only when cut short."""
+	"""Fold one symbol's fetch into the run block. A symbol is named only when it was cut short. Pure."""
 	meta = fetch_meta if isinstance(fetch_meta, Mapping) else {}
 	requests = int(meta.get("requests") or 0)
 	batches = int(meta.get("batches") or 0)
 	truncated_batches = int(meta.get("truncated_batches") or 0)
 	acc["symbols_fetched"] += 1
 	acc["requests"] += requests
+	acc["pages"] += int(meta.get("pages") or 0)
 	acc["failed_requests"] += int(meta.get("failed_requests") or 0)
 	acc["fetch_seconds"] = round(float(acc["fetch_seconds"]) + float(seconds or 0.0), 3)
 	if requests > batches:
@@ -518,229 +411,157 @@ def record_trades_fetch(acc: Dict[str, Any], symbol: str, fetch_meta: Any, secon
 			"truncated_batches": truncated_batches,
 			"sides": list(meta.get("truncated_sides") or []),
 			"requests": requests,
+			"pages": int(meta.get("pages") or 0),
 			"trades_returned": dict(meta.get("trades_returned") or {}),
 		}
-
-
-def record_trades_shadow(
-	acc: Dict[str, Any],
-	symbol: str,
-	shadow_payload: Any,
-	selected: Sequence[Mapping[str, Any]],
-	config: UoaConfig,
-	seconds: float,
-) -> None:
-	"""Record what the fully paginated fetch would have given. Never read by scoring."""
-	payload = shadow_payload if isinstance(shadow_payload, Mapping) else {}
-	meta = payload.get("fetch") if isinstance(payload.get("fetch"), Mapping) else {}
-	summary = summarize_symbol_flow(selected, payload.get("trades") or {}, config)
-	acc["shadow_symbols"] += 1
-	acc["shadow_requests"] += int(meta.get("requests") or 0)
-	acc["shadow_seconds"] = round(float(acc["shadow_seconds"]) + float(seconds or 0.0), 3)
-	if int(meta.get("truncated_batches") or 0) > 0:
-		acc["shadow_truncated"] += 1
-	summary.update(
-		{
-			"requests": int(meta.get("requests") or 0),
-			"truncated_batches": int(meta.get("truncated_batches") or 0),
-			"truncated_sides": list(meta.get("truncated_sides") or []),
-			"failed_requests": int(meta.get("failed_requests") or 0),
-		}
-	)
-	acc["shadow_full"][str(symbol).upper()] = summary
 ```
 
-Add the five public names to `__all__` at `services/uoa_screener.py:2457-2465`, after
-`"backfill_uoa_outcomes_range",`: `"uoa_trades_fetch_settings"`, `"summarize_symbol_flow"`,
-`"new_trades_fetch_stats"`, `"record_trades_fetch"`, `"record_trades_shadow"`.
+Add both public names to `__all__` at `services/uoa_screener.py:2457-2465`, after `"backfill_uoa_outcomes_range",`:
+`"new_trades_fetch_stats"`, `"record_trades_fetch"`.
 
-### 3.3 `services/uoa_screener.py` — initialise the run block
+### 3.5 `services/uoa_screener.py` — initialise the run block
 
-Insert immediately **after** `stats["force_deleted"] = deleted` at `:1423` and before `for symbol in universe_syms:` at `:1425`:
+Insert immediately **after** `stats["force_deleted"] = deleted` at `:1423` and before `for symbol in universe_syms:`
+at `:1425`:
 
 ```python
-	# PI-020: how option trades are fetched tonight, and every place a fetch was cut short.
-	trades_fetch_settings = uoa_trades_fetch_settings()
-	trades_fetch_stats = new_trades_fetch_stats(trades_fetch_settings, cfg)
+	# PI-020: what tonight's option-trade fetch cost, and every place a ceiling was hit.
+	trades_fetch_stats = new_trades_fetch_stats(cfg)
 	stats["trades_fetch"] = trades_fetch_stats
 ```
 
-`stats` is serialised once at `:2006` (`run.set_stats(stats)`) and again at `:2014` and `:2034`; the block rides along.
+`stats` is serialised at `:2006` (`run.set_stats(stats)`) and again at `:2014` and `:2034`; the block rides along.
 
-### 3.4 `services/uoa_screener.py` — replace the fetch at `:1504-1509`
+### 3.6 `services/uoa_screener.py` — the fetch at `:1504-1510`
 
-Replace exactly the six lines `trades_payload = options_client.get_option_trades(` … `)` at `:1504-1509`. Keep
-`:1510` (`trades_map = trades_payload.get("trades", {}) if isinstance(trades_payload, dict) else {}`) **unchanged**,
-and put the new lines after it as shown:
+Replace exactly the six lines `trades_payload = options_client.get_option_trades(` … `)` at `:1504-1509`, keep
+`:1510` (`trades_map = ...`) as it is, and add the recording call after it:
 
 ```python
-		# PI-020: option trades. Flag off sends exactly the pre-PI-020 requests (one page per
-		# 50-contract batch, limit=cfg.trades_limit) and only reads whether a page was cut short.
-		# Flag on follows next_page_token, with calls and puts batched apart.
+		# PI-020: read every page of prints, calls and puts in separate batches.
 		trades_fetch_t0 = datetime.now(timezone.utc)
-		if trades_fetch_settings["mode"] == "paginated":
-			trades_payload = options_client.get_option_trades_paged(
-				contract_symbols,
-				start=start_iso,
-				end=end_iso,
-				page_limit=int(trades_fetch_settings["page_limit"]),
-				max_pages_per_batch=int(trades_fetch_settings["max_pages_per_batch"]),
-				split_by_type=True,
-			)
-		else:
-			trades_payload = options_client.get_option_trades_paged(
-				contract_symbols,
-				start=start_iso,
-				end=end_iso,
-				page_limit=cfg.trades_limit,
-				max_pages_per_batch=1,
-				split_by_type=False,
-			)
+		trades_payload = options_client.get_option_trades(
+			contract_symbols,
+			start=start_iso,
+			end=end_iso,
+			limit=cfg.trades_limit,
+		)
 		trades_map = trades_payload.get("trades", {}) if isinstance(trades_payload, dict) else {}
-		trades_fetch_meta = trades_payload.get("fetch", {}) if isinstance(trades_payload, dict) else {}
 		record_trades_fetch(
 			trades_fetch_stats,
 			symbol,
-			trades_fetch_meta,
+			trades_payload.get("fetch", {}) if isinstance(trades_payload, dict) else {},
 			(datetime.now(timezone.utc) - trades_fetch_t0).total_seconds(),
 		)
-		if trades_fetch_settings["shadow_enabled"] and int(trades_fetch_meta.get("truncated_batches") or 0) > 0:
-			# Shadow only: everything below reads trades_map, never shadow_payload.
-			shadow_t0 = datetime.now(timezone.utc)
-			try:
-				shadow_payload = options_client.get_option_trades_paged(
-					contract_symbols,
-					start=start_iso,
-					end=end_iso,
-					page_limit=int(trades_fetch_settings["page_limit"]),
-					max_pages_per_batch=int(trades_fetch_settings["max_pages_per_batch"]),
-					split_by_type=True,
-				)
-				record_trades_shadow(
-					trades_fetch_stats,
-					symbol,
-					shadow_payload,
-					selected,
-					cfg,
-					(datetime.now(timezone.utc) - shadow_t0).total_seconds(),
-				)
-			except Exception:
-				trades_fetch_stats["shadow_errors"] += 1
-				logger.exception("PI-020 shadow trades fetch failed symbol=%s", symbol)
 ```
 
 `datetime` and `timezone` are already imported at `:9` and used this way at `:1302`. Note that `time` at `:9` is
-`datetime.time`, not the `time` module; do not add `import time`. Nothing from `:1511` onward changes. The
-per-contract loop, `dir_ratio`, `prem_*`, percentiles, scores, labels and bulletin code are exactly as at `c311e81`.
+`datetime.time`, not the `time` module; do not add `import time`. Nothing from `:1511` onward changes: the
+per-contract loop, `dir_ratio`, `prem_*`, percentiles, scores, labels and the bulletin builder are untouched — they
+simply receive a complete `trades_map`.
 
-### 3.5 Docs — `docs/UOA_SCREENER_MVP.md`
+### 3.7 Docs — `docs/UOA_SCREENER_MVP.md`
 
 Replace `§2.3` at `docs/UOA_SCREENER_MVP.md:107-115` (from `### 2.3 Trades (intraday prints)` through
 `MVP design assumes you compute UOA primarily from these trade rows.`) with:
 
 ```markdown
 ### 2.3 Trades (intraday prints)
-Method: `AlpacaOptionsClient.get_option_trades_paged(contract_symbols, start=..., end=..., page_limit=..., max_pages_per_batch=..., split_by_type=...)`
-(the nightly screener; `get_option_trades` is the older single-page method, still used by the omega tool and the flow monitor)
+Method: `AlpacaOptionsClient.get_option_trades(contract_symbols, start=..., end=..., limit=...)`
 - Under the hood: `/v1beta1/options/trades`, up to 50 contracts per request
 - For each contract: list of trade rows; the code expects:
   - `p` or `price`
   - `s` or `size`
   - `t` or `timestamp`
 
-**Pagination (PI-020).** Alpaca orders a multi-contract response by OCC symbol (expiry, then C before P, then strike).
-One page of 1,000 prints on a busy name therefore holds only near-dated calls, and puts come back empty. Two
-flags, both default off: `UOA_TRADES_PAGINATION_ENABLED` makes the nightly follow `next_page_token`, with calls and
-puts in separate batches, up to `UOA_TRADES_MAX_PAGES_PER_BATCH` (10) pages of `UOA_TRADES_PAGE_LIMIT` (10,000)
-prints per batch. `UOA_TRADES_PAGINATION_SHADOW_ENABLED` keeps scoring from the single page and, for symbols whose
-page was cut short, records the fully paginated totals. Every run writes `uoa_runs.stats_json.trades_fetch`: mode,
-requests, elapsed seconds, and every symbol whose fetch was cut short, by side (`truncated`). Shadow runs also write
-`shadow_full`. Turning pagination on changes flow premiums, `dir_ratio` and the cross-sectional scores; the flip date is logged.
+**Pagination (PI-020, shipped 2026-09-15).** Alpaca orders a multi-contract response by OCC symbol (expiry, then C
+before P, then strike), so one page of 1,000 prints on a busy name held only near-dated calls and the puts came back
+empty. The method now follows `next_page_token` to the end of each batch, and requests calls and puts in separate
+batches so a page ceiling on one side cannot starve the other. `limit` is the page size (`UoaConfig.trades_limit` =
+10,000, Alpaca's maximum); `ALPACA_OPTION_TRADE_PAGES` (20) is the per-batch safety bound. Every nightly writes
+`uoa_runs.stats_json.trades_fetch`: page size, symbols fetched, pages, requests, elapsed seconds, and every symbol
+whose fetch hit the ceiling, with the side (`truncated`). From the ship date, flow premiums, `dir_ratio` and the
+cross-sectional scores are built from every print; earlier nights are capped.
 
 MVP design assumes you compute UOA primarily from these trade rows.
 ```
 
-That is the whole change: `ai_agents/options_client.py`, `services/uoa_screener.py`, `docs/UOA_SCREENER_MVP.md`,
-and a new `tests/test_uoa_trades_pagination.py`. Nothing else.
+That is the whole change: `ai_agents/options_client.py`, `services/uoa_screener.py`, `docs/UOA_SCREENER_MVP.md`, and
+a new `tests/test_uoa_trades_pagination.py`. Nothing else.
 
 ---
 
 ## 4. Before / after check — repository only, no database, no network
 
-`DATABASE_URL` must be unset in the shell for every command
-(PowerShell: `Remove-Item Env:DATABASE_URL -ErrorAction SilentlyContinue`; Git Bash: `unset DATABASE_URL`).
-None of these commands opens a connection. `ai_agents/options_client.py` imports only the standard library,
-`requests` and `core.datetime_utils` (`:1-10`), and `ai_agents/__init__.py` imports nothing. `services/uoa_screener.py`
-imports `models` (`:22-30`), and `models.py:1-7` imports only SQLAlchemy symbols. No module in that chain imports
-`db.py`; `user.py:7` is the one that does, and nothing here imports `user`. Importing the screener pulls
-`indicator_fetcher` → `symbol_map`, which may try the Alpaca asset catalogue and fall back offline. That is slow,
-not a DB call.
+This is the coding agent's own check. `DATABASE_URL` must be unset in the shell for every command
+(PowerShell: `Remove-Item Env:DATABASE_URL -ErrorAction SilentlyContinue`; Git Bash: `unset DATABASE_URL`). None of
+these commands opens a connection. `ai_agents/options_client.py` imports only the standard library, `requests` and
+`core.datetime_utils` (`:1-10`), and `ai_agents/__init__.py` imports nothing. `services/uoa_screener.py` imports
+`models` (`:22-30`), and `models.py:1-7` imports only SQLAlchemy symbols. No module in that chain imports `db.py`;
+`user.py:7` is the one that does, and nothing here imports `user`. Importing the screener pulls `indicator_fetcher`
+→ `symbol_map`, which may try the Alpaca asset catalogue and fall back offline. That is slow, not a DB call.
 
 The fixed trading date for every check is **2026-09-08** (SNDK, the traced night), built as the §5 fixture.
 
-**(a) The test file — this is what changes.**
+**(a) The test — before and after.**
 
 ```
 python tests/test_uoa_trades_pagination.py
 ```
 
-Before: the file does not exist. After: exactly `PI-020: 10/10 checks passed`.
+Before the change: the file does not exist. With the test file added but the code not yet changed, T3 and T7 fail
+(`put_trades == 0`, the defect). After the change: exactly `PI-020: 9/9 checks passed`.
 
-**(b) Flags default off, settings as specified.**
+**(b) The page size the nightly will send.**
 
 ```
-python -c "import os; [os.environ.pop(k, None) for k in ('DATABASE_URL','UOA_TRADES_PAGINATION_ENABLED','UOA_TRADES_PAGINATION_SHADOW_ENABLED','UOA_TRADES_PAGE_LIMIT','UOA_TRADES_MAX_PAGES_PER_BATCH')]; from services.uoa_screener import uoa_trades_fetch_settings as s, UoaConfig; print(s()); print(UoaConfig().trades_limit)"
+python -c "import os; [os.environ.pop(k, None) for k in ('DATABASE_URL','ALPACA_OPTION_TRADE_PAGES')]; from services.uoa_screener import UoaConfig; from ai_agents.options_client import _MAX_TRADE_PAGES; print(UoaConfig().trades_limit, _MAX_TRADE_PAGES)"
 ```
 
-Before: `ImportError: cannot import name 'uoa_trades_fetch_settings'`. After, exactly:
-`{'mode': 'single_page', 'shadow_enabled': False, 'page_limit': 10000, 'max_pages_per_batch': 10}` then `1000`.
+Before: `1000`, and `ImportError: cannot import name '_MAX_TRADE_PAGES'`. After, exactly: `10000 20`.
 
-**(c) The old method and every other file are untouched — proved by diff, not by running anything.**
+**(c) Nothing outside the four files moved — proved by diff, not by running anything.**
 
 Commit PI-020 as **one commit** containing only the four paths in §3. Then:
 
 ```
 git show --stat HEAD
-git show --numstat HEAD -- ai_agents/options_client.py
-git show --numstat HEAD -- services/uoa_screener.py
-git diff --quiet HEAD~1 HEAD -- services/super_agent_select_scoring.py services/super_agent_select_service.py services/symbol_context_builder.py services/candidate_universe_builder.py services/uoa_scheduler.py services/gex.py scripts/run_nightly_pipeline.py scripts/run_uoa_oi_gex_for_day.py scripts/run_uoa_nightly.py scripts/run_uoa_range.py ai_agents/omega_agent.py ai_agents/option_flow_monitor.py routers models.py db.py conftest.py core fmp_mcp_server && echo UNCHANGED
+git diff --quiet HEAD~1 HEAD -- services/super_agent_select_scoring.py services/super_agent_select_service.py services/symbol_context_builder.py services/candidate_universe_builder.py services/uoa_scheduler.py services/gex.py scripts/ routers/ models.py db.py conftest.py core/ fmp_mcp_server/ ai_agents/omega_agent.py ai_agents/option_flow_monitor.py && echo UNCHANGED
 ```
 
 - `git show --stat HEAD` lists exactly `ai_agents/options_client.py`, `services/uoa_screener.py`,
   `docs/UOA_SCREENER_MVP.md`, `tests/test_uoa_trades_pagination.py`.
-- `numstat` for `ai_agents/options_client.py` shows **0 deleted lines**. The file only gains the new method, so
-  `get_option_trades` is byte-identical.
-- `numstat` for `services/uoa_screener.py` shows **at most 6 deleted lines**, and `git show HEAD -- services/uoa_screener.py`
-  shows every removed line coming from the old `options_client.get_option_trades(` call at `:1504-1509`.
-- The `git diff --quiet` line prints `UNCHANGED`.
+- The `git diff --quiet` line prints `UNCHANGED`. No migration file, no schema change, no scripts.
+- `git show HEAD -- services/uoa_screener.py` shows removals only at `:806` and `:1504-1509`.
 
-With (a) T1–T3 this is the complete inertness argument. With the flags unset, the screener sends Alpaca the same
-requests as at `c311e81` and builds the same `trades_map`, and nothing that turns `trades_map` into rows,
-percentiles, scores, labels or bulletins changed. Do not try to demonstrate it by running the screener.
-
-**(d) What must not differ, stated for the PR.** With flags unset: every `uoa_contract_daily`, `uoa_symbol_daily`
-and `uoa_bulletins` value, and every SAS input. What differs: `uoa_runs.stats_json` gains `trades_fetch`.
+**(d) What must change and what must not, stated for the PR.** Must change on the next nightly: `uoa_contract_daily`
+and `uoa_symbol_daily` for capped names, and the percentile columns for all names (§8 W1, W3). Must not change: any
+row dated before the deploy (§8 W5), any schema, any router response shape, any script.
 
 ---
 
 ## 5. Test — `tests/test_uoa_trades_pagination.py`
 
-A standalone runner, the EN-019 pattern. It uses no pytest fixtures, no conftest and no database. The network seam
-is `AlpacaOptionsClient._request`, replaced on the instance by an in-memory fake that honours `symbols`, `limit`
-and `page_token` with Alpaca's ordering. **Fixture provenance:** the SNDK fixture reproduces the desk's measured
-totals for 2026-09-08 (`research/reports/case_SNDK_2026-09-15/verify_trades.py`): 14,441 call and 11,154 put
-prints on the first 50 contracts, 60 contracts in all, stored as 2,000 prints, all calls. The split across
-contracts and the prices are synthetic. Every print is $1.00 × 1 contract, a $100 premium. Alpaca prints are not
-frozen, and the desk does not ship market data into the platform repo. Which line would have caught the bug: T4
-(a paginated fetch returns both sides) and T8 (`put_trades == 0` on the single page).
+A standalone runner, the EN-019 pattern: no pytest fixtures, no conftest, no database, no network. The network seam
+is `AlpacaOptionsClient._request`, replaced on the instance by an in-memory fake that honours `symbols`, `limit` and
+`page_token` with Alpaca's ordering. The pre-fix behaviour is reproduced *inside the test* by `_legacy_single_page`,
+which is the old `:1007-1017` loop (chunks of 50 in the caller's order, one request each, token dropped) — so the
+defect stays visible after the code that caused it is gone.
+
+**Fixture provenance:** the SNDK fixture reproduces the desk's measured totals for 2026-09-08
+(`research/reports/case_SNDK_2026-09-15/verify_trades.py`): 14,441 call and 11,154 put prints on the first 50
+contracts, 60 contracts in all, stored as 2,000 prints, all calls. The split across contracts and the prices are
+synthetic. Every print is $1.00 × 1 contract, a $100 premium. Alpaca prints are not frozen, and the desk does not
+ship market data into the platform repo. **Which line would have caught the bug:** T3 (a fetch returns both sides)
+and T7 (`put_trades == 0`, `dir_ratio` pinned at 1.00 on the single page).
 
 ```python
 """PI-020: UOA option trades must not stop at one page.
 
-get_option_trades sends one /trades request per 50-contract batch with limit=1000 and never reads
-next_page_token. Alpaca orders a multi-contract response by contract symbol, and an OCC symbol sorts
-expiry -> C before P -> strike, so a busy batch returns only the nearest expiry's calls. SNDK
-2026-09-08: stored 2,000 trades, all calls, dir_ratio 1.00; paginated, 14,441 call and 11,154 put
+Before the fix, get_option_trades sent one /trades request per 50-contract batch with limit=1000 and
+never read next_page_token. Alpaca orders a multi-contract response by contract symbol, and an OCC
+symbol sorts expiry -> C before P -> strike, so a busy batch returned only the nearest expiry's calls.
+SNDK 2026-09-08: stored 2,000 trades, all calls, dir_ratio 1.00; paginated, 14,441 call and 11,154 put
 trades on the first 50 contracts (research PI-020, case_SNDK_2026-09-15/verify_trades.py).
 
 Offline: no database, no network. Run as
@@ -763,19 +584,11 @@ if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
 os.environ.pop("DATABASE_URL", None)
+os.environ.pop("ALPACA_OPTION_TRADE_PAGES", None)
 _DB_STUB = types.ModuleType("db")
 sys.modules.setdefault("db", _DB_STUB)  # any `from db import ...` raises ImportError
 
-_FLAG_KEYS = (
-    "UOA_TRADES_PAGINATION_ENABLED",
-    "UOA_TRADES_PAGINATION_SHADOW_ENABLED",
-    "UOA_TRADES_PAGE_LIMIT",
-    "UOA_TRADES_MAX_PAGES_PER_BATCH",
-)
-for _k in _FLAG_KEYS:
-    os.environ.pop(_k, None)
-
-from ai_agents.options_client import AlpacaOptionsClient  # noqa: E402
+from ai_agents.options_client import _SNAPSHOT_BATCH, AlpacaOptionsClient  # noqa: E402
 
 START = "2026-09-08T13:30:00Z"  # _session_window_utc(2026-09-08)
 END = "2026-09-08T20:00:00Z"
@@ -805,10 +618,10 @@ def _meta(sym, side, buckets):
 
 
 def _sndk_case():
-    """60 contracts in the screener's mixed order -> legacy batches of 50 + 10, both capped.
+    """60 contracts in the screener's mixed order -> pre-fix batches of 50 + 10, both capped.
 
     First 50 (exp 2026-09-11, DTE 3): 14,441 call and 11,154 put prints (the desk's paginated totals).
-    Last 10 (exp 2026-09-18, DTE 10): 1,250 call and 500 put prints, enough to cap batch two as well.
+    Last 10 (exp 2026-09-18, DTE 10): 1,250 call and 500 put prints.
     """
     trades, selected = {}, []
     groups = (
@@ -871,181 +684,170 @@ def _client(fake):
     return client
 
 
-def _legacy(trades, selected, fail_on_request=None):
+def _fetch(trades, selected, *, limit=10000, max_pages=20, fail_on_request=None):
     fake = _FakeAlpacaTrades(trades, fail_on_request)
-    return _client(fake).get_option_trades(_syms(selected), start=START, end=END, limit=1000), fake
-
-
-def _paged(trades, selected, page_limit, max_pages, split, fail_on_request=None):
-    fake = _FakeAlpacaTrades(trades, fail_on_request)
-    out = _client(fake).get_option_trades_paged(
-        _syms(selected), start=START, end=END,
-        page_limit=page_limit, max_pages_per_batch=max_pages, split_by_type=split,
+    out = _client(fake).get_option_trades(
+        _syms(selected), start=START, end=END, limit=limit, max_pages=max_pages,
     )
     return out, fake
 
 
+def _legacy_single_page(trades, selected, limit=1000):
+    """The pre-fix algorithm, options_client.py:1007-1017 at c311e81: chunks of 50 in caller order,
+    one request each, next_page_token dropped. Kept here so the defect stays reproducible."""
+    fake = _FakeAlpacaTrades(trades)
+    syms = _syms(selected)
+    aggregated = {}
+    for i in range(0, len(syms), _SNAPSHOT_BATCH):
+        batch = syms[i: i + _SNAPSHOT_BATCH]
+        aggregated.update(fake("/trades", {"symbols": ",".join(batch), "limit": limit}).get("trades", {}))
+    return aggregated, fake
+
+
 # --- client -------------------------------------------------------------------
 
-def test_t1_flag_off_sends_the_legacy_requests_and_returns_the_legacy_map():
-    trades, selected = _sndk_case()
-    legacy, legacy_fake = _legacy(trades, selected)
-    new, new_fake = _paged(trades, selected, 1000, 1, False)
-    assert new_fake.calls == legacy_fake.calls
-    assert len(legacy_fake.calls) == 2
-    assert new["trades"] == legacy["trades"]
-    f = new["fetch"]
-    assert (f["batches"], f["requests"], f["truncated_batches"]) == (2, 2, 2), f
-    assert f["truncated_sides"] == ["mixed"]
-    assert f["trades_returned"] == {"call": 2000, "put": 0}  # the stored signature: 2,000 prints, no puts
-
-
-def test_t2_flag_off_failed_request_matches_legacy():
-    trades, selected = _small((100, 100, 100), (100, 100, 100))
-    legacy, legacy_fake = _legacy(trades, selected, fail_on_request=1)
-    new, new_fake = _paged(trades, selected, 1000, 1, False, fail_on_request=1)
-    assert new_fake.calls == legacy_fake.calls
-    assert new["trades"] == legacy["trades"] == {}
-    f = new["fetch"]
-    assert (f["failed_requests"], f["failed_batches"], f["truncated_batches"]) == (1, 1, 0), f
-
-
-def test_t3_under_the_cap_pagination_returns_the_same_prints():
+def test_t1_small_symbol_one_page_per_side_no_truncation():
     trades, selected = _small((100, 120, 90), (80, 60, 110))
-    legacy, _ = _legacy(trades, selected)
-    paged, _ = _paged(trades, selected, 10000, 10, True)
-    assert paged["trades"] == legacy["trades"]
-    assert paged["fetch"]["truncated_batches"] == 0 and paged["fetch"]["requests"] == 2
-
-
-def test_t4_sndk_paginated_sees_both_sides():
-    trades, selected = _sndk_case()
-    out, fake = _paged(trades, selected, 10000, 10, True)
+    out, fake = _fetch(trades, selected)
+    assert out["trades"] == trades  # every print of every contract
     f = out["fetch"]
-    assert (f["batches"], f["requests"], f["truncated_batches"], f["failed_requests"]) == (2, 4, 0, 0), f
-    assert f["trades_returned"] == {"call": 15691, "put": 11654}
-    assert out["trades"] == trades  # every print of every contract, in order, including a contract split across pages
+    assert (f["batches"], f["requests"], f["pages"], f["truncated_batches"]) == (2, 2, 2, 0), f
+    assert f["truncated"] is False and f["truncated_sides"] == []
+    assert f["trades_returned"] == {"call": 310, "put": 250}
     for _path, params in fake.calls:
         assert len({s[-9] for s in dict(params)["symbols"].split(",")}) == 1  # one side per request
 
 
-def test_t5_page_ceiling_is_side_balanced_and_recorded():
+def test_t2_failed_first_page_is_recorded_and_the_other_side_still_reads():
+    trades, selected = _small((100, 100, 100), (100, 100, 100))
+    out, _ = _fetch(trades, selected, fail_on_request=1)  # the call batch fails outright
+    f = out["fetch"]
+    assert (f["requests"], f["failed_requests"], f["failed_batches"], f["truncated_batches"]) == (2, 1, 1, 0), f
+    assert out["trades"] and all(s[-9] == "P" for s in out["trades"])  # puts survived the call side's failure
+    assert f["trades_returned"] == {"call": 0, "put": 300}
+
+
+def test_t3_sndk_paginated_sees_both_sides():
+    trades, selected = _sndk_case()
+    out, fake = _fetch(trades, selected)
+    f = out["fetch"]
+    assert (f["batches"], f["requests"], f["truncated_batches"], f["failed_requests"]) == (2, 4, 0, 0), f
+    assert f["trades_returned"] == {"call": 15691, "put": 11654}
+    assert out["trades"] == trades  # including contracts split across pages
+    for _path, params in fake.calls:
+        assert len({s[-9] for s in dict(params)["symbols"].split(",")}) == 1
+
+
+def test_t4_page_ceiling_is_side_balanced_and_recorded():
     trades, selected = _small((600, 600, 600), (400, 400, 400))
-    one_page, _ = _paged(trades, selected, 1000, 1, False)
-    assert one_page["fetch"]["trades_returned"] == {"call": 1000, "put": 0}  # the defect
-    capped, _ = _paged(trades, selected, 500, 2, True)
+    capped, _ = _fetch(trades, selected, limit=500, max_pages=2)
     f = capped["fetch"]
     assert f["trades_returned"] == {"call": 1000, "put": 1000}  # a ceiling cannot crowd out puts
     assert (f["truncated_batches"], f["requests"]) == (2, 4) and f["truncated_sides"] == ["call", "put"]
+    assert f["truncated"] is True
 
 
-def test_t6_failure_mid_pagination_keeps_pages_and_marks_the_batch_cut_short():
+def test_t5_failure_mid_pagination_keeps_pages_and_marks_the_batch_cut_short():
     trades, selected = _small((600, 600, 600), (400, 400, 400))
-    out, _ = _paged(trades, selected, 1000, 10, True, fail_on_request=2)
+    out, _ = _fetch(trades, selected, limit=1000, max_pages=10, fail_on_request=2)
     f = out["fetch"]
     assert (f["failed_requests"], f["failed_batches"], f["truncated_batches"], f["requests"]) == (1, 0, 1, 4), f
     assert f["truncated_sides"] == ["call"]
     assert f["trades_returned"] == {"call": 1000, "put": 1200}
 
 
-# --- screener helpers (heavy import; opens no connection) ----------------------
+def test_t6_the_old_single_page_shape_reproduces_the_defect():
+    trades, selected = _sndk_case()
+    legacy, fake = _legacy_single_page(trades, selected)
+    assert len(fake.calls) == 2  # 50 + 10 mixed contracts
+    assert all(s[-9] == "C" for s in legacy)  # every put came back empty
+    assert sum(len(v) for v in legacy.values()) == 2000  # the stored signature
+
+
+# --- screener (heavy import; opens no connection) ------------------------------
 
 def _screener():
     import services.uoa_screener as s
     return s
 
 
-def test_t7_flags_default_off_and_settings_clamped():
-    s = _screener()
-    saved = {k: os.environ.pop(k, None) for k in _FLAG_KEYS}
-    try:
-        assert s.uoa_trades_fetch_settings() == {
-            "mode": "single_page", "shadow_enabled": False, "page_limit": 10000, "max_pages_per_batch": 10,
-        }
-        assert s.UoaConfig().trades_limit == 1000
-        os.environ["UOA_TRADES_PAGINATION_SHADOW_ENABLED"] = "1"
-        assert s.uoa_trades_fetch_settings()["shadow_enabled"] is True
-        os.environ["UOA_TRADES_PAGINATION_ENABLED"] = "true"
-        got = s.uoa_trades_fetch_settings()
-        assert got["mode"] == "paginated" and got["shadow_enabled"] is False
-        for raw, want in (("50", 1000), ("99999", 10000), ("abc", 10000), ("", 10000), ("2500", 2500)):
-            os.environ["UOA_TRADES_PAGE_LIMIT"] = raw
-            assert s.uoa_trades_fetch_settings()["page_limit"] == want, raw
-        for raw, want in (("0", 1), ("500", 50), ("x", 10), ("3", 3)):
-            os.environ["UOA_TRADES_MAX_PAGES_PER_BATCH"] = raw
-            assert s.uoa_trades_fetch_settings()["max_pages_per_batch"] == want, raw
-    finally:
-        for k in _FLAG_KEYS:
-            os.environ.pop(k, None)
-        for k, v in saved.items():
-            if v is not None:
-                os.environ[k] = v
+def _symbol_flow(s, selected, trades_map, cfg):
+    """run_uoa_nightly's own arithmetic, uoa_screener.py:1538-1622, applied to a trades map."""
+    tot = {"call_trades": 0, "put_trades": 0, "call_premium": 0.0, "put_premium": 0.0,
+           "call_buy": 0.0, "put_buy": 0.0, "prem_day": 0.0, "prem_swing": 0.0, "prem_long": 0.0}
+    for meta in selected:
+        rows = trades_map.get(meta["symbol"]) or []
+        if not rows:
+            continue
+        agg = s._aggregate_trades_for_contract(rows, bid=meta["bid"], ask=meta["ask"], config=cfg)
+        prem = float(agg["premium_total"])
+        side = "call" if meta["type"] == "call" else "put"
+        tot[f"{side}_trades"] += int(agg["trade_count"])
+        tot[f"{side}_premium"] += prem
+        tot[f"{side}_buy"] += float(agg.get("buy_premium") or 0.0)
+        if prem > 0:
+            for b in meta["buckets"]:
+                tot[f"prem_{b}"] += prem
+    call_dir, put_dir = tot["call_buy"], tot["put_buy"]  # cfg.aggressor_proxy_enabled is True
+    tot["dir_ratio"] = (call_dir - put_dir) / (call_dir + put_dir + 1.0)  # :1605
+    return tot
 
 
-def test_t8_symbol_flow_single_page_vs_paginated():
+def test_t7_symbol_flow_single_page_vs_paginated():
     s = _screener()
     cfg = s.UoaConfig()
     assert cfg.aggressor_proxy_enabled is True
+    assert cfg.trades_limit == 10000  # PI-020 page size
     trades, selected = _sndk_case()
-    legacy, _ = _legacy(trades, selected)
-    paged, _ = _paged(trades, selected, 10000, 10, True)
-    before = s.summarize_symbol_flow(selected, legacy["trades"], cfg)
-    after = s.summarize_symbol_flow(selected, paged["trades"], cfg)
+    legacy, _ = _legacy_single_page(trades, selected)
+    paged, _ = _fetch(trades, selected)
+    before = _symbol_flow(s, selected, legacy, cfg)
+    after = _symbol_flow(s, selected, paged["trades"], cfg)
+    # the defect, as stored on 2026-09-08
     assert (before["call_trades"], before["put_trades"], before["put_premium"]) == (2000, 0, 0.0)
     assert before["dir_ratio"] == (200000.0 - 0.0) / (200000.0 + 0.0 + 1.0)  # the stored 1.00
     assert (before["prem_day"], before["prem_swing"]) == (200000.0, 100000.0)
+    # the fix
     assert (after["call_trades"], after["put_trades"]) == (15691, 11654)
-    assert (after["call_buy_premium"], after["put_buy_premium"]) == (1569100.0, 1165400.0)
+    assert (after["call_buy"], after["put_buy"]) == (1569100.0, 1165400.0)
     assert after["dir_ratio"] == (1569100.0 - 1165400.0) / (1569100.0 + 1165400.0 + 1.0)
+    assert 0.14 < after["dir_ratio"] < 0.15  # no longer pinned at 1.00
     assert (after["prem_day"], after["prem_swing"], after["prem_long"]) == (2734500.0, 175000.0, 0.0)
-    t2, sel2 = _small((100, 120, 90), (80, 60, 110))
-    legacy2, _ = _legacy(t2, sel2)
-    paged2, _ = _paged(t2, sel2, 10000, 10, True)
-    assert s.summarize_symbol_flow(sel2, legacy2["trades"], cfg) == s.summarize_symbol_flow(sel2, paged2["trades"], cfg)
 
 
-def test_t9_run_record_is_additive_and_names_what_was_cut():
+def test_t8_run_record_is_additive_and_names_what_was_cut():
     s = _screener()
-    cfg = s.UoaConfig()
-    acc = s.new_trades_fetch_stats(
-        {"mode": "single_page", "shadow_enabled": True, "page_limit": 10000, "max_pages_per_batch": 10}, cfg
-    )
-    assert (acc["mode"], acc["page_limit"], acc["max_pages_per_batch"], acc["split_by_type"]) == ("single_page", 1000, 1, False)
-    assert (acc["shadow_page_limit"], acc["shadow_max_pages_per_batch"]) == (10000, 10)
+    acc = s.new_trades_fetch_stats(s.UoaConfig())
+    assert (acc["page_limit"], acc["split_by_type"], acc["truncated"]) == (10000, True, {})
     trades, selected = _sndk_case()
-    one_page, _ = _paged(trades, selected, 1000, 1, False)
-    s.record_trades_fetch(acc, "sndk", one_page["fetch"], 0.5)
+    sndk, _ = _fetch(trades, selected, limit=10000, max_pages=1)  # a ceiling hit on both sides
+    s.record_trades_fetch(acc, "sndk", sndk["fetch"], 0.5)
     t2, sel2 = _small((100, 100, 100), (100, 100, 100))
-    ko, _ = _paged(t2, sel2, 1000, 1, False)
+    ko, _ = _fetch(t2, sel2)
     s.record_trades_fetch(acc, "KO", ko["fetch"], 0.25)
-    assert (acc["symbols_fetched"], acc["symbols_truncated"], acc["requests"], acc["fetch_seconds"]) == (2, 1, 3, 0.75)
+    assert (acc["symbols_fetched"], acc["symbols_truncated"], acc["fetch_seconds"]) == (2, 1, 0.75)
+    assert (acc["requests"], acc["pages"]) == (4, 4)
     assert list(acc["truncated"]) == ["SNDK"]
-    assert acc["truncated"]["SNDK"]["sides"] == ["mixed"]
-    assert acc["truncated"]["SNDK"]["trades_returned"] == {"call": 2000, "put": 0}
-    full, _ = _paged(trades, selected, 10000, 10, True)
-    s.record_trades_shadow(acc, "SNDK", full, selected, cfg, 1.0)
-    rec = acc["shadow_full"]["SNDK"]
-    assert (acc["shadow_symbols"], acc["shadow_requests"], acc["shadow_truncated"]) == (1, 4, 0)
-    assert (rec["call_trades"], rec["put_trades"], rec["truncated_sides"]) == (15691, 11654, [])
+    assert acc["truncated"]["SNDK"]["sides"] == ["call", "put"]
+    assert acc["truncated"]["SNDK"]["trades_returned"] == {"call": 10000, "put": 10000}
     json.dumps(acc)  # written to uoa_runs.stats_json: must serialise
 
 
-def test_t10_nothing_imported_a_database():
+def test_t9_nothing_imported_a_database():
     assert sys.modules.get("db") is _DB_STUB
     assert "user" not in sys.modules
 
 
 _CHECKS = [
-    test_t1_flag_off_sends_the_legacy_requests_and_returns_the_legacy_map,
-    test_t2_flag_off_failed_request_matches_legacy,
-    test_t3_under_the_cap_pagination_returns_the_same_prints,
-    test_t4_sndk_paginated_sees_both_sides,
-    test_t5_page_ceiling_is_side_balanced_and_recorded,
-    test_t6_failure_mid_pagination_keeps_pages_and_marks_the_batch_cut_short,
-    test_t7_flags_default_off_and_settings_clamped,
-    test_t8_symbol_flow_single_page_vs_paginated,
-    test_t9_run_record_is_additive_and_names_what_was_cut,
-    test_t10_nothing_imported_a_database,
+    test_t1_small_symbol_one_page_per_side_no_truncation,
+    test_t2_failed_first_page_is_recorded_and_the_other_side_still_reads,
+    test_t3_sndk_paginated_sees_both_sides,
+    test_t4_page_ceiling_is_side_balanced_and_recorded,
+    test_t5_failure_mid_pagination_keeps_pages_and_marks_the_batch_cut_short,
+    test_t6_the_old_single_page_shape_reproduces_the_defect,
+    test_t7_symbol_flow_single_page_vs_paginated,
+    test_t8_run_record_is_additive_and_names_what_was_cut,
+    test_t9_nothing_imported_a_database,
 ]
 
 
@@ -1061,36 +863,40 @@ if __name__ == "__main__":
     print(f"PI-020: {passed}/{len(_CHECKS)} checks passed")
 ```
 
-Arithmetic the assertions rest on, so a failure points at code, not at the test. The legacy batch one, sorted,
+Arithmetic the assertions rest on, so a failure points at code, not at the test. The pre-fix batch one, sorted,
 opens with call contracts of 578 prints each (14,441 = 25 × 577 + 16), so one page of 1,000 covers two call
-contracts and no put. Batch two opens with five calls of 250 prints each, so its page is four call contracts. That
-makes 2,000 prints, all calls. Every print is at the ask ($1.00 ≥ ask − 0.1 × spread), so it all counts as buy
-premium. Paginated calls: 15,691 = 14,441 + 1,250, on 2 pages. Puts: 11,654 = 11,154 + 500, on 2 pages. If a
-check fails, fix the code, not the numbers.
+contracts and no put; batch two opens with five calls of 250 prints each, so its page is four call contracts. That
+makes 2,000 prints, all calls (T6). Every print is at the ask ($1.00 ≥ ask − 0.1 × spread), so it all counts as buy
+premium. Paginated calls: 15,691 = 14,441 + 1,250, two pages of 10,000. Puts: 11,654 = 11,154 + 500, two pages.
+T8's `max_pages=1` forces one 10,000-print page per side, hence the recorded ceiling on both. If a check fails, fix
+the code, not the numbers.
 
-### Acceptance (what the PR must report)
+### Acceptance criteria (what the PR must report)
 
-1. §4(a): `PI-020: 10/10 checks passed`, and a statement that `pytest` was not run.
-2. §4(b): the two exact output lines.
-3. §4(c): the four-path stat list, `0` deletions for `ai_agents/options_client.py`, ≤ 6 deletions for
-   `services/uoa_screener.py` (all from the old call), and `UNCHANGED`.
-4. No file under `models.py`, `db.py`, `conftest.py`, `routers/`, `scripts/` or any SAS service in the diff; no
-   migration script added.
-5. The platform SHA of the merge.
+1. `python tests/test_uoa_trades_pagination.py` prints `PI-020: 9/9 checks passed`, and the PR states that `pytest`
+   was **not** run (PI-021).
+2. §4(b) prints exactly `10000 20`.
+3. §4(c): `git show --stat HEAD` lists exactly the four paths, and the `git diff --quiet` line prints `UNCHANGED`.
+4. `git show HEAD -- services/uoa_screener.py` shows removals only at `:806` and `:1504-1509`; no migration file is
+   added; `models.py`, `db.py`, `conftest.py`, `routers/` and `scripts/` are absent from the diff.
+5. `get_option_trades` has no flag, no gate and no second code path: the only environment read added is
+   `ALPACA_OPTION_TRADE_PAGES`, a page ceiling, and the method paginates at every value of it.
+6. The PR body names the merge SHA and says, in one line, that from the first nightly on that SHA the UOA premium
+   fields, `dir_ratio`, flow scores and SAS flow votes change for liquid names, and that no historical row is
+   rewritten.
 
 ---
 
 ## 6. Rollback
 
-**Behaviour:** unset `UOA_TRADES_PAGINATION_ENABLED` and `UOA_TRADES_PAGINATION_SHADOW_ENABLED` in the application
-settings the nightly reads. They are read at call time. **Code:**
+One command, no data step, no flag to unset:
 
 ```
 git revert --no-edit <sha> && git push
 ```
 
-One commit, four files, no schema, no data step. Rows written on nights when pagination was on stay as written.
-Nothing rewrites them back, and the DATA_NOTES entry (§8 Step 4) records the interval.
+Rows written on nights that ran the fix stay as written; nothing rewrites them back. If a revert happens, the
+Steward records the reverted interval in the DATA_NOTES entry of §8 Step 3, so the split range stays correct.
 
 ---
 
@@ -1098,182 +904,140 @@ Nothing rewrites them back, and the DATA_NOTES entry (§8 Step 4) records the in
 
 - **Backfilling history.** Re-scoring past nights with full prints would be forced UOA re-runs (PI-017-scoped) plus
   historical Alpaca trades. That rewrites `uoa_contract_daily`, `uoa_symbol_daily` and bulletins that Q014, Q029,
-  Q030 and every frozen question read. It is Haci's separate decision. It would need the exact date list and row
+  Q030 and every frozen question read. It is Haci's separate decision: it would need the exact date list and row
   counts in the register before it runs, and a repair-log row in `research/data/DATA_NOTES.md` with range and ship
   SHA (DP-50(a)). Neither the desk nor the coding agent runs it.
-- **The other `get_option_trades` callers**, `ai_agents/omega_agent.py:1655-1673` and
-  `ai_agents/option_flow_monitor.py:92-97`. They keep the single-page method. Whether they need pagination is not
-  part of PI-020.
+- **`ai_agents/omega_agent.py` and `ai_agents/option_flow_monitor.py`.** They call the fixed method and need no
+  edit; do not change their call sites, their clamps or their payload handling.
 - **The GEX lead.** `services/gex.py` does not call `get_option_trades`. It reads the contract list with
   `get_option_chain(limit=2000)` (`services/gex.py:422-427`, `:700-702`) and snapshots (`:476`, `:750`). The
   register's "39–50 of 2,000 contracts used" matches that **contract-list** cap, a different path. It is unverified
   whether it drops puts. The Steward checks it before any GEX finding (Q021, Q029, H-091) is trusted. Not fixed here.
 - **The UOA contract-list cap.** `get_option_chain(symbol, limit=cfg.request_limit)` with `request_limit = 600`
-  (`services/uoa_screener.py:798`, `:1435-1440`) stops `_list_contracts` at 600 contracts (`options_client.py:522-591`).
-  Whether that list is expiry- or side-ordered on names with more than 600 contracts inside 180 DTE is unverified.
-  Record it as a lead; do not change it.
+  (`services/uoa_screener.py:798`, `:1435-1440`) stops `_list_contracts` at 600 contracts
+  (`options_client.py:522-591`). Whether that list is expiry- or side-ordered on names with more than 600 contracts
+  inside 180 DTE is unverified. Record it as a lead; do not change it.
 - **PI-014** (polarity coverage, Conviction Monitor) and **PI-013** (morning OI overwrite of `score_swing/long`).
   They share tables and are different defects. PI-014's brief should read this one first.
-- `UoaConfig.trades_limit` (`:806`), `_pct_rank` (`:870-895`), the scoring formulas (`:1793-1846`), labels,
-  `model_version` (`:822`), the bulletin builder, SAS scoring and selection, `models.py`, `db.py`, `conftest.py`,
-  every router and every script. §4(c) requires their diff to be empty.
-- Any subscriber-visible copy, field, ordering or number. With the flags unset there is none.
+- `_pct_rank` (`:870-895`), the scoring formulas (`:1793-1846`), labels, `model_version` (`:822`), the bulletin
+  builder, SAS scoring and selection, `models.py`, `db.py`, `conftest.py`, every router and every script. §4(c)
+  requires their diff to be empty.
+- Any subscriber-visible copy, field name or ordering. The *numbers* change; the surfaces do not.
 
 ---
 
-## 8. Verification at `/desk-run verify PI-020 <sha>`
+## 8. After deploy — the Data Steward's check at `/desk-run verify PI-020 <sha>`
 
-**Whose step is whose.** The coding agent's work ends at §4/§5. **Haci:** merge, deploy, set flags, and later the
-flip decision. **Data Steward:** the queries below, on `$RESEARCH_DB_URL` under `sas_research_ro`, counts and
-timestamps only, no outcome column. **Registrar:** the in-flight sweep before any flip.
+**Whose step is whose.** The coding agent's work ends at §4/§5. **Haci:** merge and deploy. **Data Steward:** the
+queries below, on `$RESEARCH_DB_URL` under `sas_research_ro`, counts and timestamps only, plus the DATA_NOTES entry.
+No step here belongs to the coding agent (DP-49).
 
-**Repo half (Steward, read-only on the platform repo):** at `<sha>`, run the three `git` commands of §4(c). They
-must reproduce the four-path list, 0 deletions in `ai_agents/options_client.py`, and `UNCHANGED`. Record the output.
+**Repo half (read-only on the platform repo):** at `<sha>`, run the two `git` commands of §4(c). They must reproduce
+the four-path stat list and `UNCHANGED`.
 
-**Step 1 — Haci.** Merge and deploy with both flags **unset**. Note `D0`, the first trading date whose nightly ran `<sha>`.
+**Step 1 — Haci.** Merge and deploy. Note `D0`, the first trading date whose UOA nightly ran `<sha>`.
 
-**Before-state.** The symbol-level before-state is the pinned freeze
-`research/data/v001_uoa_symbol.parquet` (sha256 `1b959ef8…ae34ac4`, §1 tables). `uoa_contract_daily` is not
-frozen, but the fix rewrites no row, so §1 R1/R2 on pre-`D0` dates are stable and are the contract-level before-state.
+**Before-state — from the freeze, not from a live capture.** The symbol-level before-state is the pinned parquet
+`research/data/v001_uoa_symbol.parquet` (sha256 `1b959ef8…ae34ac4`), whose 2026-09-08 rows are quoted in §1: SNDK
+`put_premium_total = 0`, `dir_ratio = 1.000000`; AMZN 0 / 0.999999; GOOGL 0 / 0.999991. `uoa_contract_daily` is not
+frozen, but the fix rewrites no row, so §1 R1 (SNDK 2026-09-08: 60 | 2000 | >0 | 0) and R2 on pre-`D0` months are
+the contract-level before-state and must be unchanged afterwards (W5).
+
+**Step 2 — the Steward, on the first nightly after deploy (`D0`).**
 
 ```sql
--- V1. History did not move. Must match §1 exactly: R1 = 60 | 2000 | >0 | 0; R2 capped / capped_zero_put for
---     2026-01 = 1311/164, 2026-04 = 1741/165, 2026-07 = 1601/194, 2026-08 = 1483/164.
---     (re-run §1 R1 and R2 as written)
+-- W1. The fifteen always-capped names, first nightly on the new SHA. This is the fix, visible.
+SELECT u.trading_date, u.symbol,
+       u.call_premium_total, u.put_premium_total, round(u.dir_ratio::numeric, 4) AS dir_ratio,
+       c.contracts, c.trades, c.call_trades, c.put_trades
+FROM uoa_symbol_daily u
+JOIN (
+  SELECT trading_date, underlying_symbol AS symbol, count(*) AS contracts, sum(trade_count) AS trades,
+         sum(CASE WHEN option_type = 'call' THEN trade_count ELSE 0 END) AS call_trades,
+         sum(CASE WHEN option_type = 'put'  THEN trade_count ELSE 0 END) AS put_trades
+  FROM uoa_contract_daily GROUP BY 1, 2) c USING (trading_date, symbol)
+WHERE u.trading_date = DATE 'D0'
+  AND u.symbol IN ('SNDK','GOOG','GOOGL','MSFT','AMZN','NFLX','ORCL','CRM','NOW','KO','WMT','BAC','BA','PFE','GLW')
+ORDER BY u.symbol;
 
--- V2. The run block exists and the flags read as deployed (first 5 nightlies from D0).
+-- W2. The run telemetry block: pages, requests, ceilings, elapsed.
 SELECT trading_date, status,
-       (stats_json::jsonb)->'trades_fetch'->>'mode'               AS mode,
-       (stats_json::jsonb)->'trades_fetch'->>'shadow_enabled'     AS shadow,
        (stats_json::jsonb)->'trades_fetch'->>'page_limit'         AS page_limit,
        (stats_json::jsonb)->'trades_fetch'->>'symbols_fetched'    AS fetched,
-       (stats_json::jsonb)->'trades_fetch'->>'symbols_truncated'  AS truncated,
+       (stats_json::jsonb)->'trades_fetch'->>'symbols_multi_page' AS multi_page,
+       (stats_json::jsonb)->'trades_fetch'->>'symbols_truncated'  AS ceiling_hits,
        (stats_json::jsonb)->'trades_fetch'->>'requests'           AS requests,
+       (stats_json::jsonb)->'trades_fetch'->>'pages'              AS pages,
+       (stats_json::jsonb)->'trades_fetch'->>'failed_requests'    AS failed,
        (stats_json::jsonb)->'trades_fetch'->>'fetch_seconds'      AS fetch_seconds,
+       (stats_json::jsonb)->'trades_fetch'->'truncated'           AS truncated_symbols,
        extract(epoch FROM finished_at - started_at)               AS run_seconds
 FROM uoa_runs
 WHERE run_type = 'nightly' AND trading_date >= DATE 'D0'
 ORDER BY trading_date LIMIT 5;
 
--- V3. On single-page nights every symbol the run names as cut short really hit a 1,000-print page.
-WITH r AS (
-  SELECT trading_date, jsonb_object_keys((stats_json::jsonb)->'trades_fetch'->'truncated') AS sym
-  FROM uoa_runs
-  WHERE run_type = 'nightly' AND trading_date >= DATE 'D0'
-    AND (stats_json::jsonb)->'trades_fetch'->>'mode' = 'single_page'),
-c AS (
-  SELECT trading_date, underlying_symbol AS sym, sum(trade_count) AS trades,
-         sum(CASE WHEN option_type = 'put' THEN premium_total ELSE 0 END) AS put_prem
-  FROM uoa_contract_daily WHERE trading_date >= DATE 'D0' GROUP BY 1, 2)
-SELECT r.trading_date, count(*) AS named_truncated,
-       sum(CASE WHEN c.trades >= 1000 THEN 1 ELSE 0 END) AS with_1000_plus_trades,
-       sum(CASE WHEN c.put_prem = 0 THEN 1 ELSE 0 END)   AS with_zero_put_premium
-FROM r LEFT JOIN c USING (trading_date, sym)
-GROUP BY r.trading_date ORDER BY r.trading_date;
-```
-
-**PASS for Step 1 requires:** V1 identical to §1. V2 shows `mode = single_page`, `shadow = false`,
-`page_limit = 1000`, `status = success`, and `truncated` in the tens (the §1 floor is about 70 a night). V3 shows
-`named_truncated ≤` that night's R2 capped count, with `with_1000_plus_trades = named_truncated` (a shortfall of a
-few is allowed only for prints with zero price or size, which `_aggregate_trades_for_contract:1225` drops; list
-them). Contract and symbol rows for `D0` onward need no check. Their equality with the old code is proved by §4, not by data.
-
-**Step 2 — Haci, recommended, moves no published number.** Set `UOA_TRADES_PAGINATION_SHADOW_ENABLED=1`. Note `S0`.
-
-```sql
--- V4. Shadow nights: how far the single page is from the full prints, counts and medians of a platform input.
-WITH s AS (
-  SELECT r.trading_date, e.key AS sym,
-         (e.value->>'put_trades')::int      AS shadow_put_trades,
-         (e.value->>'put_premium')::float   AS shadow_put_premium,
-         (e.value->>'dir_ratio')::float     AS shadow_dir_ratio,
-         (e.value->>'truncated_batches')::int AS shadow_cut
-  FROM uoa_runs r
-  CROSS JOIN LATERAL jsonb_each((r.stats_json::jsonb)->'trades_fetch'->'shadow_full') e
-  WHERE r.run_type = 'nightly' AND r.trading_date >= DATE 'S0')
-SELECT count(*)                                                                   AS shadow_symbol_days,
-       count(DISTINCT s.trading_date)                                             AS nights,
-       sum(CASE WHEN u.put_premium_total = 0 AND s.shadow_put_premium > 0 THEN 1 ELSE 0 END) AS puts_hidden_by_page,
-       percentile_cont(0.5) WITHIN GROUP (ORDER BY abs(u.dir_ratio - s.shadow_dir_ratio)) AS median_abs_dir_gap,
-       sum(CASE WHEN sign(u.dir_ratio) <> sign(s.shadow_dir_ratio) THEN 1 ELSE 0 END)     AS dir_sign_flips,
-       sum(CASE WHEN s.shadow_cut > 0 THEN 1 ELSE 0 END)                          AS ceiling_hit_even_paginated
-FROM s JOIN uoa_symbol_daily u ON u.trading_date = s.trading_date AND u.symbol = s.sym;
-```
-
-Report V4 after ≥ 30 shadow nights, plus V6 for runtime. This gives Haci the size of the change before the flip:
-how many symbol-days a night move, and how many flip flow direction. It is not a gate; the flip is his decision (header).
-
-**Step 3 — Haci's decision: the flip.** Before it, the **Registrar** sweeps the locked questions named in the
-header (Q014, Q019, Q029, Q030, and every prospective slate reader), rules on Q030's composition clause, and
-records, for each, split at the flip date or hold. Then Haci sets `UOA_TRADES_PAGINATION_ENABLED=1`. Note `P0`.
-
-**Step 4 — on `P0`, the Steward writes this DATA_NOTES entry** (a forward-only mechanism change, not a repair-log
-row, because no historical row is rewritten):
-
-> ## UOA option trades paginated from `P0` (PI-020, flag flipped `P0`, code `<sha>`)
-> From trading date `P0`, `uoa_contract_daily.trade_count / volume_traded / premium_total / premium_max /
-> first_trade_ts / last_trade_ts / buy_premium / sell_premium / unknown_premium / top_trades_json`,
-> `uoa_symbol_daily.call_premium_total / put_premium_total / total_premium / call_buy_premium / put_buy_premium /
-> net_directional_premium / dir_ratio / prem_* / unusual_* / quality_* / conc_* / score_* / bias_* / label_* /
-> why_json`, `uoa_bulletins.lists_json / markdown`, and every SAS flow input and output downstream
-> (`flow_strength_score`, flow polarity and vote, `overall_score`, `selected_rank`) are built from every print,
-> not one 1,000-print page per 50 contracts. Nights before `P0` stay capped. A question spanning `P0` treats these
-> as two different features (DP-50(a)). Nights with `stats_json.trades_fetch.mode` absent or `single_page` are
-> capped.
-
-```sql
--- V5. Flip nights, fixed names: prints above the old cap and puts present.
-SELECT c.trading_date, c.underlying_symbol,
-       sum(c.trade_count)                                                   AS trades,
-       sum(CASE WHEN c.option_type = 'call' THEN c.trade_count ELSE 0 END)  AS call_trades,
-       sum(CASE WHEN c.option_type = 'put'  THEN c.trade_count ELSE 0 END)  AS put_trades,
-       jsonb_exists((r.stats_json::jsonb)->'trades_fetch'->'truncated', c.underlying_symbol) AS ceiling_hit
-FROM uoa_contract_daily c
-JOIN uoa_runs r ON r.trading_date = c.trading_date AND r.run_type = 'nightly'
-WHERE c.trading_date BETWEEN DATE 'P0' AND DATE 'P0' + 6
-  AND c.underlying_symbol IN ('SNDK', 'GOOG', 'GOOGL', 'MSFT', 'AMZN')
-GROUP BY c.trading_date, c.underlying_symbol, r.stats_json
-ORDER BY 1, 2;
-
--- V5b. Dropped-side signature, by side, before and after the flip: contracts the chain says traded
---      (snapshot_volume > 0) but that hold zero stored prints, on symbol-days with >= 1,000 stored prints.
+-- W3. The dropped-side signature, by side, three weeks either side of D0: contracts the chain says
+--     traded (snapshot_volume > 0) but that hold zero stored prints, on symbol-days with >= 1,000 prints.
 WITH sd AS (
   SELECT trading_date, underlying_symbol FROM uoa_contract_daily
-  WHERE trading_date BETWEEN DATE 'P0' - 30 AND DATE 'P0' + 30
+  WHERE trading_date BETWEEN DATE 'D0' - 21 AND DATE 'D0' + 21
   GROUP BY 1, 2 HAVING sum(trade_count) >= 1000)
-SELECT CASE WHEN c.trading_date < DATE 'P0' THEN 'before' ELSE 'after' END AS period,
+SELECT CASE WHEN c.trading_date < DATE 'D0' THEN 'before' ELSE 'after' END AS period,
        c.option_type, count(*) AS contracts,
        sum(CASE WHEN c.snapshot_volume > 0 AND c.trade_count = 0 THEN 1 ELSE 0 END) AS traded_but_empty
 FROM uoa_contract_daily c JOIN sd USING (trading_date, underlying_symbol)
 GROUP BY 1, 2 ORDER BY 1, 2;
 
--- V5c. Share of >=1,000-print symbol-days with zero put premium, per month (R2's ratio), through P0's month and after.
---      (re-run §1 R2; compare capped_zero_put / capped for months after P0 with 2026-07 = 12.1%, 2026-08 = 11.1%)
-
--- V6. Runtime and publication time, 10 nightlies before and after each flag change (D0, S0, P0).
+-- W4. Runtime and publication time, 10 nightlies either side of D0 (UOA runs before SAS:
+--     scripts/run_nightly_pipeline.py:272-275; DATA_NOTES.md:156-165 treats finished_at as actionable).
 SELECT u.trading_date,
-       extract(epoch FROM u.finished_at - u.started_at)                AS uoa_seconds,
-       (u.stats_json::jsonb)->'trades_fetch'->>'requests'              AS trade_requests,
-       (u.stats_json::jsonb)->'trades_fetch'->>'fetch_seconds'         AS fetch_seconds,
-       (u.stats_json::jsonb)->'trades_fetch'->>'shadow_seconds'        AS shadow_seconds,
-       (u.stats_json::jsonb)->'trades_fetch'->>'symbols_truncated'     AS truncated,
-       s.finished_at                                                    AS sas_finished_at
+       extract(epoch FROM u.finished_at - u.started_at)            AS uoa_seconds,
+       (u.stats_json::jsonb)->'trades_fetch'->>'requests'          AS trade_requests,
+       (u.stats_json::jsonb)->'trades_fetch'->>'fetch_seconds'     AS fetch_seconds,
+       s.finished_at                                                AS sas_finished_at
 FROM uoa_runs u
 LEFT JOIN super_agent_select_runs s ON s.trading_date = u.trading_date
-WHERE u.run_type = 'nightly' AND u.trading_date BETWEEN DATE 'X' - 14 AND DATE 'X' + 14   -- X = D0, S0 or P0
+WHERE u.run_type = 'nightly' AND u.trading_date BETWEEN DATE 'D0' - 14 AND DATE 'D0' + 14
 ORDER BY u.trading_date;
+
+-- W5. History did not move. Re-run §1 R1 and R2 exactly as written.
+--     R1 must still be 60 | 2000 | >0 | 0. R2 capped / capped_zero_put for months before D0 must still be
+--     2026-01 = 1311/164, 2026-04 = 1741/165, 2026-07 = 1601/194, 2026-08 = 1483/164.
+
+-- W6. The share of >= 1,000-print symbol-days with zero put premium, per month, through D0's month and after
+--     (re-run §1 R2 and compare capped_zero_put / capped with 2026-07 = 12.1% and 2026-08 = 11.1%).
 ```
 
-**PASS for the flip requires all of:**
-1. **V5:** on each of the first five flip nights, each of the five names has `trades > 1000` or `ceiling_hit = true`,
-   and `put_trades > 0` unless `ceiling_hit` names the put side.
-2. **V5b:** `after` `traded_but_empty` for puts falls to within the same range as calls. Before, puts should far
-   exceed calls; report both.
-3. **V5c:** the zero-put share among ≥ 1,000-print symbol-days is **≤ 2%** over the first ten flip nights. Each
-   remaining case either has no put contract selected, or its symbol is in that night's `truncated` map with side `put`.
-4. **V2 on flip nights:** `mode = paginated`, `page_limit = 10000`, `symbols_truncated` (ceiling hits) reported. If
-   it is above 5 a night on the names in V5, the Steward tells Haci to raise `UOA_TRADES_MAX_PAGES_PER_BATCH`.
-5. **V6:** the median `sas_finished_at` shift is reported in minutes for each flag change. It is not a pass bar, but
-   Haci reads it because `finished_at` is the actionable time (`DATA_NOTES.md:156-165`).
-6. **V1 still identical** to §1 for months before `D0`. Any change there is a historical rewrite this fix does not
-   make, so it is a FAIL: stop and find what wrote it.
+**PASS requires all of:**
+
+1. **W1:** for each of the fifteen names on `D0` — `put_premium_total > 0` (it was 0 every session before),
+   `dir_ratio` not within 0.001 of 1.00, and `trades > 2000` (the old ceiling was 1,000 prints per 50-contract
+   batch, so 2,000 for a 60-contract name). A name that genuinely traded no puts is allowed only if W2's `truncated`
+   map does not name it and its contract rows show no put with `snapshot_volume > 0`.
+2. **W2:** the `trades_fetch` block is present, `page_limit = 10000`, `status = success`, `failed_requests` small,
+   and `ceiling_hits` in the low single digits. If ceiling hits exceed 5 a night, or name any of the fifteen, tell
+   Haci to raise `ALPACA_OPTION_TRADE_PAGES`: that is a knob, not a flag, and pagination is on either way.
+3. **W3:** `after` `traded_but_empty` for puts falls to roughly the call-side level. Before, puts far exceed calls;
+   report both numbers.
+4. **W6:** the zero-put share among ≥ 1,000-print symbol-days drops to **≤ 2%** over the first ten sessions from `D0`.
+5. **W4:** the median `sas_finished_at` shift is reported in minutes. Not a pass bar, but Haci reads it, because
+   `finished_at` is the earliest actionable moment.
+6. **W5 identical to §1.** Any change to a pre-`D0` month is a historical rewrite this fix does not make: FAIL —
+   stop and find what wrote it.
+
+**Step 3 — on `D0`, the Steward writes this DATA_NOTES entry** (a forward-only mechanism change, not a repair-log
+row, because no historical row is rewritten):
+
+> ## UOA option trades paginated from `D0` (PI-020, shipped `<sha>`, no flag — DP-59)
+> From trading date `D0`, `uoa_contract_daily.trade_count / volume_traded / premium_total / premium_max /
+> first_trade_ts / last_trade_ts / buy_premium / sell_premium / unknown_premium / top_trades_json`,
+> `uoa_symbol_daily.call_premium_total / put_premium_total / total_premium / call_buy_premium / put_buy_premium /
+> net_directional_premium / dir_ratio / prem_* / unusual_* / quality_* / conc_* / score_* / bias_* / label_* /
+> why_json`, `uoa_bulletins.lists_json / markdown`, and every SAS flow input and output downstream
+> (`flow_strength_score`, flow polarity and vote, `overall_score`, `selected_rank`) are built from every print, not
+> from one 1,000-print page per 50 contracts. Nights before `D0` stay capped and were not rewritten. A question
+> spanning `D0` treats these as two different features (DP-50(a)): Q014, Q019, Q029, Q030 and every prospective
+> slate reader split there. Nights whose `stats_json` has no `trades_fetch` block are pre-fix.
+
+**Step 4 — the Registrar** records the split date on Q014, Q019, Q029, Q030 and the prospective slate readers in the
+board's decision log. No locked PREREG is edited (rule 3).
