@@ -38,7 +38,8 @@ Statuses: `OPEN` · `HACI_DECIDED:<fix|research|accept>` · `BRIEF_WRITTEN` · `
 | PI-014 | high | OPEN | Conviction Monitor's polarity arm silent since 2026-06-01: `polarity_unavailable_coverage_low` on 100% of in-scope rows, 0 polarity HOLD/EXIT rows — the EXIT tier is the technical arm alone |
 | PI-015 | high | OPEN | Projection layer (v1.6 weight 29, the largest) unscored — `available: false` — on 72.2% of published and 74.3% of capped main-lane rows; `overall_score` is a six-layer blend on ~3 of 4 picks |
 | PI-016 | med | OPEN | Conviction label degenerate on the published slate: `completeness_score` never below 65.37 (min 65.3686 of 4,195 scored rows), so `_confidence_label`'s completeness arm is inert — 401 high / 141 medium / **0 low** on 542 published rows, every `medium` the `[80,82)` score sliver; the subscriber sentence at `services/super_agent_select_public.py:212` re-prints "is the score ≥ 82" |
-| PI-017 | high | BRIEF_WRITTEN | A forced UOA re-run deletes the **whole trading date** from `uoa_contract_daily`, `uoa_symbol_daily` and `uoa_bulletins`, then rebuilds only the symbols it was given — so the single-symbol range runner with `--force` wipes ~498 other symbols and the night's bulletins (a SAS candidate-universe source); the run still records `success`. Signature seen once, 2026-01-09 (23 of ~499 symbols), before every study window. Brief: `research/briefs/PI-017_forced_uoa_rerun_delete_scope.md` (2026-09-14) |
+| PI-017 | high | FAILED:verification-blocked -- repo-side checks all PASS, no desk database credential available for brief section 8 checks V1-V4; see VERIFY_PI-017.md | A forced UOA re-run deletes the **whole trading date** from `uoa_contract_daily`, `uoa_symbol_daily` and `uoa_bulletins`, then rebuilds only the symbols it was given — so the single-symbol range runner with `--force` wipes ~498 other symbols and the night's bulletins (a SAS candidate-universe source); the run still records `success`. Signature seen once, 2026-01-09 (23 of ~499 symbols), before every study window. Brief: `research/briefs/PI-017_forced_uoa_rerun_delete_scope.md` (2026-09-14) |
+| PI-018 | high | OPEN | Multi-agent technical report: the per-timeframe BUY/SELL call is not a faithful read of the technicals. A ≥ 70-strength signal with "medium" confidence is dropped (neither counted nor held), then "within 2% of a Fibonacci support" turns it into **BUY** — in the SNDK 2026-09-11 sample a 71% **bearish** 15m signal printed as BUY. Support is checked before resistance, so ties go to BUY; and `hold_count` is decremented without having been incremented, so the consensus tally is wrong (sample shows 2/2/2 across 7 timeframes). `day_trading_agent.py:749-804` |
 
 ## Detail
 
@@ -482,3 +483,46 @@ flag any date where a forced run considered fewer symbols than its neighbours.
 **Suggested route.** Plain bug fix that restores intended behaviour → `fix-brief` once Haci decides
 `fix`. Under DP-49 the brief changes the delete predicate only; it never hands the coding agent a
 database step, and it does not repair 2026-01-09.
+
+### PI-018 — the technical report's BUY/SELL call can contradict its own technicals
+
+**Found 2026-09-14** while filing Haci's F9 idea, from the SNDK report he pasted (ai_job `7e78c055…`,
+2026-09-11 10:01:49) and a read of the decision code. Read-only; no database or blob was touched.
+
+**What the sample shows.** On the 15m timeframe the indicator layer says `overall_bias: "bearish"`,
+`strength: 71.43`, `confidence: "medium"`. The printed decision for the same timeframe is
+**`recommendation: "BUY"`**, with the reasoning "Near Fibonacci support at $1624.55". The 4h call is
+also BUY for the same reason, on a bullish bias of only 65%. The consensus reads BUY 2 / SELL 2 /
+HOLD 2 — six calls for seven timeframes.
+
+**The code that produces it** — `day_trading_agent.py`, thresholds at `:591-593` (`buy_threshold = 70`,
+`sell_threshold = 70`, `high_confidence_only = True`):
+
+1. **A strong medium-confidence signal is silently dropped (`:749-771`).** A bearish bias with strength
+   ≥ 70 enters the SELL branch, but `if not self.high_confidence_only or confidence == 'high'` fails for
+   "medium". Nothing is recorded: not SELL, and — because the `else` that counts a HOLD is never reached
+   — not a counted HOLD either. The recommendation stays at its default HOLD.
+2. **A nearby Fibonacci level then decides the call (`:776-804`).** Any HOLD with price within 2% of the
+   nearest support becomes BUY. The 71% bearish 15m signal becomes a BUY this way.
+3. **Ties go to BUY.** Support is tested before resistance, and only a still-HOLD call can flip. On short
+   timeframes the Fibonacci grid is tight — the sample's 15m support and resistance sit 0.5% below and
+   0.4% above price, both inside the 2% band — so the call becomes BUY and never SELL.
+4. **The tally is wrong.** Step 2 runs `hold_count -= 1` for a HOLD that step 1 never counted. Replaying
+   the sample through the code gives exactly the printed 2 / 2 / 2: 15m −1, 4h +1−1, 1d/1wk/1mo +3.
+   `overall_recommendation` uses `buy_pct` / `sell_pct` over all timeframes, so the headline is not
+   changed by this, but the distribution shown to users is.
+
+**Why it matters.** A subscriber reading "BUY, near Fibonacci support" on a timeframe whose technicals are
+71% bearish is being given the opposite of the analysis. It also means any research on these reports
+must treat the raw indicator bias and the printed call as different variables (BACKLOG F9 preamble).
+
+**Expected behaviour — Haci's call, because part of it is design, not bug:**
+- *Bug:* a signal that passes strength but fails the confidence gate must land somewhere explicit (a
+  counted HOLD with its reason), and the tally must never decrement what it did not count.
+- *Design:* whether proximity to a Fibonacci level may override the indicator bias at all, and if so
+  whether it may override an *opposing* strong bias, and how a price inside both bands is resolved
+  (today: always BUY).
+
+**Suggested route.** Split it: the counting fix is a plain bug fix (`fix-brief`); the override rule is a
+behaviour change to what subscribers are told and should go through research first — H-086/H-089 can
+measure whether Fibonacci-flipped calls behave like signal-driven ones before anyone changes the rule.
