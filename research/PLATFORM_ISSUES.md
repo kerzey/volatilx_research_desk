@@ -42,6 +42,7 @@ Statuses: `OPEN` · `HACI_DECIDED:<fix|research|accept>` · `BRIEF_WRITTEN` · `
 | PI-018 | high | OPEN | Multi-agent technical report: the per-timeframe BUY/SELL call is not a faithful read of the technicals. A ≥ 70-strength signal with "medium" confidence is dropped (neither counted nor held), then "within 2% of a Fibonacci support" turns it into **BUY** — in the SNDK 2026-09-11 sample a 71% **bearish** 15m signal printed as BUY. Support is checked before resistance, so ties go to BUY; and `hold_count` is decremented without having been incremented, so the consensus tally is wrong (sample shows 2/2/2 across 7 timeframes). `day_trading_agent.py:749-804`. **At scale (697 reports): 12.6% of directional calls oppose their own timeframe's bias; 76.1% cite "Near Fibonacci"; 50.1% of reports print a wrong tally** |
 | PI-019 | med | OPEN | Multi-agent technical reports: the zone-less `timestamp` switched from **UTC** (to 2026-04-05) to **US Eastern** (from 2026-04-07; both on 04-06) with no marker; and no report records whether it came from a subscriber (`/analyze`) or the internal batch (`user_id=1`, 73.6% of reports). Anything reading report times or treating reports as subscriber demand is silently wrong for part of the history |
 | PI-020 | high | OPEN | **UOA scanner truncates option trades: the flow layer is blind to puts on the most liquid names.** `AlpacaOptionsClient.get_option_trades` (`ai_agents/options_client.py:985-1018`) requests up to 50 contracts with `limit=1000` (`services/uoa_screener.py:1505-1510`, `trades_limit` at `:806`) and never follows `next_page_token`. Alpaca sorts by contract symbol, so calls fill the page and puts get nothing. SNDK 2026-09-08: stored 2,000 trades, all calls, `dir_ratio` 1.00; paginated, the same contracts traded 14,441 calls ($200.7M) and 11,154 puts ($82.5M). **~15–16% of symbol-days hit the cap every month since 2026-01; 317 of 604 published SAS picks since 2026-06-01 were scored on capped flow** (GOOG, MSFT, AMZN, SNDK, ORCL… capped every day). Biases `call/put_premium_total`, `dir_ratio`, flow scores and the flow direction votes bullish. Evidence: `research/reports/case_SNDK_2026-09-15/` |
+| PI-021 | high | OPEN | **Running the platform test suite deletes every user.** `conftest.py:37-55` (platform `c311e81`) has an autouse fixture that deletes all rows of `UserActivityEvent` and `User` before and after *every* test, and `conftest.py:31-35` runs `create_tables()`, against whatever database the test environment's connection URL names (`conftest.py:9-21` refuses only SQLite). Pointed at production, `pytest` empties `users` and `user_activity_events`. The PI-017 fix brief (§4(c)) told the coding agent to run `python -m pytest tests/ -q` on the base commit and after; PI-017 merged as `575df11`. **Not verified whether that run touched production** — first check: row count and newest signup in `users` against what you expect. Found 2026-09-15 by the Brief Writer while writing EN-019. |
 
 ## Detail
 
@@ -624,3 +625,25 @@ per-symbol ceiling that is *recorded* when hit (`trades_truncated` flag and coun
 dropped. Plain bug fix, restores intended behaviour. Historical rows are not rewritten by the fix; if Haci
 later backfills, the repair is logged in `research/data/DATA_NOTES.md` with its range and ship SHA and any
 question spanning it splits at that date (DP-50). DP-49: no database step in the brief.
+
+### PI-021 — platform test fixtures delete all users in whatever database the tests connect to
+
+**Found 2026-09-15** by the Brief Writer while writing the EN-019 brief; lines re-read by the coordinator at
+platform `c311e81`.
+
+- `conftest.py:9-21` requires a Postgres connection URL and rejects only SQLite; nothing refuses a
+  production host.
+- `conftest.py:31-35`: session-scoped autouse fixture runs `create_tables()` (DDL).
+- `conftest.py:38-55`: autouse fixture deletes **all** rows of `UserActivityEvent` and `User` before and
+  after every test, and commits.
+- **Exposure.** `research/briefs/PI-017_forced_uoa_rerun_delete_scope.md` §4(c) (lines 516-525) instructed
+  `python -m pytest tests/ -q` on the base commit and after. PI-017 merged as `575df11`. If the coding
+  agent's connection URL was the production read-write one (DP-49 says the coding agent's credential is),
+  both tables were emptied — twice. **The desk has not verified this**: the research connection was not set
+  in the coordinator's shell on 2026-09-15, and the desk does not go looking for credentials (rule 1).
+
+**Expected behaviour.** Tests refuse to run unless the connection names a disposable test database (a
+required dedicated test URL, or a hard stop when the host or database name matches production), and cleanup
+deletes only rows the tests created. Plain bug fix. **Desk rule until PI-021 is fixed:** no brief tells a
+coding agent to run `pytest` in the platform repo (the EN-019 brief already forbids it and uses a standalone
+runner).
