@@ -39,7 +39,8 @@ Statuses: `OPEN` · `HACI_DECIDED:<fix|research|accept>` · `BRIEF_WRITTEN` · `
 | PI-015 | high | OPEN | Projection layer (v1.6 weight 29, the largest) unscored — `available: false` — on 72.2% of published and 74.3% of capped main-lane rows; `overall_score` is a six-layer blend on ~3 of 4 picks |
 | PI-016 | med | OPEN | Conviction label degenerate on the published slate: `completeness_score` never below 65.37 (min 65.3686 of 4,195 scored rows), so `_confidence_label`'s completeness arm is inert — 401 high / 141 medium / **0 low** on 542 published rows, every `medium` the `[80,82)` score sliver; the subscriber sentence at `services/super_agent_select_public.py:212` re-prints "is the score ≥ 82" |
 | PI-017 | high | FAILED:verification-blocked -- repo-side checks all PASS, no desk database credential available for brief section 8 checks V1-V4; see VERIFY_PI-017.md | A forced UOA re-run deletes the **whole trading date** from `uoa_contract_daily`, `uoa_symbol_daily` and `uoa_bulletins`, then rebuilds only the symbols it was given — so the single-symbol range runner with `--force` wipes ~498 other symbols and the night's bulletins (a SAS candidate-universe source); the run still records `success`. Signature seen once, 2026-01-09 (23 of ~499 symbols), before every study window. Brief: `research/briefs/PI-017_forced_uoa_rerun_delete_scope.md` (2026-09-14) |
-| PI-018 | high | OPEN | Multi-agent technical report: the per-timeframe BUY/SELL call is not a faithful read of the technicals. A ≥ 70-strength signal with "medium" confidence is dropped (neither counted nor held), then "within 2% of a Fibonacci support" turns it into **BUY** — in the SNDK 2026-09-11 sample a 71% **bearish** 15m signal printed as BUY. Support is checked before resistance, so ties go to BUY; and `hold_count` is decremented without having been incremented, so the consensus tally is wrong (sample shows 2/2/2 across 7 timeframes). `day_trading_agent.py:749-804` |
+| PI-018 | high | OPEN | Multi-agent technical report: the per-timeframe BUY/SELL call is not a faithful read of the technicals. A ≥ 70-strength signal with "medium" confidence is dropped (neither counted nor held), then "within 2% of a Fibonacci support" turns it into **BUY** — in the SNDK 2026-09-11 sample a 71% **bearish** 15m signal printed as BUY. Support is checked before resistance, so ties go to BUY; and `hold_count` is decremented without having been incremented, so the consensus tally is wrong (sample shows 2/2/2 across 7 timeframes). `day_trading_agent.py:749-804`. **At scale (697 reports): 12.6% of directional calls oppose their own timeframe's bias; 76.1% cite "Near Fibonacci"; 50.1% of reports print a wrong tally** |
+| PI-019 | med | OPEN | Multi-agent technical reports: the zone-less `timestamp` switched from **UTC** (to 2026-04-05) to **US Eastern** (from 2026-04-07; both on 04-06) with no marker; and no report records whether it came from a subscriber (`/analyze`) or the internal batch (`user_id=1`, 73.6% of reports). Anything reading report times or treating reports as subscriber demand is silently wrong for part of the history |
 
 ## Detail
 
@@ -526,3 +527,33 @@ must treat the raw indicator bias and the printed call as different variables (B
 **Suggested route.** Split it: the counting fix is a plain bug fix (`fix-brief`); the override rule is a
 behaviour change to what subscribers are told and should go through research first — H-086/H-089 can
 measure whether Fibonacci-flipped calls behave like signal-driven ones before anyone changes the rule.
+
+**At scale (Data Steward blob inventory, 2026-09-14, `research/reports/STEWARD_F9_blob_inventory.md` §8).**
+Over all 697 history reports: **495 of 3,933 (12.6%)** BUY/SELL decisions oppose their own timeframe's
+`overall_bias` (378 BUY on bearish, 117 SELL on bullish); **"Near Fibonacci" appears in the reasoning of
+2,992 of 3,933 (76.1%)**; the consensus tally does not equal the number of timeframes on **349 of 697
+reports (50.1%)**. PI-018 is systematic, not a sample artefact.
+
+### PI-019 — report timestamps changed zone silently; report trigger not recorded
+
+**Found 2026-09-14** by the Data Steward's F9 blob inventory (`research/reports/STEWARD_F9_blob_inventory.md`
+§3, §6), counts and metadata only.
+
+- **Zone switch.** The report `timestamp` (and every `price_timestamp`, which equals it) carries no zone.
+  Against the UTC `stored_at`, reports from 2026-01-22 to 2026-04-05 (201) differ by ≈ 0 minutes — UTC —
+  and reports from 2026-04-07 (494) by 240–241 minutes — US Eastern (EDT). 2026-04-06 carries both. No
+  `day_trading_agent.py` commit in that window explains it; the cause is platform-side and unlocated.
+- **No provenance.** Reports come from `POST /analyze` (`app.py:3286-3287`, the subscriber's `user_id`) or
+  `POST /api/internal/batch-analyze` (`app.py:3696-3700`, which hard-codes `user_id = 1` at `app.py:3966`).
+  Neither the blob name nor the payload says which. `user_id = 1` is 513 of 697 reports (73.6%).
+- **Legacy shape.** 28 reports without `strategy_scope` carry `5m` instead of `15m`.
+
+**Why it matters.** Any display, alert or analysis that reads report times across April 2026 is off by four
+hours for part of the history, and any usage or popularity metric built on reports counts an internal job
+as subscriber demand three times out of four.
+
+**Expected behaviour.** Timestamps written as ISO-8601 with an explicit offset (or UTC with `Z`); a
+`trigger` field (`subscriber` / `internal_batch` / other) on every report. Plain bug fix + additive field;
+no historical rewrite needed — the desk can normalise history by date (DP-49: no database or blob step in
+the brief).
+

@@ -91,17 +91,26 @@ and a consensus. The decision layer is `day_trading_agent.py:668-917`.
 **Facts every F9 question inherits — read from the code and the sample, verify at the inventory:**
 - **Entry is the spot price at analysis time**, never a trigger (`day_trading_agent.py:718`, `:737`).
   "Did it reach entry" is always yes; the testable things are the stop, the target, and the path.
-- **SELL calls carry no target** in the sample (`take_profit: null`; `risk_reward: {}` on 30m and 1h).
-  A bearish setup can only be graded against a synthetic level at a matched ATR distance.
+- **Targets are present on most calls, SELL included** (corrected by the inventory: the SNDK sample's
+  target-less 30m/1h SELLs were not typical). `take_profit` exists on 78–88% of BUYs and 73–100% of SELLs,
+  varying by timeframe; a call without one is graded against a synthetic level at a matched ATR distance.
 - **The call is not a clean read of the technicals (PI-018).** A 71%-strength *bearish* 15m signal
   printed as **BUY**: strength ≥ 70 but confidence "medium" falls through both branches, and "price
   within 2% of a Fibonacci support" then turns the HOLD into BUY (`:749-791`). Support is checked before
   resistance, so on a tight Fibonacci grid the tie goes to BUY. Every F9 question must therefore
   test the **raw indicator bias** and the **final call** as separate inputs, never assume one is the other.
-- **Timestamps are ET wall-clock without a zone** ("2026-09-11 10:01:49"); wave points are UTC. The
-  zone is pinned before any bar is matched (rule 14).
-- **Selection hazard.** If reports are requested by users, they cluster on names already moving, and
-  "the analysis worked" becomes "momentum worked". The control must be built inside the analysed set.
+- **Timestamps carry no zone, and the zone changed on 2026-04-06** (corrected by the inventory):
+  UTC for 2026-01-22..04-05, US Eastern from 04-07, both on 04-06. One clock read serves every timeframe.
+  The zone is normalised by report date before any bar is matched (rule 14).
+- **Selection hazard — measured, and worse than expected.** 73.6% of the 697 reports come from the internal
+  batch endpoint (hard-coded `user_id = 1`, volatilx `app.py:3966`) re-running a hand-picked watchlist; seven
+  symbols are 60% of the corpus (TSLA 134). The payload does not record the trigger. The same symbol recurs
+  within 5 trading days on 56.5% of symbol-days, so independent episodes number in the low dozens.
+  **Historical reports support exploration only; a decidable test needs reports generated going forward
+  on a fixed, pre-declared universe with the trigger recorded (EN-019).** Inventory:
+  `research/reports/STEWARD_F9_blob_inventory.md`.
+- **Two shapes.** 28 legacy reports (no `strategy_scope`) carry 5m instead of 15m; 6–14% of reports lack
+  1d/1wk/1mo.
 - **Crypto trades 24/7** and has no session close: it is a registered split with its own horizons,
   never pooled with stocks. Outcome bars come from the Alpaca market-data host only.
 - **Unit of inference:** the analysis day, with the same symbol re-analysed on nearby days treated as
@@ -115,7 +124,7 @@ and a consensus. The decision layer is `day_trading_agent.py:668-917`.
   level at the same distance — n: TBD (inventory first) — why real: stops and targets come from
   Fibonacci and ATR structure that can mark real support and resistance — why noise: entry is spot,
   short-timeframe targets sit inside ordinary intraday noise (the sample's 15m target is 0.38% away with
-  risk/reward 0.82, the 1d risk/reward 0.38), and SELL targets do not exist. Source: INBOX 2026-09-14.
+  risk/reward 0.82, the 1d risk/reward 0.38), and 12–27% of calls carry no target at all. Source: INBOX 2026-09-14.
 - [ ] H-087 (F9) — **Timeframe alignment.** Reports where ≥ 6 of 7 timeframes agree in direction vs mixed
   reports: first touch of +k ATR vs −k ATR at the day, swing and long horizons — baseline: mixed and HOLD
   reports on the same day, distance-matched — n: TBD — why real: multi-timeframe confluence is standard

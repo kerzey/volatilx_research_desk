@@ -47,6 +47,12 @@ def _parse(text: str) -> dict:
         key, val = m.group(1), m.group(2)
         if len(val) >= 2 and val[0] == val[-1] and val[0] in ("'", '"'):
             val = val[1:-1]
+        else:
+            # Match `set -a; . ./.env.research` (scripts/research_routines.sh:13): in an unquoted value a
+            # '#' preceded by whitespace starts a comment. Without this, `KEY=value  # note` loaded the note
+            # into the value (found by the F9 blob inventory, 2026-09-14). A '#' with no space before it
+            # (e.g. inside a URL) is kept, as bash keeps it.
+            val = re.sub(r"\s+#.*$", "", val)
         out[key] = val
     return out
 
