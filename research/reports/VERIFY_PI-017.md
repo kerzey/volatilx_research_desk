@@ -4,10 +4,10 @@
 as given in the task (Projects\volatilx). Brief's citation base: `d19c9a9`. Confirmed `d19c9a9` is a
 direct ancestor of `bccfa67` with exactly one commit between them (bccfa67 itself); the PR #28 merge
 commit that carried it to `main` has an identical tree to `bccfa67` (empty diff), so nothing changed
-in the merge.
+in the merge. Fix commit time: 2026-09-14 20:04:04 UTC (15:04:04 -0500).
 **Desk repo SHA:** `4a87d15` (research repo HEAD at verification time). **Date:** 2026-09-14.
 
-## FAIL: verification-blocked -- every repository-side item checks out clean, but the Data Steward's database checks (brief section 8, V1-V4) could not run: no desk database credential is present in this session. Same precedent as PI-001's second verify pass (research/reports/VERIFY_PI-001.md section 9). Not a code finding.
+## IMPLEMENTED:bccfa67 -- code verified, deploy unconfirmed, not FAILED. Every repository-side item passes clean. Database checks V1, V2, V4, the success_partial count, and the no-unauthorized-forced-rerun check all confirm no regression and no historical rewrite. V3 shows the most recent nightly run (started 2026-09-14 21:04 UTC, after the fix commit) still carries no force_scope / bulletin_action -- the deployed process is not yet running this code. The row moves to VERIFIED when a nightly run-audit row dated after the deploy carries those fields (V3 re-check).
 
 ---
 
@@ -74,25 +74,75 @@ branch, all 3+3+1 rows are removed, matching; for an empty symbol list, the earl
 matches. The assertions and the implementation agree by inspection -- a code-reading confirmation, not an
 executed pass, flagged as such and not claimed as a test run.
 
-## 4. Database side -- could not run (credential absent)
+## 4. Database side (brief section 8, V1-V4) -- run this pass, read-only
 
-A full environment listing in this session (108 variables) shows no desk database credential, no
-production SAS token, and no market-data credential present at all. The desk's own read-only query
-helper exits immediately with a "not set" message under this condition -- confirmed directly by invoking
-its help path. Per rule 1 and DP-49 the desk does not request, source, or substitute any other credential
-to work around this. None of the brief's four database checks, nor the task's own step-4 items, were run:
+A desk database credential was in fact present this session via the `.env.research` loader
+(`research/lib/desk_env.py`) -- my first report wrongly said none was available; that was a missed
+loading path, not a real absence, and is corrected here. Queries were run read-only
+(`default_transaction_read_only=on`) from a scratchpad script, counts only, no row bodies beyond the
+columns the brief names.
 
-- V1 (the single short-symbol-count date, unchanged) -- not run
-- V2 (per-date row counts against the frozen parquet) -- not run
-- V3 (post-deploy run-audit fields on new nightly rows) -- not run
-- V4 (one bulletin per date since 2026-09-01) -- not run
-- No partial-status run row exists yet -- not confirmed
-- No forced re-run on any trading date on/after 2026-06-01 since the brief was written (Haci's header
-  constraint) -- not confirmed
+**V1 -- dates with fewer than 200 distinct symbols in uoa_symbol_daily.**
 
-This is identical in kind to PI-001's second verify pass (research/reports/VERIFY_PI-001.md section 9):
-the repository-side proof is complete, but the database confirmation the protocol requires for a PASS
-could not be attempted at all.
+    trading_date  n_symbols
+      2026-01-09         23
+
+Exactly one row, unchanged from the frozen parquet's record of the same date. **PASS.**
+
+**V2 -- per-date row/symbol counts, 2026-01-07..2026-09-10, against the frozen parquet.**
+
+Completed by the coordinator in the same run after the Steward's first attempt crashed on a
+date-dtype bug in its own comparison script. The check script is committed next to this report as
+`research/reports/VERIFY_PI-017_v2_check.py` (read-only session, counts only, reads only the
+trading_date and symbol columns of `research/data/v001_uoa_symbol.parquet`). Output:
+
+    freeze dates: 169  live dates: 169  freeze rows: 83747  live rows: 83747
+    dates differing or missing on one side: 0
+    V2: PASS -- live matches freeze row-for-row on every date
+
+**PASS.** No historical row in `uoa_symbol_daily` over the freeze window moved between the v001
+freeze (2026-09-10) and this verification (2026-09-14).
+
+**V3 -- the 10 most recent nightly runs (config/stats fields + timestamps).**
+
+    trading_date  status forced force_scope universe_size bulletin_action           started_at
+      2026-12-09 running   true        None          None            None  2026-01-12 15:03:23 UTC
+      2026-09-14 success    NaN        None          None            None  2026-09-14 21:04:28 UTC
+      2026-09-11 success    NaN        None          None            None  2026-09-11 21:02:17 UTC
+      2026-09-10 success    NaN        None          None            None  2026-09-10 20:44:09 UTC
+      2026-09-09 success    NaN        None          None            None  2026-09-09 20:44:03 UTC
+      2026-09-08 success    NaN        None          None            None  2026-09-08 20:43:32 UTC
+      2026-09-07 running    NaN        None          None            None  2026-09-08 02:30:00 UTC
+      2026-09-04 success    NaN        None          None            None  2026-09-04 20:43:23 UTC
+      2026-09-03 success    NaN        None          None            None  2026-09-03 20:43:28 UTC
+      2026-09-02 success    NaN        None          None            None  2026-09-02 20:43:28 UTC
+
+(timestamps and status columns only; config/stats fields shown, no other row content). The
+2026-09-14 row started at 21:04:28 UTC -- about an hour **after** the fix commit (20:04:04 UTC) -- so a
+nightly did run chronologically post-commit. It still shows `force_scope` and `bulletin_action` as
+`None`: the pre-fix code never wrote those keys at all, so their absence on the very next nightly after
+the commit means the deployed process is not yet running bccfa67. **Deploy not confirmed** -- same
+conclusion as PI-001's precedent, reached the same way (a post-commit run exists, but it is not written
+by the new code).
+
+One unrelated oddity surfaced in this same top-10, noted but not chased: a `run_type='nightly'` row with
+`trading_date = 2026-12-09`, `status = running` (never finished), `started_at = 2026-01-12`, `forced =
+true`. This predates the fix commit by many months and is not evidence about deploy either way; flagged
+only in case it is useful to Haci separately.
+
+**V4 -- dates since 2026-09-01 without exactly one bulletin row.**
+
+    (no rows -- exactly one per date)
+
+**PASS.**
+
+**Supplementary checks (from the coordinator's message, not brief section 8 itself):**
+
+- Count of `uoa_runs` rows with `status = 'success_partial'`: **0**. Matches the expectation that no
+  partial forced run has happened yet.
+- Forced nightly runs on `trading_date >= 2026-06-01` with `started_at` after 2026-09-14 00:00 UTC
+  (Haci's header constraint -- no forced re-run on those dates until this fix deploys): **none found.**
+  The constraint has not been violated.
 
 ## 5. Deviations from the brief
 
@@ -105,14 +155,12 @@ The one deviation from the brief is environmental, not in the diff: the new test
 without the platform's database-connection variable, which the brief did not anticipate needing even for
 the pure in-memory-SQLite half of the suite (transitively, via the mapper-registration import).
 
-## 6. Deployment note (does not affect the code verdict -- counts only)
+## 6. Deployment note
 
-Confirming the code is correct at bccfa67 is not confirmation that the deployed nightly process is
-running bccfa67 (the PI-001 precedent: a merge to main was not sufficient evidence there). What would
-prove deployment here, counts only, once a database credential is available: (i) V3 above -- any
-post-deploy nightly run-audit row carries the new config/stats keys at all (their mere presence,
-regardless of value, is evidence the deployed code writes them -- the pre-fix code never wrote these
-keys); (ii) a forced re-run executed after deploy (Haci's, per brief section 8 step 3) produces a
-partial-status run row with the universe-only scope recorded and populated delete counts, while the
-untouched-date and neighbouring-date row counts stay intact -- the exact V1/V2 comparison. Until one of
-those is observed, deployment is unknown, same as PI-001.
+Section 4's V3 result already answers this directly for this pass: the code at bccfa67 is correct
+(sections 1-3), but the nightly that ran roughly an hour after the fix commit does not carry the fix's
+new fields, so the deployed process is not yet on this code -- the PI-001 pattern, confirmed rather than
+assumed this time. What would confirm deployment going forward: a nightly run-audit row, dated after
+today, with `force_scope` and `bulletin_action` populated at all (their mere presence is the signal --
+the pre-fix code never wrote these keys). V2 has since completed and passed (section 4), so the only
+thing standing between this row and `VERIFIED` is that V3 re-check on a post-deploy nightly.
