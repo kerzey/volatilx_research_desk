@@ -256,7 +256,7 @@ _Each was a question the desk would once have asked you. It took the recommended
 
 ## 8. Backlog and calendar
 
-- Open hypotheses: **6** · registered: 53 · deferred (data missing): H-014, H-021, H-022, H-041, H-055, H-062, H-067, H-078, H-080
+- Open hypotheses: **10** · registered: 53 · deferred (data missing): H-014, H-021, H-022, H-041, H-055, H-062, H-067, H-078, H-080
 - Next to register (DP-47 order): H-086, H-087, H-088, H-089, H-090
 
 | decides on | Q |
