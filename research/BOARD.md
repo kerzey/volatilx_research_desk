@@ -67,8 +67,6 @@ A missing counts snapshot is shown as unmeasured, not assumed to be a maturation
 
 - **PI-014** — run the brief in the platform repo, then tell the desk the SHA  
   `/desk-run verify PI-014 <sha>`
-- **PI-020** — run the brief in the platform repo, then tell the desk the SHA  
-  `/desk-run verify PI-020 <sha>`
 - **EN-002** — run the brief in the platform repo, then tell the desk the SHA  
   `/desk-run verify EN-002 <sha>`
 
@@ -155,7 +153,7 @@ _Source: `research/PLATFORM_ISSUES.md`. Statuses: OPEN → HACI_DECIDED:fix/rese
 | PI-017 | OPEN | A forced UOA re-run deletes the **whole trading date** from `uoa_contract_daily`, `uoa_symbol_daily` and `uoa_bulletins`, then rebuilds only |
 | PI-018 | OPEN | Multi-agent technical report: the per-timeframe BUY/SELL call is not a faithful read of the technicals. A ≥ 70-strength signal with "medium" |
 | PI-019 | OPEN | Multi-agent technical reports: the zone-less `timestamp` switched from **UTC** (to 2026-04-05) to **US Eastern** (from 2026-04-07; both on 0 |
-| PI-020 | BRIEF_WRITTEN | **UOA scanner truncates option trades: the flow layer is blind to puts on the most liquid names.** `AlpacaOptionsClient.get_option_trades` ( |
+| PI-020 | OPEN | **UOA scanner truncates option trades: the flow layer is blind to puts on the most liquid names.** `AlpacaOptionsClient.get_option_trades` ( |
 | PI-021 | OPEN | **Running the platform test suite deletes every user.** `conftest.py:37-55` (platform `c311e81`) has an autouse fixture that deletes all row |
 | PI-023 | OPEN | **Option buy/sell side is judged against the closing quote, so the label follows the day's price drift.** `services/uoa_screener.py:1114-111 |
 | PI-022 | OPEN | **Conviction Monitor wrote nothing on 2026-07-06** — `conviction_monitor_daily` has 0 rows for that session while every other in-window sess |
