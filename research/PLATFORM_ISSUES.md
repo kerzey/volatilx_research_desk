@@ -44,7 +44,7 @@ Statuses: `OPEN` · `HACI_DECIDED:<fix|research|accept>` · `BRIEF_WRITTEN` · `
 | PI-019 | med | OPEN | Multi-agent technical reports: the zone-less `timestamp` switched from **UTC** (to 2026-04-05) to **US Eastern** (from 2026-04-07; both on 04-06) with no marker; and no report records whether it came from a subscriber (`/analyze`) or the internal batch (`user_id=1`, 73.6% of reports). Anything reading report times or treating reports as subscriber demand is silently wrong for part of the history |
 | PI-020 | high | BRIEF_WRITTEN | **UOA scanner truncates option trades: the flow layer is blind to puts on the most liquid names.** `AlpacaOptionsClient.get_option_trades` (`ai_agents/options_client.py:985-1018`) requests up to 50 contracts with `limit=1000` (`services/uoa_screener.py:1505-1510`, `trades_limit` at `:806`) and never follows `next_page_token`. Alpaca sorts by contract symbol, so calls fill the page and puts get nothing. SNDK 2026-09-08: stored 2,000 trades, all calls, `dir_ratio` 1.00; paginated, the same contracts traded 14,441 calls ($200.7M) and 11,154 puts ($82.5M). **~15–16% of symbol-days hit the cap every month since 2026-01; 317 of 604 published SAS picks since 2026-06-01 were scored on capped flow** (GOOG, MSFT, AMZN, SNDK, ORCL… capped every day). Biases `call/put_premium_total`, `dir_ratio`, flow scores and the flow direction votes bullish. Evidence: `research/reports/case_SNDK_2026-09-15/` — brief: `research/briefs/PI-020_uoa_trades_pagination.md` (2026-09-15, rewritten 2026-09-15 under DP-59: ships directly, no flag, no shadow — from the ship date `put_premium_total`, `dir_ratio`, flow scores and SAS flow votes change for liquid names; no historical row rewritten; the desk logs the ship SHA/date in DATA_NOTES so Q014/Q019/Q029/Q030 split there under DP-50) |
 | PI-021 | high | OPEN | **Running the platform test suite deletes every user.** `conftest.py:37-55` (platform `c311e81`) has an autouse fixture that deletes all rows of `UserActivityEvent` and `User` before and after *every* test, and `conftest.py:31-35` runs `create_tables()`, against whatever database the test environment's connection URL names (`conftest.py:9-21` refuses only SQLite). Pointed at production, `pytest` empties `users` and `user_activity_events`. The PI-017 fix brief (§4(c)) told the coding agent to run `python -m pytest tests/ -q` on the base commit and after; PI-017 merged as `575df11`. **Not verified whether that run touched production** — first check: row count and newest signup in `users` against what you expect. Found 2026-09-15 by the Brief Writer while writing EN-019. |
-| PI-023 | high | OPEN | **Option buy/sell side is judged against the closing quote, so the label follows the day's price drift.** `services/uoa_screener.py:1114-1116` keeps the closing snapshot's bid/ask and `:1246-1256` classifies every print of the session against it. Over 170 sessions the daily call buy-share runs *against* the tape (Spearman −0.57 with SPY open-to-close) and the put buy-share *with* it (+0.53): up days show 43% of call premium "bought" and 60% of put premium "bought", down days 62% / 41% — the mirror image of a real aggressor label. Feeds `dir_ratio`, `call/put_buy_premium`, the SAS flow vote (`super_agent_select_scoring.py:555-560`), Whale Watch qualification (ask-share ≥ 0.65, `whale_watch_tracking.py:114-116`) and the UOA "conviction" column. Alpaca keeps no historical option quotes, so this cannot be repaired after the fact: the quote must be captured during the session → **EN-020** (intraday sampler). Evidence: `research/reports/uoa_side_2026-09-15/REPORT.md` §2, `drift_test.py`. Blocks H-092 alongside PI-020. |
+| PI-023 | high | OPEN | **Option buy/sell side is judged against the closing quote, so the label follows the day's price drift.** `services/uoa_screener.py:1114-1116` keeps the closing snapshot's bid/ask and `:1246-1256` classifies every print of the session against it. Over 170 sessions the daily call buy-share runs *against* the tape (Spearman −0.57 with SPY open-to-close) and the put buy-share *with* it (+0.53): up days show 43% of call premium "bought" and 60% of put premium "bought", down days 62% / 41%. **Placebo (Red Team):** for prints in the last 30 minutes, where the closing quote *is* the quote at trade time, the correlation is zero (−0.03 / −0.02); for prints > 3 h before the close in the same contracts on the same days it is −0.58 / +0.46 — the artefact, not trader behaviour. Feeds `dir_ratio`, `call/put_buy_premium`, the SAS flow vote (`super_agent_select_scoring.py:555-560`), Whale Watch qualification (ask-share ≥ 0.65, `whale_watch_tracking.py:114-116`) and the UOA "conviction" column. Alpaca keeps no historical option quotes, so this cannot be repaired after the fact: the quote must be captured during the session → **EN-020** (intraday sampler). Evidence: `research/reports/uoa_side_2026-09-15/REPORT.md` §2, `drift_test.py`. Blocks H-092 alongside PI-020. |
 | PI-022 | med | OPEN | **Conviction Monitor wrote nothing on 2026-07-06** — `conviction_monitor_daily` has 0 rows for that session while every other in-window session carries 31–56 (frozen `manifest_v001`; `research/reports/STEWARD_Q038_exposure.md` item 3). A complete one-day outage of the monitor job, not a holiday (07-06 was a normal session; 07-03 was the holiday, and holidays still get off-calendar rows). No watchdog fired; the 24 picks of 06-29/06-30/07-01 lost their day-3/day-4 row and are excluded as `monitor_coverage_outage` in `exclusions_v004.json` (Q019 and Q038 read this table). Same watchdog gap as PI-002 — the PI-002 fix brief should add this table to the coverage check |
 
 ## Detail
@@ -681,8 +681,23 @@ of a day's classified premium, by side, against SPY's open-to-close move (Alpaca
 | up day | 0.429 | 0.598 |
 
 Spearman −0.566 (calls) / +0.533 (puts). On an up day the call's closing quote sits above most of the day's
-prints, so they read as sold; the put's sits below, so they read as bought. A true aggressor label would not
-lean this way. 23–35% of premium is already `unknown` under the rule.
+prints, so they read as sold; the put's sits below, so they read as bought. 23–35% of premium is already
+`unknown` under the rule.
+
+**Placebo that rules out trader behaviour (Red Team, `ttc_test.py` / `ttc_test2.py`, 73 sessions
+2026-06-01..09-14, the 10 largest prints per contract, 457,135 prints).** If the label were real, its tape
+correlation would not depend on how many minutes remained in the session; if it is the closing-quote
+artefact it must vanish near the close, where the closing quote is the quote at trade time:
+
+| minutes to close | call ρ | put ρ |
+|---|---:|---:|
+| < 10 | +0.03 | +0.10 |
+| 10–30 | −0.01 | −0.13 |
+| 1–3 h | −0.24 | +0.18 |
+| > 3 h | −0.55 | +0.47 |
+
+Same contract-days, both legs present (114,619 prints): early (> 3 h) −0.58 / +0.46; late (< 30 min)
+−0.03 / −0.02. The < 10-minute row is also the residual bias a 10-minute sampler would carry.
 
 **Why it matters.** The flow direction vote in SAS carries tape-correlated noise on the very variable rule 7
 calls dominant; Whale Watch admits contracts by afternoon drift; the UI's conviction number is not what it
@@ -693,6 +708,7 @@ forward window with quote-at-trade labels exists.
 **Expected behaviour.** Each print is labelled against the quote prevailing when it traded. Alpaca offers no
 historical option quotes, so the quote must be sampled during the session: EN-020 (every 10 minutes: chain
 snapshot → contracts that traded → bracketing quotes stored → prints fetched with a lag and classified against
-the brackets → 10-minute buckets; the nightly sums the buckets and labels each row's `aggressor_source`).
-Historical rows are not rewritten; the ship date is logged in `DATA_NOTES.md` and locked questions split there
+the brackets → 10-minute buckets; the nightly sums the buckets and marks uncovered premium **unknown** —
+no closing-quote fallback — and `dir_ratio` is NULL when a symbol's classified share is below 0.50, so the
+SAS legacy vote abstains instead of re-reading the artefact). Historical rows are not rewritten; the ship date is logged in `DATA_NOTES.md` and locked questions split there
 (DP-50). A delta-adjusted backfill of history is Phase 2, only after the sampler provides a truth set.
