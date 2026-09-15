@@ -380,14 +380,49 @@ Tier 1 is *not* the place to save money: every symbol the nightly scores needs c
 NULL (§5.5), and under Plus 800 requests every 5 minutes is 1.6% of the allowance. Keeping Tier 1 at 100 would
 cost coverage for nothing.
 
-**Tier-2 flags (per sweep; thresholds are settings, sizing not gates), computed from the snapshot alone:**
-- `contract_premium_today = v × vw × 100 ≥ $2M` (a single large order or a stack of them on one line);
-- `contract_volume_ratio = v / prevDailyBar.v ≥ 10` with `v ≥ 500` (the 20× day);
-- `symbol_premium_today ≥ 20 × symbol_premium_yesterday` with `symbol_premium_today ≥ $5M`;
-- `symbol_premium_today ≥ $20M` outright;
-- a between-sweep jump `Δ(v × vw) × 100 ≥ $5M` on one contract (the single big print, caught within 15 min).
-Every flag is written to `uoa_widenet_flags` (trading_date, sweep_ts, symbol, contract, rule, values) — the
-raw material for the "unusual" table and, later, for research on which flags mean anything.
+**Tier-2 flags, calibrated (`calibrate_flags.py`, 73 sessions 2026-06-01..09-14, stored nightly rows).** Haci
+asked whether the first-draft thresholds were any good; they were guesses. The table shows how many flags a
+day each rule would have raised on the S&P 500 book (median / p90 per session). Two caveats make every count a
+*floor*: the nightly rows only hold the ≤ 60 selected contracts per symbol, and PI-020 truncation understated
+premium on liquid names throughout.
+
+| rule | threshold tried | flags per day (median / p90) |
+|---|---|---:|
+| contract premium today | ≥ $1M / $2M / $5M / $10M | 66 / 25 / **6** / 1 (p90 88 / 38 / 10 / 3) |
+| contract volume vs yesterday, ≥ 500 contracts | ≥ 5× / 10× / 20× | 55 / 41 / 29 (p90 82 / 61 / 45) |
+| same, and premium ≥ $1M | ≥ 10× | **8** (p90 14) |
+| fresh line (no volume yesterday), ≥ 500, ≥ $1M | — | 31 (p90 41) |
+| largest single print on a contract | ≥ $0.5M / $1M / $2M / $5M | 22 / 8 / **2** / 0 (p90 38 / 19 / 7 / 2) |
+| symbol premium today | ≥ $5M / $10M / $20M / $50M | 16 / 6 / **2** / 0 (p90 22 / 10 / 4 / 1) |
+| symbol premium vs yesterday, ≥ $5M | ≥ 3× / 5× / 10× / 20× | 3 / **2** / 1 / 0 (p90 6 / 4 / 3 / 2) |
+
+Reading: the first-draft **20× symbol rule fires on nobody** (0/day); **$2M per contract fires 25 times a day**
+(too many to be "a big order" — AAPL and NVDA lines do that routinely); half of each session's premium sits in
+its top 20 symbols, so pure dollar rules are a mega-cap list, and ratio rules are what catch the mid-cap name
+that suddenly lights up. The distributions: a symbol-day at p90 is $1.9M, p99 $11.6M; a contract-day at p99 is
+$0.87M, at p99.9 $4.4M.
+
+**Calibrated v1 flag set (all are settings; target 20–40 flag events a day, fewer unique names):**
+
+| kind | rule | expected/day on S&P 500 |
+|---|---|---:|
+| whale (dollar) | contract premium today ≥ **$5M** | ~6 |
+| whale (dollar) | single print ≥ **$2M** (between-sweep jump `Δ(v × vw) × 100`) | ~2 |
+| whale (dollar) | symbol premium today ≥ **$20M** | ~2 |
+| unusual (ratio) | contract volume ≥ **10× its trailing 20-session mean** and ≥ 500 and ≥ $1M | ~8 |
+| unusual (ratio) | fresh line: no volume in the trailing 20 sessions, ≥ 500 and ≥ **$2M** | ~10–15 |
+| unusual (ratio) | symbol premium ≥ **5× its trailing 20-session mean** and ≥ $5M | ~2 |
+
+Baselines: the ratio rules use a **trailing 20-session mean**, not yesterday alone (a single quiet day makes
+every name look 10× busier). Tier 1 names have that history in `uoa_symbol_daily` / `uoa_contract_daily`; for
+Tier-2 names the sweep stores one end-of-day row per symbol and per flagged contract (`uoa_widenet_daily`,
+~3,500 rows a session) so the wide net builds its own baseline, and on its first 20 sessions falls back to
+`prevDailyBar` with the flag marked `baseline = yesterday`. Dollar thresholds are not scaled by market cap in
+v1; the ratio rules are what make a $3B name visible, and the counts above will be re-read after 20 live
+sessions with the wide universe. Every flag is written to `uoa_widenet_flags` (trading_date, sweep_ts, symbol,
+contract, rule, value, baseline) — the raw material for the "unusual" table and, later, for a research
+question on which flags mean anything (none of these thresholds is a finding; they are display and promotion
+rules).
 
 **Promotion.** A flagged symbol joins Tier 1 for the rest of the day at the next 5-minute tick: its prints from
 that moment are labelled; the prints *before* promotion are fetched once and labelled against Tier 2's own
