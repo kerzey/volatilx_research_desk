@@ -41,6 +41,7 @@ Statuses: `OPEN` · `HACI_DECIDED:<fix|research|accept>` · `BRIEF_WRITTEN` · `
 | PI-017 | high | IMPLEMENTED:bccfa67 (code verified 2026-09-14; deploy unconfirmed -- V3 re-check after the next nightly that runs bccfa67; see reports/VERIFY_PI-017.md) | A forced UOA re-run deletes the **whole trading date** from `uoa_contract_daily`, `uoa_symbol_daily` and `uoa_bulletins`, then rebuilds only the symbols it was given — so the single-symbol range runner with `--force` wipes ~498 other symbols and the night's bulletins (a SAS candidate-universe source); the run still records `success`. Signature seen once, 2026-01-09 (23 of ~499 symbols), before every study window. Brief: `research/briefs/PI-017_forced_uoa_rerun_delete_scope.md` (2026-09-14) |
 | PI-018 | high | OPEN | Multi-agent technical report: the per-timeframe BUY/SELL call is not a faithful read of the technicals. A ≥ 70-strength signal with "medium" confidence is dropped (neither counted nor held), then "within 2% of a Fibonacci support" turns it into **BUY** — in the SNDK 2026-09-11 sample a 71% **bearish** 15m signal printed as BUY. Support is checked before resistance, so ties go to BUY; and `hold_count` is decremented without having been incremented, so the consensus tally is wrong (sample shows 2/2/2 across 7 timeframes). `day_trading_agent.py:749-804`. **At scale (697 reports): 12.6% of directional calls oppose their own timeframe's bias; 76.1% cite "Near Fibonacci"; 50.1% of reports print a wrong tally** |
 | PI-019 | med | OPEN | Multi-agent technical reports: the zone-less `timestamp` switched from **UTC** (to 2026-04-05) to **US Eastern** (from 2026-04-07; both on 04-06) with no marker; and no report records whether it came from a subscriber (`/analyze`) or the internal batch (`user_id=1`, 73.6% of reports). Anything reading report times or treating reports as subscriber demand is silently wrong for part of the history |
+| PI-020 | high | OPEN | **UOA scanner truncates option trades: the flow layer is blind to puts on the most liquid names.** `AlpacaOptionsClient.get_option_trades` (`ai_agents/options_client.py:985-1018`) requests up to 50 contracts with `limit=1000` (`services/uoa_screener.py:1505-1510`, `trades_limit` at `:806`) and never follows `next_page_token`. Alpaca sorts by contract symbol, so calls fill the page and puts get nothing. SNDK 2026-09-08: stored 2,000 trades, all calls, `dir_ratio` 1.00; paginated, the same contracts traded 14,441 calls ($200.7M) and 11,154 puts ($82.5M). **~15–16% of symbol-days hit the cap every month since 2026-01; 317 of 604 published SAS picks since 2026-06-01 were scored on capped flow** (GOOG, MSFT, AMZN, SNDK, ORCL… capped every day). Biases `call/put_premium_total`, `dir_ratio`, flow scores and the flow direction votes bullish. Evidence: `research/reports/case_SNDK_2026-09-15/` |
 
 ## Detail
 
@@ -557,3 +558,56 @@ as subscriber demand three times out of four.
 no historical rewrite needed — the desk can normalise history by date (DP-49: no database or blob step in
 the brief).
 
+
+### PI-020 — UOA option trades truncated at one page; puts dropped on liquid names
+
+**Found 2026-09-15** while tracing why SNDK's three rank-1 picks (09-08, 09-10, 09-11) failed
+(`research/reports/case_SNDK_2026-09-15/REPORT.md`). Read-only queries and Alpaca market data only.
+
+**Mechanism, read from code.**
+- `services/uoa_screener.py:1505-1510` calls `options_client.get_option_trades(contract_symbols, start, end,
+  limit=cfg.trades_limit)` for the up-to-60 selected contracts; `trades_limit = 1000` (`:806`).
+- `ai_agents/options_client.py:1007-1017` splits the list into batches of 50 (`_SNAPSHOT_BATCH`, `:17`),
+  sends one `/trades` request per batch with `limit=1000`, and **never reads `next_page_token`** (the chain
+  and snapshot fetches in the same file do paginate, `:584`, `:914`).
+- Alpaca's multi-symbol trades response is ordered by contract symbol. `…C…` sorts before `…P…`, so when a
+  batch holds more than 1,000 trades the page fills with calls and the puts return empty.
+- `:1522-1535` then stores a zero-trade row for every contract without trades, and `:1601-1605` builds
+  `dir_ratio` from the truncated call and put totals.
+
+**Reproduction (`verify_trades.py` in the case folder).** SNDK 2026-09-08: `uoa_contract_daily` holds 60
+contracts, 2,000 trades in total, trades on 10 calls and 0 puts. The platform's request shape returns 1,000
+trades over 8 call contracts with a `next_page_token`. Paginated, the first 50 contracts hold 14,441 call
+trades ($200.7M) and 11,154 put trades ($82.5M). Stored `dir_ratio`: 1.00.
+
+**Scale (`truncation_scale.py`; a symbol-day is "capped" when its stored trades reach 1,000, a floor).**
+
+| month | symbol-days | capped | capped with zero put premium |
+|---|---:|---:|---:|
+| 2026-01 | 7,992 | 1,311 | 164 |
+| 2026-04 | 10,499 | 1,741 | 165 |
+| 2026-07 | 10,927 | 1,601 | 194 |
+| 2026-08 | 10,461 | 1,483 | 164 |
+
+Every month from January to September is in the same range. Since 2026-06-01, 317 of 604 published SAS picks
+had a capped UOA row on their pick night (64 with zero put premium). The most liquid names are capped every
+session (GOOG, GOOGL, MSFT, AMZN, NFLX, ORCL, CRM, NOW, KO, WMT, BAC, BA, PFE, GLW, SNDK).
+
+**Why it matters.**
+- The flow layer (weight 24) and two direction votes read a premium mix biased toward calls on exactly the
+  names with the most options activity. Scores, the cross-layer agreement bonus and "bullish flow" labels
+  are inflated for them; bearish flow on liquid names is systematically under-seen.
+- **Desk data.** Frozen `uoa_symbol` in `manifest_v001` carries the defect for its whole range. Questions
+  that read flow — Q014 (UOA persistence), Q029's flow layer, H-092 (flow label vs premium mix) — measure the
+  platform *as it behaved*, which is legitimate for a "does the published score work" question but not for
+  "does options flow carry information". No locked question is edited; the Red Team is told at review.
+- **Possibly related, unverified:** `gex_symbol_daily.quality_json` shows 39–50 of 2,000 contracts used and
+  `flip_quality = missing_iv` for SNDK; 755 of 1,972 GEX rows since 2026-08-01 have no put wall; SNDK reads
+  POS_GAMMA every night. The steward should check whether GEX shares a truncation before any GEX finding
+  (Q021, Q029, H-091) is trusted.
+
+**Expected behaviour.** Follow `next_page_token` until exhausted (or request per contract) with a sane
+per-symbol ceiling that is *recorded* when hit (`trades_truncated` flag and count), so no side is silently
+dropped. Plain bug fix, restores intended behaviour. Historical rows are not rewritten by the fix; if Haci
+later backfills, the repair is logged in `research/data/DATA_NOTES.md` with its range and ship SHA and any
+question spanning it splits at that date (DP-50). DP-49: no database step in the brief.
