@@ -3289,3 +3289,181 @@ set is empty and stays empty**, and the SAS half explicitly does **not** join F6
 edited; nothing here changes Q006, Q009 or Q010, whose ladder endpoints are unaffected. DP-41 is not
 engaged. Under this file's preamble **nothing here may be reported, briefed or quoted** until those
 triggers are met.
+
+---
+
+## Q038 / H-097 — "Does the Conviction Monitor's five-day tier history order the forward path at all?" — **a gate this desk chose for itself has a floor the data cannot reach**
+
+**Deferred 2026-09-15 by the registrar, autonomous run (DP-40..48), on this file's second admission
+ground (a sample-size problem, in the shape DP-43 sends here) — but with an unusual cause that the
+entry states plainly: the question is deferred *not* because the hypothesis failed a pre-lock test,
+and *not* on its primary criterion. It is deferred because of a floor the desk's own decision pass
+added.** Drafted at `research/questions/Q038_monitor_tier_calibration/PREREG.md` (state stays
+`PREREG_DRAFT`; **never locked: no `PREREG_LOCKED`, no `schedule.json`** — the Q020 / Q025 / Q030
+precedent); decisions at `research/questions/Q038_monitor_tier_calibration/DECISIONS.md`
+(decision-maker, decide + record passes 2026-09-15, 13 rows + 3 corrections); the measurement at
+`research/reports/STEWARD_Q038_exposure.md` with `readiness.json` beside it. **The PREREG carries every
+decided item and all three corrections** — `@registrar apply` ran before any commit — so this entry and
+the PREREG agree, and where either disagrees with `DECISIONS.md`'s record pass, the record governs.
+**The question number Q038 is consumed by this entry and is not reused.**
+
+### What the question is, and why it is worth keeping
+
+Haci's own question about a live surface: *"is the monitor working; if it is useless we can remove
+it."* The Conviction Monitor watches every published pick for five sessions and prints a tier; nothing
+on the platform reads that tier and it prescribes no action. Q038 asks whether the **three terminal
+states** the watch can leave a pick in — never EXIT, EXIT that softened, EXIT that persisted to day 5 —
+**order the forward path at all** from the open of session 6, after each group is netted against
+same-night unpublished candidates that had already fallen just as far (DP-12). It is a calibration
+question, not an action question, and it is the one that decides whether the surface stays or goes even
+if its sibling Q019 (sell on the flag vs hold) comes back positive. Kept, emphatically.
+
+### Why it is deferred — the primary criterion passed, and the added gate did not
+
+**The primary criterion did not fail.** The measured contributing-night rate is **19 of 53 matured
+nights = 0.3585 per eligible session** (95% Wilson CI 0.243–0.493), which lands inside the PREREG's own
+registered **0.29–0.55** band: on that number alone the window end and both decision dates move out and
+the question **locks** (window end ≈ 2027-04-26, decision ≈ Monday 2027-05-24). The monotonicity gate is
+not the problem either — **18 of 53** nights already carry a matched pick in all three groups, clearing
+its 20-night floor within about six further eligible sessions.
+
+**What fails is the floor decision 3 added.** `DECISIONS.md` item 3 was **DEFAULTED under R-5**, on
+DP-45's "where two options differ only in strictness, take the stricter": B3 — the within-published
+`dam5` pairing of persisting-EXIT picks to never-EXIT picks — became a **two-way gate**, so CONFIRMED
+now requires B3 to clear **≥ 20 B3-contributing nights** *and* beat the 5.0 pp MPE in the same sign,
+and a B3 that is thin, inside MPE or unevaluable forces **INCONCLUSIVE**. Measured (counts only, on
+`manifest_v001` + `manifest_prices_v001` against `exclusions_v003.json`, no live query — DP-50(c)):
+
+| quantity | measured | source |
+|---|---:|---|
+| Contributing nights (primary, §2.6) | **19 / 53 = 0.3585 per eligible session**, 95% CI 0.243–0.493 | `STEWARD_Q038_exposure.md` item 5 |
+| — by month | 0.250 (Jun) · 0.350 (Jul) · 0.538 (Aug) | item 5 |
+| Three-group nights (§8 clause 6) | 18 / 53 = 0.3396 — floor clears ≈ 2026-09 | item 5 |
+| **B3-contributing nights (§8 clause 7, as amended)** | **4 / 53 = 0.0755 per session**, 95% CI **0.030–0.179** | item 6 |
+| **`G_C` picks obtaining a matched `G_A` partner** | **4 of 129** matured gradeable picks = **3.1%** (Q019's published-to-published rate: 31.3%) | item 6 |
+| B3 projected at the primary-driven decision date (≈ 2027-05-24) | ≈ **16.9** of the 20 required | item 6 |
+| Earliest all-floors-met date at the **central** rate | window end 2027-06-24, decision **Monday 2027-07-26**, where B3 projects to **exactly 20.0** | DECISIONS rows 5, 8 |
+| B3 at its **CI lower bound** (0.030) | 20 nights needs ≈ **590** eligible sessions — past the **2027-09-15** ceiling | item 6 |
+| DP-13's single extension, in B3 nights | ≈ **+2.3** | DECISIONS row 5 |
+
+**A floor met at exactly 20.0 on four successes is not a floor met.** The PREREG's own registered sizing
+rule (§5.3) sizes a window so the floor is reached at the **pessimistic** rate, not the central one, and
+at B3's lower bound no window inside the ceiling reaches it. With **NULL also out of reach on this
+window** (§5.4: the equivalence form needs ≈ 320 contributing nights), the design can only return
+**INCONCLUSIVE** at any schedule this question can carry — which is precisely the branch `DECISIONS.md`
+routed item 8 wrote **before any number existed**. Hence DEFERRED rather than locked. **This is not the
+12-month trigger:** both candidate decision dates sit inside DP-43's 12 months from a 2026-09-15 lock.
+
+**The shortfall is structural, not accrual — and that is measured, not asserted.** B3 pairs two groups
+on a ±0.25 ATR `dam5` caliper while those groups are *defined* by a variable that all but determines
+`dam5`. R1 measures them as nearly disjoint in the matching covariate itself — retained `dam5` means
+**+0.47** (`G_A`) against **−1.27** (`G_C`), dropped tails **+1.65** against **−2.26** — so more nights
+buy **calendar, not overlap**, and the ≈ 20 pairs a 2027 schedule would eventually accumulate would be
+drawn from the **least typical 3% of `G_C`**, the picks whose damage is atypically mild. Waiting does
+not fix a near-separation.
+
+### What was considered and rejected before deferring
+
+- **Reopening decision 3 to rescue the lock.** **Rejected, and this is the important one.** Reverting
+  clause 7 to the one-way blocker *because* the strict reading costs the verdict is the forbidden
+  reason: DP-40 gives the overturn route as Haci's word rather than the desk's second thoughts, DP-45
+  says the desk never takes the option that reaches a decision date or a floor more easily, and the
+  charter says the same. That R1 is counts-only and outcome-blind does not save it — the *reason* would
+  still be "the strict reading costs us the verdict" (`DECISIONS.md` row 11).
+- **Locking at 2027-07-26, where B3's central estimate reaches 20.0.** Rejected: zero margin on four
+  successes, against the question's own registered pessimistic-sizing rule, with DP-13's extension worth
+  2.3 further nights and the hard stop then two days inside the ceiling.
+- **Locking at 2027-05-24 under the two-way gate.** Rejected: B3 projects ≈ 16.9, so the run is a
+  designed-in INCONCLUSIVE, which is what the pre-lock trigger exists to prevent.
+- **Widening the `dam5` caliper or switching B3's pool.** Rejected outright — §2.5, §10.1 and §10.12
+  register that the caliper is never widened, and loosening a match to reach a floor is DP-45's
+  paradigm case.
+- **Demoting B3 to descriptive inside a locked question** (DP-43's demotion clause). Rejected: that
+  clause demotes a **reported cell** in a question whose gates are met; here B3 *is* a gate on CONFIRMED,
+  and demoting it is the overturn of decision 3 by another name — which is Haci's call, not the desk's.
+- **Keeping the DP-58 interim.** Withdrawn rather than kept (`DECISIONS.md` row 10): at 60 contributing
+  nights B3 projects ≈ 12, so the interim could only ever continue and would spend O'Brien–Fleming α for
+  a success it could not declare. DP-58 allows withdrawal only before a lock, which is where this
+  question is.
+- **DP-13's single extension as a rescue.** Rejected: it rescues a floor that is *marginal*; this one is
+  short by ≈ 16 nights on a rate of 0.0755 and the extension buys ≈ 2.3.
+
+### What would move it back into the backlog — two routes, either one sufficient
+
+**Route 1 — the data thickens (a measurement, not a date).** At any successor freeze, **counts only**,
+on **matured** nights over a **trailing quarter** (DP-53 cohort separation), the Steward measures
+**both**:
+
+1. a **contributing-night rate ≥ 0.55 per eligible session** — the PREREG §5.6's own registered
+   re-entry threshold, used verbatim rather than a new number invented here; **and**
+2. a **B3-contributing-night rate whose 95% Wilson *lower* bound is ≥ 0.09 per eligible session**
+   (20 B3 nights inside ≈ 244 eligible sessions, i.e. twelve months from a re-lock).
+
+B3 is held to a **lower bound** rather than a point estimate because its fragility — four successes — is
+exactly what defers the question; the primary keeps its registered point threshold because §5.6 already
+fixed it. The two counts are a standing, non-blocking ask on the Data Steward, to be returned whenever
+this table is next frozen for any purpose (`DECISIONS.md` "Routed requests — record pass", item 3).
+
+**Route 2 — Haci overturns the DEFAULTED item.** One word reverts decision 3 to the **one-way blocker**:
+B3 then blocks CONFIRMED only when it clears 20 B3-contributing nights **and** is beyond MPE in the
+**opposite** sign, blocks nothing when thin, and can never create a CONFIRMED. The binding floor becomes
+the primary's 80 alone. **Route 2 needs no new decide pass and no new PREREG text** — the reverted
+wording is quoted verbatim in PREREG §3 (B3) and §8 clause 7, so the Registrar drops the amendment and
+nothing else changes — **and the schedule is already computed**, verified session by session against the
+NYSE holiday list (2026-11-26, 2026-12-25, 2027-01-01, 2027-01-18, 2027-02-15, 2027-03-26, 2027-05-31,
+2027-07-05, 2027-09-06):
+
+| item | value | construction |
+|---|---|---|
+| window | pick nights 2026-06-01 .. **2027-04-26** | 80 contributing nights at the measured 0.3585 |
+| **decision date** | **Monday 2027-05-24** | t+15 after 2027-04-26 = 2027-05-17; +1 calendar week; first Monday |
+| **extension date = hard stop** (DP-13, +30 sessions) | **Monday 2027-07-12**, window ..2027-06-08 | t+15 = 2027-06-29; +1 week; first Monday |
+| **DP-58 interim** (60 contributing nights) | **Monday 2027-03-08**, window ..2027-02-03 | t+15 = 2027-02-25; +1 week; first Monday — reinstated **only** under route 2 |
+| ceiling | 2027-09-15 | unchanged; every date above is inside it |
+
+Other floors, for the record: ≥ 20 three-group nights clears ≈ 2026-09; ≥ 30 post-lock contributing
+nights (DP-24) clears at pick night ≈ 2027-01-14 and binds on neither route; DP-31 is not invoked, so
+PROSPECTIVELY_CONFIRMED stays reachable by design. **These dates are recorded, not registered**: they
+become a `schedule.json` only at the lock a re-entry produces, and if re-entry comes by route 1 instead
+they are recomputed from the then-current freeze, **out only** (DP-43, DP-45). Either route re-enters
+Q038 at the front of the queue (DP-47).
+
+### Two things the measurement produced that outlive the deferral
+
+1. **A platform defect.** `conviction_monitor` wrote **zero rows system-wide on 2026-07-06** (every other
+   in-window session carries 31–56). Compounded with the adjacent 2026-07-03 holiday it left **every**
+   pick on 2026-06-29, 06-30 and 07-01 at three in-scope rows — 24 of 24, 100% of those three nights —
+   below the four-row classification rule. It is a monitor-job availability failure the coverage watchdog
+   did not catch, it is **not** ordinary holiday shortening, and Q019 and any question keyed on a
+   five-session watch inherits it. Routed to the Data Steward for a `DATA_NOTES.md` entry and a
+   `PLATFORM_ISSUES.md` filing in its own right (DP-07, DP-48), and for the next add-only
+   `exclusions_vNNN.json` to carry those three nights under a new kind `monitor_coverage_outage`
+   (DP-22). The PREREG prints it on its own funnel line and reports the rate on **both** denominators,
+   with the **uncorrected** 19/53 governing every date — a denominator correction may never pull a date
+   in.
+2. **Three claim-scope facts, re-measured on the frozen table and unchanged:** the monitor has printed
+   **two** states and not three since 2026-06-01 (`polarity_unavailable_coverage_low` on 100% of rows in
+   every month, **0** `overall_tier` HOLD rows, PI-014); the displayed `age_adjusted_severity` field
+   cannot carry a persisting-EXIT group at all (**0 of 491** picks) and its day-5 map is a bijection on
+   **417 of 417** rows; and the tier logic has not shipped since 2026-05-16 — `git log` from the pinned
+   SHA to HEAD over the monitor's three files returns **zero** commits, so no window-start split fires.
+
+### Bookkeeping while deferred
+
+**No verdict of any kind was produced.** Q038 returns no NULL, no INCONCLUSIVE, no `m1` and no `m2`; a
+pre-lock gate shortfall is not a verdict. **No `eval.py` was written and no `results/` directory
+exists**, and **no outcome of any kind was read** — no touch, no race, no first-touch date, no return,
+no excursion and no tier-versus-outcome cross-tab of any shape — at R1 or anywhere else; forward bars
+were read only to establish that they exist, for maturity and gradeability accounting. `state.json`
+stays `PREREG_DRAFT` until the coordinator runs the controller; **no `PREREG_LOCKED`, no
+`schedule.json`, no pin**. **F6's correction set is unchanged at 15** (Q019 §7's own figure) — Q038's
+two primaries never joined it and do not while deferred (the H-062 / Q025 / Q036 precedent), so **no
+locked file is edited and none was**. **R2 (the successor freezes) is stood down**, not built and not
+requested; its scope stands unchanged in PREREG §5.7 and is re-issued verbatim on re-entry. **Not merged
+into Q019** (DP-29): Q019 values an *action* on a binary day-1/2 flag against a fixed t+10 hold and
+reads no monitor row after the first flag, so it cannot return a verdict on whether a three-state
+display is ordered; the two share calendar bars t+6..t+10 on the flagged subset and neither may be
+quoted as support for the other. **PI-014's flag-off constraint is unaffected**: with no Q038 decision
+date the binding date is Q019's **2027-05-24**, which is already what PI-014 names. **No rule-14
+exception was requested and none is needed** (DP-05 untouched, DP-41 not engaged). Under this file's
+preamble **nothing here may be reported, briefed or quoted**.

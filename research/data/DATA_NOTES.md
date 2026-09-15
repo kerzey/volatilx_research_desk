@@ -345,9 +345,8 @@ start a second freeze at the same `--version`, and pipe freeze output to a file 
 ## External source: Financial Modeling Prep (Haci, 2026-09-15)
 
 Haci granted the desk his FMP subscription key on 2026-09-15 (`FMP_API_KEY` in `.env.research`, loaded only
-through `research/lib/desk_env.py`, never printed). **Rule 1 names the desk's credentials and CLAUDE.md is a
-guarded file the desk cannot edit; until Haci adds `FMP_API_KEY` to rule 1's list, agents treat it as
-granted-but-unlisted and use it for Steward feasibility checks only, not for a freeze a PREREG cites.** Docs: https://site.financialmodelingprep.com/developer/docs.
+through `research/lib/desk_env.py`, never printed). Haci added `FMP_API_KEY` to CLAUDE.md rule 1 the same
+day (his edit; CLAUDE.md is a guarded file the desk does not write), so it is a named desk credential. Docs: https://site.financialmodelingprep.com/developer/docs.
 It is **read-only reference and fundamental data**, and it is also what the platform's own enrichment path
 already calls (`ai_agents/fmp_client.py`), so it changes nothing about rule 1's read-only stance.
 
@@ -368,3 +367,45 @@ What it is for, and the rules that travel with it:
   metadata for the earnings engine. Anything else is out of scope until a hypothesis names it.
 - **Not for:** live checks during a study, price data (Alpaca remains the price source), or anything a
   subscriber-facing claim would cite before it is frozen and prospective.
+
+## `conviction_monitor_daily` has no rows for 2026-07-06 (steward, Q038 R1, 2026-09-15)
+
+Answering Q038 R1 (`research/questions/Q038_monitor_tier_calibration/DECISIONS.md`, "Routed
+requests -- data-steward", and `research/reports/STEWARD_Q038_exposure.md` item (3)). Counts
+only, no live query: the source is the frozen `conviction_monitor` parquet named by
+`manifest_v001.json`.
+
+**What was measured.** Row count of `conviction_monitor_daily` by `trading_date`, every
+in-window session 2026-06-01..2026-08-19 (the matured cohort). Every session but one carries
+**31 to 56 rows**. **2026-07-06 carries exactly 0.** This is a complete one-day outage of the
+monitor job, system-wide -- not a partial degradation and not holiday shortening: a genuine
+market holiday (2026-06-19 Juneteenth, 2026-07-03 Independence Day observed, 2026-09-07 Labor
+Day) still receives roughly 40-44 off-calendar rows dated on the holiday from the monitor's
+Monday-through-Friday cron running regardless of the market being open; 2026-07-06 was a normal
+NYSE trading session and received zero rows of any kind.
+
+**Downstream effect measured.** Pick nights 2026-06-29, 2026-06-30 and 2026-07-01 each have
+session t+3 or t+4 landing on 2026-07-06, dropping their in-scope monitor row count to 3 --
+one short of the 4-row eligibility floor Q038's (and Q019's) funnel requires. All 24 published
+picks across these three nights fail the eligibility rule on this account alone. Filed as a new,
+add-only block in `research/data/exclusions_v004.json` (`monitor_coverage_outage`,
+`trading_dates`: 2026-06-29, 2026-06-30, 2026-07-01), successor to `exclusions_v003.json` per
+DP-22 -- v003 carries over unchanged; nothing in it is edited.
+
+**Q019 must treat the same three nights the same way.** `research/questions/Q019_conviction_monitor_exit`
+reads the identical `conviction_monitor_daily` table over the same window. Its `eval.py` must
+read `exclusions_v004.json`'s `monitor_coverage_outage` block (never hard-code the three dates)
+and exclude the same 2026-06-29 / 2026-06-30 / 2026-07-01 pick nights from any monitor-row-dependent
+funnel step, in addition to -- not instead of -- `exclusions_v003.json`'s existing
+`manual_runs` treatment of 2026-07-06 itself as an excluded SAS pick night (an unrelated,
+independent reason: that block excludes 2026-07-06 as a candidate-publication re-run night, not
+because of the monitor outage on that date).
+
+**Not caught by the platform's coverage watchdog.** A complete one-day, system-wide zero-row
+outage on a normal trading session should be exactly the kind of gap a coverage watchdog exists
+to catch, and it was not flagged. No existing entry in `research/PLATFORM_ISSUES.md` covers this
+defect as of 2026-09-15 (the register's highest filed id is PI-021, already assigned to an
+unrelated defect -- platform pytest fixtures deleting all users -- so this is **not** the same
+issue and should not be cited under that id). The coordinator is filing this as a new
+`PLATFORM_ISSUES.md` entry (expected next free id **PI-022**); reference the entry the
+coordinator actually files, not PI-021, when this note is next revised.

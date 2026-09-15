@@ -1,6 +1,6 @@
 {
   "id": "Q038",
-  "state": "PREREG_DRAFT",
+  "state": "DEFERRED",
   "history": [
     {
       "state": "IDEA",
@@ -12,6 +12,12 @@
       "at": "2026-09-15T14:20:02.572805+00:00",
       "by": "registrar",
       "note": ""
+    },
+    {
+      "state": "DEFERRED",
+      "at": "2026-09-15T15:19:19.520197+00:00",
+      "by": "desk",
+      "note": "DECISIONS.md record 2026-09-15: B3 two-way gate (decision 3, DEFAULTED R-5) projects 20.0 B3 contributing nights only at 2027-07-26 on 4/53 measured, CI lower bound past the 2027-09-15 ceiling; primary rate 0.3585 passed. Re-entry: route 1 data trigger or route 2 Haci overturns decision 3 (see DEFERRED.md Q038)"
     }
   ]
 }

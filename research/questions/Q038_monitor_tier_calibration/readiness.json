@@ -1,0 +1,33 @@
+{
+  "as_of": "2026-09-15",
+  "sources": [
+    "research/data/manifest_v001.json",
+    "research/data/manifest_prices_v001.json",
+    "research/data/manifest_prices_universe_v001.json",
+    "research/data/exclusions_v003.json"
+  ],
+  "count_definition": "Matured cohort only (53 eligible sessions, 2026-06-01..2026-08-19, t+15 boundary confirmed against manifest_prices_v001's last date 2026-09-10). A contributing night carries >=1 gradeable, control-matched (>=3 B2 controls) pick in G_A and >=1 in G_C (PREREG section 2.6). A three-group night carries >=1 matched pick in each of G_A, G_B, G_C (section 2.6). A B3 night carries >=1 1:1 same-night same-direction dam5-matched (0.25 ATR caliper) G_C-to-G_A pair (section 3 B2/B3, clause 7 as amended by DECISIONS item 3). Counts only; no outcome of any kind computed. See research/reports/STEWARD_Q038_exposure.md for full derivation.",
+  "endpoints": [
+    {"endpoint": "P1_adverse_race", "eligible_nights": 53,
+     "contributing_nights": 19, "required_nights": 80,
+     "post_lock_contributing_nights": 0, "required_post_lock_nights": 30},
+    {"endpoint": "P2_favourable_reach", "eligible_nights": 53,
+     "contributing_nights": 19, "required_nights": 80,
+     "post_lock_contributing_nights": 0, "required_post_lock_nights": 30},
+    {"endpoint": "monotonicity_gate_three_group_nights (section 8 clause 6)", "eligible_nights": 53,
+     "contributing_nights": 18, "required_nights": 20,
+     "post_lock_contributing_nights": 0, "required_post_lock_nights": 0},
+    {"endpoint": "B3_S2_two_way_gate (section 8 clause 7, DECISIONS item 3, DEFAULTED R-5)", "eligible_nights": 53,
+     "contributing_nights": 4, "required_nights": 20,
+     "post_lock_contributing_nights": 0, "required_post_lock_nights": 0}
+  ],
+  "notes": [
+    "Primary contributing-night rate: 19/53 = 0.3585 per eligible session, 95pct Wilson CI 0.243-0.493. Falls in DP-43's 0.29-0.55 band: dates push out, do not lock as drafted, do not DEFER on this number alone.",
+    "B3 rate: 4/53 = 0.0755 per eligible session, 95pct Wilson CI 0.030-0.179 (n=4 successes, wide). At the primary-rate-implied decision date (~2027-05-24) B3 projects to ~16.9, below its 20-night floor. B3's own central rate reaches 20 at decision ~2027-07-26 (still within the 2027-09-15 ceiling); B3's CI lower bound would make 20 unreachable within the ceiling, which is DECISIONS item 8's DEFER condition. Not resolved here; routed to the coordinator.",
+    "Score band 90+ projects well past 20 nights (rate 0.189/session on the matched sample) and should NOT be suppressed at lock, unlike Q019's precedent.",
+    "Score band <80 and bearish direction both stay suppressed at every projected schedule (rate ~0.019/session each).",
+    "24 of 424 matured published picks (5.7pct) fail the >=4-row eligibility rule, concentrated on 2026-06-29/06-30/07-01, traced to a complete conviction_monitor outage on 2026-07-06 (0 rows that day, system-wide) compounding the adjacent 2026-07-03 holiday. This is a new finding distinct from ordinary holiday-shortening and is not in exclusions_v003.json.",
+    "Day-5 overall_tier vs age_adjusted_severity bijection measured at 100pct (417/417 rows, 0 exceptions).",
+    "No tier-logic ship or polarity-restoration commit found in the platform repo inside or after the window (git log, item 9); window-start rule does not fire."
+  ]
+}

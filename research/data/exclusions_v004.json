@@ -1,0 +1,72 @@
+{
+  "version": "004",
+  "supersedes": "research/data/exclusions_v003.json",
+  "manifest": "research/data/manifest_v001.json",
+  "declared_by": "data-steward",
+  "declared_on": "2026-09-15",
+  "issued_under": "research/questions/Q038_monitor_tier_calibration/DECISIONS.md (Routed requests -- data-steward, asks 1 and 2) + research/reports/STEWARD_Q038_exposure.md item 3",
+  "header_note": "Successor to exclusions_v003.json. Everything in v003 carries over unchanged: manual_runs (trading_dates and late_but_clean), non_session_runs, uncorroborated_publication_runs, night_counts_after_exclusions, catalyst_layer_regime_change, regime_label_point_in_time_from, sas_candidates_availability_note_correction. Adds one new block, monitor_coverage_outage, covering a distinct failure mode from every existing block: those exclude sas_candidates/sas_runs pick nights from the SAS population; this one flags pick nights whose downstream conviction_monitor_daily grading window is incomplete because of a one-day system-wide outage in a table the pick night does not itself touch. Does not change night_counts_after_exclusions (that block counts the sas_candidates/sas_runs population; this block is scoped to conviction_monitor-dependent studies -- Q019, Q038 -- and their eligibility-rule row-count accounting, not to which nights are published). Never overwrites v003. Affected questions: Q038 (DEFERRED per DECISIONS.md 2026-09-15 record pass -- this file is the record of R1's row-count finding, not a lock input); Q019 (reads the same conviction_monitor_daily table; its eval.py must treat 2026-06-29, 2026-06-30 and 2026-07-01 as monitor-coverage-degraded pick nights per this block, distinct from and in addition to exclusions_v003.json's manual_runs/non_session_runs/uncorroborated_publication_runs treatment of 2026-07-06 itself as a SAS pick night).",
+  "manual_runs": {
+    "reason": "manual re-runs during development, finished one or more days after the trading date's next-session open; spot_close mixed-date; not actionable at publication. The 4 nights added in v002 (2026-04-02, 04-24, 05-15, 07-02) show the same signature at smaller gaps (19-51h vs 24-115h for the original 5): sas_candidates rows carry a creation timestamp and config hash from a re-run 19-51h after the 16:05 ET decision (run start/finish reset, run creation timestamp unchanged); the 16:05 candidate set is not recoverable (no run-history table). Confirmed by the Data Steward 2026-09-11 (research/reports/KT_AUDIT_manifest_v001_rerun_nights.md), corroborating Q005 red-team finding A1.",
+    "criterion": "super_agent_select_runs.finished_at later than the next trading session's open (original 5) OR sas_candidates row creation/config-hash shows a re-run 19h+ after the 16:05 ET decision with the original 16:05 output unrecoverable (KT-audit 4, folded into the same criterion since both make the frozen candidate row not the 16:05 decision's).",
+    "trading_dates": [
+      "2026-04-02",
+      "2026-04-24",
+      "2026-05-11",
+      "2026-05-12",
+      "2026-05-13",
+      "2026-05-14",
+      "2026-05-15",
+      "2026-07-02",
+      "2026-07-06"
+    ],
+    "late_but_clean": [
+      "2026-04-01",
+      "2026-04-03",
+      "2026-04-06",
+      "2026-05-01"
+    ]
+  },
+  "non_session_runs": {
+    "reason": "run recorded on a day the NYSE was closed (no SPY bar); 0 picks published; found by the registrar in R1",
+    "trading_dates": [
+      "2026-04-03"
+    ]
+  },
+  "uncorroborated_publication_runs": {
+    "reason": "the frozen sas_candidates table for this trading_date holds more qualified, ranked rows than the night's own contemporaneous run audit (sas_runs.stats_json) recorded as selected -- specifically, 3 additional bearish rows (DPZ, COIN, AAPL; ranks 1-3, duplicating the bullish top-3) with fully-formed public_payload_json (complete lane_plans across all three lanes, including the swing-lane stop and L3 target) that stats_json.qualified_count (8) and stats_json.direction_counts (0 bearish) do not corroborate. All 52 rows for the night share one created_at (2026-06-26 21:17:31.403724 UTC) -- a single-batch write, not a re-run -- so the manual_runs criterion (a timestamp-reset re-run) does not apply; this is a distinct failure mode: the publication predicate (qualified IS TRUE AND selected_rank IS NOT NULL) cannot be trusted for this single night because it is unclear which rows the 16:05 ET decision actually published. Checked against all 113 nights in the frozen history: 2026-06-26 is the only night where the frozen qualified-row count disagrees with the run's own stats_json.qualified_count. The mutation cannot be dated more precisely than \"after the 2026-06-26 16:05 ET run, before the 2026-09-10 freeze\" -- the frozen table carries no per-column timestamp. Whole night excluded (all 11 qualified/selected_rank rows), not only the 3 uncorroborated ones -- the 8 corroborated bullish rows have not themselves been shown clean of the same write path, and the desk's night-level exclusion precedent (manual_runs, non_session_runs) is followed rather than a row-level carve-out. Ruled by the Data Steward 2026-09-13 (research/reports/STEWARD_Q009_exposure.md section R3 ruling 1), per the red team's original 2026-06-26 flag.",
+    "criterion": "frozen sas_candidates qualified-row count for the trading_date disagrees with that night's own sas_runs.stats_json.qualified_count, with no timestamp-reset (re-run) signature present -- i.e. a single-batch write whose row set does not match its own contemporaneous run audit. New and distinct from the manual_runs criterion (partial row mutation after a clean single-batch write, not a re-run); filed as a separate block rather than added to manual_runs.",
+    "trading_dates": [
+      "2026-06-26"
+    ]
+  },
+  "monitor_coverage_outage": {
+    "reason": "conviction_monitor_daily carries zero rows system-wide for trading_date 2026-07-06 -- a complete one-day outage of the monitor job, distinct from and additional to ordinary holiday shortening (a market-closed weekday still receives ~40-44 off-calendar rows from the monitor's Mon-Fri cron; 2026-07-06 was a normal trading session and received none). Found by the Data Steward answering Q038 R1 (research/reports/STEWARD_Q038_exposure.md item (3)): row count by trading_date in-window shows every other session carrying 31 to 56 conviction_monitor_daily rows, and 2026-07-06 carrying exactly 0. Pick nights 2026-06-29, 2026-06-30 and 2026-07-01 each have session t+3 or t+4 landing on 2026-07-06, which drops their in-scope monitor row count to 3 (one short of the 4-row eligibility floor Q019/Q038's funnel requires); all 24 published picks across these three nights fail the eligibility rule on this account alone. This is a monitor-table coverage gap, not a sas_candidates/sas_runs publication defect -- the three pick nights themselves published normally and are not excluded from exclusions_v003.json's blocks (2026-07-06 appears there only as a manual_runs SAS re-run night in its own right, an unrelated reason).",
+    "criterion": "pick nights whose session t+3 or t+4 falls on 2026-07-06, the date conviction_monitor_daily carried zero rows system-wide while every other in-window session carried 31-56 rows.",
+    "trading_dates": [
+      "2026-06-29",
+      "2026-06-30",
+      "2026-07-01"
+    ],
+    "source": "research/reports/STEWARD_Q038_exposure.md item (3)",
+    "evidence": {
+      "outage_date": "2026-07-06",
+      "outage_date_row_count": 0,
+      "in_window_other_sessions_row_count_range": "31-56",
+      "affected_picks": 24,
+      "affected_pick_nights": 3
+    }
+  },
+  "night_counts_after_exclusions": {
+    "all": 102,
+    "in_sample_to_2026-05-29": 34,
+    "sealed_from_2026-06-01": 68,
+    "note": "derive in eval.py from sas_runs minus manual_runs.trading_dates minus non_session_runs.trading_dates minus uncorroborated_publication_runs.trading_dates; do not hard-code. Unchanged from v003 -- monitor_coverage_outage does not remove nights from the sas_candidates/sas_runs population; it flags a downstream conviction_monitor_daily coverage gap for monitor-dependent studies (Q019, Q038) to apply separately in their own eligibility accounting. Re-derived by the Data Steward 2026-09-13 from v001_sas_runs.parquet (113 total nights) against exclusions_v003.json: v002 gave 103 (all)/34 (in-sample)/69 (sealed); v003 excludes one further night, 2026-06-26 (sealed period), giving 102 (all)/34 (in-sample)/68 (sealed)."
+  },
+  "catalyst_layer_regime_change": {
+    "reason": "earnings date resolver wrong before this date; platform commit 69ef05f",
+    "fixed_from": "2026-06-01"
+  },
+  "regime_label_point_in_time_from": "2026-06-09",
+  "sas_candidates_availability_note_correction": "The freeze config's (research/lib/freeze_config.json) and manifest_v001's availability.sas_candidates note currently reads: \"written live at decision time; point-in-time by construction. Verified: sampled created_at/updated_at cluster same trading_date evening.\" This is amended (declarative correction here; the freeze config/manifest files themselves are not edited, per protocol -- never overwrite an existing manifest) to read: \"written live at decision time for the large majority of nights; point-in-time by construction EXCEPT on the 4 known re-run nights (2026-04-02, 04-24, 05-15, 07-02), where the frozen row is a re-run's output 19-51h after the 16:05 ET decision, not the decision itself, AND on 2026-06-26, where the frozen row set (11 qualified rows) does not match the night's own 16:05 ET run audit (8 qualified rows) despite a single uniform created_at with no re-run signature -- a distinct failure mode, partial row mutation rather than a re-run. super_agent_select_runs is updated in place (no append-only run-history/audit table), so neither a re-run night's original 16:05 candidate set nor 2026-06-26's true 16:05 published set is recoverable from anything the desk can query -- only excluded. See research/reports/KT_AUDIT_manifest_v001_rerun_nights.md section 6 for the re-run validator-gap analysis and research/reports/STEWARD_Q009_exposure.md section R3 ruling 1 for the 2026-06-26 finding."
+}
