@@ -19,7 +19,7 @@ platform repo.
 
 ## Non-negotiables
 
-1. **Production is read-only.** Use `$RESEARCH_DB_URL` (read-only role) , `RESEARCH_SAS_TOKEN`,`ALPACA_SECRET_KEY`, `ALPACA_API_KEY`,`OPENAI_API_KEY` and
+1. **Production is read-only.** Use `$RESEARCH_DB_URL` (read-only role), `FMP_API_KEY`, `RESEARCH_SAS_TOKEN`,`ALPACA_SECRET_KEY`, `ALPACA_API_KEY`,`OPENAI_API_KEY` and
    `$PROD_SAS_TOKEN` (read/list only). Never look for, request, or use any other credential.
 2. **Write only under `research/`, `docs/`, `playbook/`.** The platform codebase is never edited
    from here; the Brief Writer produces a prompt, Haci executes it in the platform repo.
