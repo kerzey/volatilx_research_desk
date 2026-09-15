@@ -1,6 +1,6 @@
 # Research desk — board
 
-_Generated 2026-09-14 by `research/lib/board.py`. Do not edit; edit the source files and re-run. Ask the desk for anything on this page in plain words, or use the commands shown._
+_Generated 2026-09-15 by `research/lib/board.py`. Do not edit; edit the source files and re-run. Ask the desk for anything on this page in plain words, or use the commands shown._
 
 ## Evidence available now
 
@@ -18,15 +18,7 @@ _Generated 2026-09-14 by `research/lib/board.py`. Do not edit; edit the source f
 
 ## Desk work available before final verdicts
 
-| item | owner | next action |
-|---|---|---|
-| OPS-EN002-REVERIFY | data-steward | Write a new verification receipt against the corrected denominator specification and implemented SHA; no deployment or flag change. |
-| SCHEDULE-SUCCESSORS | registrar | Use DP-53 for unlocked Q030/Q032 drafts; scope separately registered earlier successors to affected locked studies, with shared-data and family obligations. Never move a locked date automatically. |
-| READINESS-Q006 | data-steward | Refresh Q006 readiness.json from frozen counts only, with every registered endpoint and source date. If the required snapshot does not exist, record the data dependency; do not substitute effects, invent counts or open the study's outcomes. |
-| READINESS-Q024 | data-steward | Refresh Q024 readiness.json from frozen counts only, with every registered endpoint and source date. If the required snapshot does not exist, record the data dependency; do not substitute effects, invent counts or open the study's outcomes. |
-| READINESS-Q027 | data-steward | Refresh Q027 readiness.json from frozen counts only, with every registered endpoint and source date. If the required snapshot does not exist, record the data dependency; do not substitute effects, invent counts or open the study's outcomes. |
-| READINESS-Q029 | data-steward | Refresh Q029 readiness.json from frozen counts only, with every registered endpoint and source date. If the required snapshot does not exist, record the data dependency; do not substitute effects, invent counts or open the study's outcomes. |
-| READINESS-Q034 | data-steward | Refresh Q034 readiness.json from frozen counts only, with every registered endpoint and source date. If the required snapshot does not exist, record the data dependency; do not substitute effects, invent counts or open the study's outcomes. |
+_none yet_
 
 ## What each question is waiting for
 
@@ -37,7 +29,7 @@ A missing counts snapshot is shown as unmeasured, not assumed to be a maturation
 | Q002 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
 | Q003 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
 | Q004 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
-| Q006 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
+| Q006 | WAITING_FOR_MATURATION_OR_COVERAGE | Eligible nights exist; maturity/gradeability short as of 2026-09-14 |
 | Q007 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
 | Q008 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
 | Q009 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
@@ -55,23 +47,28 @@ A missing counts snapshot is shown as unmeasured, not assumed to be a maturation
 | Q021 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
 | Q022 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
 | Q023 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
-| Q024 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
+| Q024 | WAITING_FOR_SAMPLE | Endpoint eligibility floor short as of 2026-09-14 |
 | Q025 | DEFERRED | See the question's measured re-entry trigger |
 | Q026 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
-| Q027 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
+| Q027 | WAITING_FOR_SAMPLE | Endpoint eligibility floor short as of 2026-09-14 |
 | Q028 | SCHEDULED_DIAGNOSTIC | Outcome-free audit; run on its registered date |
-| Q029 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
+| Q029 | WAITING_FOR_SAMPLE | Endpoint eligibility floor short as of 2026-09-14 |
 | Q030 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
 | Q031 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
 | Q032 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
 | Q033 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
-| Q034 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
+| Q034 | WAITING_FOR_SAMPLE | Endpoint eligibility floor short as of 2026-09-14 |
 | Q035 | DEFERRED | See the question's measured re-entry trigger |
-| Q036 | DEFERRED | See the question's measured re-entry trigger |
+| Q036 | READY_TO_RESUME | Measured deferral trigger cleared; finish registration |
+| Q037 | REGISTRATION | Resolve the draft under current decision policy |
+| Q038 | DEFERRED | See the question's measured re-entry trigger |
 
 ## 1. Waiting on you
 
-- nothing. The desk has no item that only you can move.
+- **PI-020** — run the brief in the platform repo, then tell the desk the SHA  
+  `/desk-run verify PI-020 <sha>`
+- **EN-002** — run the brief in the platform repo, then tell the desk the SHA  
+  `/desk-run verify EN-002 <sha>`
 
 **Ready when you ask** (you already decided these; the desk writes the prompt on request):
 
@@ -129,6 +126,7 @@ _none yet — every question so far is NULL, INCONCLUSIVE, or still waiting for 
 | Q021 | Q021 — GEX pin risk and two-sided paths (does a pinned pick round-trip more often?) | DATASET_PINNED | 2027-08-09 (exposure check; hard stop 2027-09-20) |
 | Q034 | of the nine ways the desk can measure a pick, which one does VolatilX actually predict best? | PREREG_LOCKED | 2027-08-09 (exposure check; hard stop 2027-09-20) |
 | Q015 | do picks scoring 85–90 reach the swing target and then hand it back more often than picks scoring 80–85, and does exitin | DATASET_PINNED | 2027-08-30 |
+| Q037 | Q037 — Does the report's own GEX warning predict a weaker path? | PREREG_DRAFT | — |
 
 ## 4. Platform issues
 
@@ -155,6 +153,9 @@ _Source: `research/PLATFORM_ISSUES.md`. Statuses: OPEN → HACI_DECIDED:fix/rese
 | PI-017 | OPEN | A forced UOA re-run deletes the **whole trading date** from `uoa_contract_daily`, `uoa_symbol_daily` and `uoa_bulletins`, then rebuilds only |
 | PI-018 | OPEN | Multi-agent technical report: the per-timeframe BUY/SELL call is not a faithful read of the technicals. A ≥ 70-strength signal with "medium" |
 | PI-019 | OPEN | Multi-agent technical reports: the zone-less `timestamp` switched from **UTC** (to 2026-04-05) to **US Eastern** (from 2026-04-07; both on 0 |
+| PI-020 | BRIEF_WRITTEN | **UOA scanner truncates option trades: the flow layer is blind to puts on the most liquid names.** `AlpacaOptionsClient.get_option_trades` ( |
+| PI-021 | OPEN | **Running the platform test suite deletes every user.** `conftest.py:37-55` (platform `c311e81`) has an autouse fixture that deletes all row |
+| PI-022 | OPEN | **Conviction Monitor wrote nothing on 2026-07-06** — `conviction_monitor_daily` has 0 rows for that session while every other in-window sess |
 
 ## 5. Enhancements to build in the platform
 
@@ -253,11 +254,14 @@ _Each was a question the desk would once have asked you. It took the recommended
 - **Q035** #4 The uniform target level — chose **2.0 × the row's own ATR14 decides, 1.0 and 3.0 printed and
 - **Q035** #24 Window end, decision date and hard stop — chose **2026-09-15 .. 2027-03-31, decision Monday
 - **Q036** #8 Window end, decision date and hard stop — chose **2026-09-15 .. 2027-06-11, decision Monday
+- **Q037** #3 Thin "neither" arm — chose **DEFERRED if R1 measures below 0.27 contributing nights per eligible session, with the complement staying a printed secondary**; not taken: **switch the primary to D vs C∪M** — DP-43. Overturn = successor question.
+- **Q038** #3 B3 (`S2`), the within-published damage pairing — chose **two-way gate: CONFIRMED requires B3 to clear 20 contributing nights and beat 5.0 pp in the same sign; unevaluable or inside MPE ⇒ INCONCLUSIVE**; not taken: **one-way blocker (blocks only on the opposite sign)** — DP-45. Overturn = successor question.
 
 ## 8. Backlog and calendar
 
-- Open hypotheses: **10** · registered: 53 · deferred (data missing): H-014, H-021, H-022, H-041, H-055, H-062, H-067, H-078, H-080
-- Next to register (DP-47 order): H-086, H-087, H-088, H-089, H-090
+- Open hypotheses: **6** · registered: 61 · deferred (data missing): H-014, H-021, H-022, H-041, H-055, H-062, H-067, H-078, H-080, H-086, H-087, H-088, H-089, H-090, H-094
+- Next to register (DP-47 order): H-092, H-093, H-095, H-096, H-098
+- **Deferrals lifted, resuming at the front of the queue:** Q036 — the blocker was measured away, so each resumes at `@registrar apply` with its DECISIONS.md binding in full and its schedule re-derived from the actual lock date, out only (DP-43, DP-45)
 
 | decides on | Q |
 |---|---|
