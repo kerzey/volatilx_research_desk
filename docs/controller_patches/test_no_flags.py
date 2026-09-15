@@ -45,6 +45,13 @@ def apply(tmp: Path, *extra):
 
 def part1(tmp):
     print("\nPart 1 — applies cleanly, then is a no-op")
+    pending, problems, _ = P.plan(ROOT)
+    if not pending and not problems:
+        # The real repo is already patched, so the copies are too: there is nothing left to apply.
+        rc, out = apply(tmp)
+        check("real repo already patched; a run on the copies is a no-op",
+              rc == 0 and "already fully applied" in out, out)
+        return
     rc, out = apply(tmp, "--check")
     check("--check succeeds and changes nothing", rc == 0 and "would change" in out
           and (tmp / "CLAUDE.md").read_bytes() == (ROOT / "CLAUDE.md").read_bytes(), out)
