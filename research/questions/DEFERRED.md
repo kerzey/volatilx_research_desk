@@ -2527,6 +2527,14 @@ may be reported, briefed or quoted** until both triggers are met.
 ---
 
 > **2026-09-15 — blocker may be lifting, not lifted.** Haci granted the desk his Financial Modeling Prep key (`FMP_API_KEY`; rule 1 listing pending Haci's edit; `research/data/DATA_NOTES.md` "External source: FMP"). FMP's insider-trading search endpoints are named above as a candidate source. Before any TRIGGER MET line: the Steward verifies, read-only, that the history endpoint returns Form 4 rows with an acceptance / filing timestamp for the study window and the candidate universe, freezes them with a manifest, and records the availability rule; only then does the registrar reassess. Not resumed by this note.
+> **Steward result, same day** (`research/reports/STEWARD_FMP_insider_feasibility.md`): **partly.** FMP's
+> `insider-trading/search` returns the full Form 3/4/5 history per symbol (reporting-owner CIK, SEC transaction
+> codes including P-Purchase, date, shares, price; paginated at 1,000 rows, no server-side date filter) but
+> every row carries only calendar `transactionDate` and `filingDate` — **no acceptance date-time**, which is
+> the field the knowledge-time rule needs. Two routes remain: a conservative proxy (`filingDate` + 2 sessions,
+> descriptive-grade) or the true acceptance timestamp from the EDGAR index each row's `url` links to. The
+> five sampled symbols showed **0 P-Purchase rows** in 2026-04-01..09-14 — consistent with the entry's
+> exposure concern (condition 2), not a substitute for its probe. Trigger still not met.
 
 ## H-086 (F9) — "Do the multi-agent technical setups work, per timeframe?" — **no frozen dataset of the reports exists, no sub-hourly or crypto price freeze exists, and the historical corpus cannot supply the same-day distance-matched control the hypothesis names**
 
