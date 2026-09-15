@@ -59,12 +59,14 @@ A missing counts snapshot is shown as unmeasured, not assumed to be a maturation
 | Q033 | READINESS_UNMEASURED | Registered date known; no fresh counts-only readiness snapshot |
 | Q034 | WAITING_FOR_SAMPLE | Endpoint eligibility floor short as of 2026-09-14 |
 | Q035 | DEFERRED | See the question's measured re-entry trigger |
-| Q036 | READY_TO_RESUME | Measured deferral trigger cleared; finish registration |
+| Q036 | DEFERRED | See the question's measured re-entry trigger |
 | Q037 | REGISTRATION | Resolve the draft under current decision policy |
 | Q038 | DEFERRED | See the question's measured re-entry trigger |
 
 ## 1. Waiting on you
 
+- **PI-014** — run the brief in the platform repo, then tell the desk the SHA  
+  `/desk-run verify PI-014 <sha>`
 - **PI-020** — run the brief in the platform repo, then tell the desk the SHA  
   `/desk-run verify PI-020 <sha>`
 - **EN-002** — run the brief in the platform repo, then tell the desk the SHA  
@@ -147,7 +149,7 @@ _Source: `research/PLATFORM_ISSUES.md`. Statuses: OPEN → HACI_DECIDED:fix/rese
 | PI-011 | HACI_DECIDED:fix | Printed swing stop on the wrong side of the pick-night close for 67 of 382 published picks (17.5%) |
 | PI-012 | HACI_DECIDED:research | 2026-06-26: three qualified, ranked picks the night's own run audit does not record; no run-history table |
 | PI-013 | OPEN | `uoa_symbol_daily.score_swing` / `score_long` overwritten in place by the next-morning OI-confirmation pass; no point-in-time copy |
-| PI-014 | OPEN | Conviction Monitor's polarity arm silent since 2026-06-01: `polarity_unavailable_coverage_low` on 100% of in-scope rows, 0 polarity HOLD/EXI |
+| PI-014 | BRIEF_WRITTEN | Conviction Monitor's polarity arm silent since 2026-06-01: `polarity_unavailable_coverage_low` on 100% of in-scope rows, 0 polarity HOLD/EXI |
 | PI-015 | OPEN | Projection layer (v1.6 weight 29, the largest) unscored — `available: false` — on 72.2% of published and 74.3% of capped main-lane rows; `ov |
 | PI-016 | OPEN | Conviction label degenerate on the published slate: `completeness_score` never below 65.37 (min 65.3686 of 4,195 scored rows), so `_confiden |
 | PI-017 | OPEN | A forced UOA re-run deletes the **whole trading date** from `uoa_contract_daily`, `uoa_symbol_daily` and `uoa_bulletins`, then rebuilds only |
@@ -155,11 +157,12 @@ _Source: `research/PLATFORM_ISSUES.md`. Statuses: OPEN → HACI_DECIDED:fix/rese
 | PI-019 | OPEN | Multi-agent technical reports: the zone-less `timestamp` switched from **UTC** (to 2026-04-05) to **US Eastern** (from 2026-04-07; both on 0 |
 | PI-020 | BRIEF_WRITTEN | **UOA scanner truncates option trades: the flow layer is blind to puts on the most liquid names.** `AlpacaOptionsClient.get_option_trades` ( |
 | PI-021 | OPEN | **Running the platform test suite deletes every user.** `conftest.py:37-55` (platform `c311e81`) has an autouse fixture that deletes all row |
+| PI-023 | OPEN | **Option buy/sell side is judged against the closing quote, so the label follows the day's price drift.** `services/uoa_screener.py:1114-111 |
 | PI-022 | OPEN | **Conviction Monitor wrote nothing on 2026-07-06** — `conviction_monitor_daily` has 0 rows for that session while every other in-window sess |
 
 ## 5. Enhancements to build in the platform
 
-_Source: `research/ENHANCEMENTS.md`. `plumbing` items can be built now; `behaviour` items wait for their question's verdict (rule 10/11) unless built as a flag-off internal tool._
+_Source: `research/ENHANCEMENTS.md`. `plumbing` items can be built now; `behaviour` items wait for their question's verdict (rule 10) unless built as a Haci-only internal tool (DP-59: no flags)._
 
 | ID | status | build | enhancement |
 |---|---|---|---|
@@ -182,6 +185,7 @@ _Source: `research/ENHANCEMENTS.md`. `plumbing` items can be built now; `behavio
 | EN-017 | PROPOSED | — | Edge-decay monitor: a nightly job that appends, per pick night, the Spearman IC between `overall_score` and the path outcome across all 16:0 |
 | EN-018 | PROPOSED | — | Setup labels on the pick card (A flow-led / B projection-led continuation / C catalyst-driven, assigned deterministically from the 16:05 dom |
 | EN-019 | PROPOSED | — | **Make the multi-agent technical reports researchable going forward.** Run the internal batch analysis on a fixed, pre-declared universe eve |
+| EN-020 | READY | — | **Intraday UOA sampler: option buy/sell side from the quote at trade time (fixes PI-023).** A 10-minute WebJob on NYSE sessions (XNYS calend |
 
 ## 6. Trade ideas (yours; never subscriber-facing until prospective)
 
@@ -261,7 +265,6 @@ _Each was a question the desk would once have asked you. It took the recommended
 
 - Open hypotheses: **6** · registered: 61 · deferred (data missing): H-014, H-021, H-022, H-041, H-055, H-062, H-067, H-078, H-080, H-086, H-087, H-088, H-089, H-090, H-094
 - Next to register (DP-47 order): H-092, H-093, H-095, H-096, H-098
-- **Deferrals lifted, resuming at the front of the queue:** Q036 — the blocker was measured away, so each resumes at `@registrar apply` with its DECISIONS.md binding in full and its schedule re-derived from the actual lock date, out only (DP-43, DP-45)
 
 | decides on | Q |
 |---|---|
