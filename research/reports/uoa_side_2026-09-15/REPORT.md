@@ -349,6 +349,63 @@ W6. `DATA_NOTES.md` entry with ship SHA, first covered session, the feed in use 
    searched in the tab that is not in the universe is **added to the day's sticky set from that moment**; its
    earlier prints stay `unknown (not_sampled)` and the tab says so on the row.
 
+### 5.14 Brainstorm with Haci (2026-09-15, later): a wide net for orders outside the list — supersedes §5.13 item 3
+Haci's concern: a fixed list of ~100 names misses the stock outside it that prints a 20× volume day or a
+$20M order; and the nightly SAS and UOA must be fed from correctly labelled activity of the *same* day.
+
+**First, the timing fact.** The nightly pipeline computes UOA for day D at ~16:43 (step 3) and then SAS for D
+(step 4; SAS reads the same session's UOA row, `symbol_context_builder.py:482-483`). The sampler's last tick at
+close + 10 lands before that, so the picks of night D are scored on day-D labels. Nothing comes from the
+previous day.
+
+**Second, the probe (`wide_net_probe.py`).**
+- Alpaca has a **stock** screener — most-actives by volume or trade count (top ≤ 100) and movers — but **no
+  options most-actives** (404). FMP has stock most-actives (50) and a company screener; **neither has any
+  options-level activity feed.** So "most active options" must be computed by us from chain snapshots.
+- A chain snapshot already carries, per contract, `dailyBar {v, n, vw}` (today's volume, trade count and VWAP)
+  and `prevDailyBar` (yesterday's). **Premium so far today ≈ v × vw × 100 per contract, with no trade fetched.**
+  A $20M order shows up as a jump in `v × vw` between two sweeps. `openInterest` is absent (as the nightly
+  already knows; it uses the Trading API for OI).
+- Universe sizing from FMP's screener: US-listed names with market cap > $2B ≈ 3,500 (NASDAQ 2,466 + NYSE
+  1,022); > $10B ≈ 2,200. A mid-cap chain is one page, ~0.7 s.
+
+**Design: two tiers, both under OPRA / Algo Trader Plus (10,000 requests/min).**
+
+| Tier | Who | Cadence | What is fetched | Cost per sweep |
+|---|---|---|---|---|
+| **1 — labelled** | the nightly UOA universe (~500) ∪ last night's SAS candidates ∪ favourites ∪ SPY/QQQ/IWM ∪ **today's Tier-2 promotions** | 5 min | chain snapshot (quotes) + prints of contracts that traded, labelled by §5.4 | ~700–800 requests |
+| **2 — wide net, detection only** | every US-listed name ≥ $2B (FMP screener, refreshed weekly; ~3,500) plus the Alpaca stock most-actives top 100 and movers of the moment | 15 min | chain snapshot only (`dailyBar`, `prevDailyBar`, `latestQuote`); **no prints** | ~3,500–4,000 requests, 1–2 min with 8 workers |
+
+Tier 1 is *not* the place to save money: every symbol the nightly scores needs coverage or its `dir_ratio` is
+NULL (§5.5), and under Plus 800 requests every 5 minutes is 1.6% of the allowance. Keeping Tier 1 at 100 would
+cost coverage for nothing.
+
+**Tier-2 flags (per sweep; thresholds are settings, sizing not gates), computed from the snapshot alone:**
+- `contract_premium_today = v × vw × 100 ≥ $2M` (a single large order or a stack of them on one line);
+- `contract_volume_ratio = v / prevDailyBar.v ≥ 10` with `v ≥ 500` (the 20× day);
+- `symbol_premium_today ≥ 20 × symbol_premium_yesterday` with `symbol_premium_today ≥ $5M`;
+- `symbol_premium_today ≥ $20M` outright;
+- a between-sweep jump `Δ(v × vw) × 100 ≥ $5M` on one contract (the single big print, caught within 15 min).
+Every flag is written to `uoa_widenet_flags` (trading_date, sweep_ts, symbol, contract, rule, values) — the
+raw material for the "unusual" table and, later, for research on which flags mean anything.
+
+**Promotion.** A flagged symbol joins Tier 1 for the rest of the day at the next 5-minute tick: its prints from
+that moment are labelled; the prints *before* promotion are fetched once and labelled against Tier 2's own
+15-minute brackets, tagged `reason = widenet_bracket` (coarser, reported separately, counted as classified only
+if W4-style telemetry shows the 15-minute bias is small — the §2.2 table says a 10–30-minute-old quote carries
+ρ ≈ 0.0–0.13). The promoted symbol is also appended to that night's UOA universe (`_resolve_universe(explicit=…)`
+accepts a list, `uoa_screener.py:1043-1046`), so SNDK-type names outside the S&P 500 get a UOA row and SAS
+sees them the same night.
+
+**The live tab (§5.13 item 2) then has two sources:** the unusual-ratio rule over Tier 1, and the Tier-2 flags
+with their rule names — a name flagged by the wide net appears within 15 minutes of the order, whether or not
+anyone had it on a list.
+
+**What the wide net cannot do:** label sides for names it never promoted (by design: detection only), and see
+OI (no OI in snapshots; the volume-vs-OI "opening position" test stays a nightly/next-morning check via the OI
+confirm run). It also inherits the snapshot page bound; a > $2B name with more than 12,000 in-range contracts
+does not exist, so truncation is a Tier-1 (SPY/QQQ) matter only.
+
 ## 6. Seen in passing
 - `uoa_runs` has a `nightly` row dated **2026-12-09** in state `running` (started 10:03 ET) and one for the
   Labor Day holiday 2026-09-07 (22:30, never finished — the `_is_weekday` guard). Harmless to the data; noted
