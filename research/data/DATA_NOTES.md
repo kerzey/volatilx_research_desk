@@ -428,3 +428,36 @@ different features either side of this date: **Q014, Q019, Q029 and Q030 split h
 Ship date: **2026-09-15**. Repository checks (§4.1 a-f of the brief) and the schema-landed check
 passed the same day; W1-W3 (sampler ran, merge reconciles, early-vs-late placebo) are pending on
 the schedule in `research/reports/VERIFY_EN-020.md`.
+
+## UOA option trades paginated from D0 (PI-020, shipped 3f1d3e6, no flag — DP-59)
+
+From trading date D0, `uoa_contract_daily.trade_count / volume_traded / premium_total / premium_max /
+first_trade_ts / last_trade_ts / buy_premium / sell_premium / unknown_premium / top_trades_json`,
+`uoa_symbol_daily.call_premium_total / put_premium_total / total_premium / call_buy_premium / put_buy_premium /
+net_directional_premium / dir_ratio / prem_* / unusual_* / quality_* / conc_* / score_* / bias_* / label_* /
+why_json`, `uoa_bulletins.lists_json / markdown`, and every SAS flow input and output downstream
+(`flow_strength_score`, flow polarity and vote, `overall_score`, `selected_rank`) are built from every print, not
+from one 1,000-print page per 50 contracts. Nights before D0 stay capped and were not rewritten. A question
+spanning D0 treats these as two different features (DP-50(a)): Q014, Q019, Q029, Q030 and every prospective
+slate reader split there. Nights whose `stats_json` has no `trades_fetch` block are pre-fix.
+
+**D0 = 2026-09-15**, confirmed: the nightly of that date is the first whose `uoa_runs.stats_json` carries a
+`trades_fetch` block (started 21:03:43 UTC, finished 21:13:21 UTC, `status = success`); every nightly back to
+2026-09-01 has none. Ship SHA `3f1d3e6` ("PI-020: get_option_trades paginates in place, calls and puts apart
+(no flag)"), merged into `main` as PR #32 (`e513d44`), 2026-09-15.
+
+**Verified 2026-09-15 — OVERALL PASS, with W6 confirming ~2026-09-29** (`research/reports/VERIFY_PI-020.md`).
+History is unchanged to the row (SNDK 2026-09-08 still 60 contracts / 2,000 prints / 0 puts; capped and
+zero-put counts for 2026-01, -04, -07, -08 all reproduce the brief exactly), so **no historical row was
+rewritten** and the DP-50(a) split at 2026-09-15 is clean. On D0 all fifteen always-capped names carry put
+premium and none sits within 0.001 of `dir_ratio` 1.00; SNDK moved from `dir_ratio` 1.00 on 2,000 call-only
+prints to -0.0575 on 12,081 prints with 7,222 puts and $75.4M of put premium. Run telemetry: `page_limit`
+10000, 498 symbols, 1,068 requests, 0 ceiling hits, 0 failed requests, 104.4 s of trade fetch. The share of
+>= 1,000-print symbol-days with zero put premium is 0/78 on D0, against 3.6-19.8% in the preceding six
+sessions. Nightly runtime cost of this fix is about +40 s and SAS publication did not slip.
+
+**A caveat for anyone re-running the brief's checks:** `uoa_contract_daily.snapshot_volume` is NULL on every
+row, before and after D0. The brief's W3 query keys on `snapshot_volume > 0`, so it returns all zeros and
+reads like a pass while measuring nothing. The substitute used instead — zero-print contracts by side on
+symbol-days with >= 1,000 prints — is decisive: the put-side zero-print share falls 74.0% -> 17.5% while the
+call side falls 55.2% -> 14.3%, i.e. a 19-point side gap closing to 3 points.
