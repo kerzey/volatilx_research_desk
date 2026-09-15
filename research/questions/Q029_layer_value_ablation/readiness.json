@@ -1,0 +1,244 @@
+{
+  "as_of": "2026-09-14",
+  "sources": [
+    "research/questions/Q029_layer_value_ablation/PREREG.md (Sec 2 population/units, Sec 4.2-4.3 endpoints and m=16 register, Sec 5.1 floors, Sec 5.4 R2 successor freeze, Sec 5.5 window/schedule)",
+    "research/questions/Q029_layer_value_ablation/schedule.json",
+    "research/questions/Q029_layer_value_ablation/state.json (state: PREREG_LOCKED)",
+    "research/questions/Q029_layer_value_ablation/DECISIONS.md (## Schedule, 2026-09-14 record pass)",
+    "research/reports/STEWARD_Q029_feasibility.md (R1b, counts only -- fixes m=16 and the EVALUABLE/DEAD/UNEVALUABLE register; cited, not recomputed)",
+    "research/reports/STEWARD_Q027_exposure.md (R1(a), borrowed exposure rate 0.6761 contributing nights per elapsed session, Sec 5.2)",
+    "research/reports/SCHEDULE_AUDIT.md (Q029 inherits Q027 funnel; layer-specific gates listed separately here per its own note)"
+  ],
+  "count_definition": "PREREG Sec 2.6, in its own words. E1j/E2j: 'a Q027 Sec 2.5 contributing night (>=30 eligible rows, defined d*_t, matured, non-excluded) that additionally carries >=30 eligible rows with a non-null subscore_j and non-zero within-night variance in it; for E2j, additionally every one of the night's retained layers non-null on those rows.' E3j: 'a Q027 Sec 2.5 contributing night that additionally (i) passes Sec 2.4's Gate-0 night rule, (ii) has |S^prod_t| >= 1, and (iii) has >=10 distinct same-night candidates in that night's Sec 3 B4 distance-matched control pool ... for every pick in S^prod_t union S^abl_t,j. Ten is the number B4 actually draws ... A night failing (iii) is non-contributing and counted, never back-filled.' Maturity: 'Binding maturity: 20 sessions, uniform across every eligible row' (Sec 5.1). 'Every contributing night here is post-lock by construction' (Sec 5.1) since the window opens 2026-09-15, the session after the lock commit.",
+  "elapsed_sessions": 0,
+  "window": {
+    "start": "2026-09-15",
+    "end": "2027-03-05",
+    "elapsed_sessions_at_end": 119,
+    "extended_end_if_DP13_fires": "2027-04-19",
+    "extended_elapsed_sessions": 149,
+    "note": "Window adopted whole from Q027 (PREREG Sec 2.0, Sec 5.2, Sec 5.5). As of today (2026-09-14) the window has not opened, so elapsed_sessions = 0 and every endpoint's in-window counts are 0 by construction, not by measurement shortfall."
+  },
+  "decision_date": "2027-04-12",
+  "extension_date": "2027-05-24",
+  "hard_stop": "2027-05-24",
+  "m_fixed_at_record": 16,
+  "endpoints": [
+    {
+      "endpoint": "flow_strength_E1_marginal_IC",
+      "layer": "flow_strength",
+      "eligible_nights": 0,
+      "mature_nights": 0,
+      "contributing_nights": 0,
+      "required_nights": 80,
+      "post_lock_contributing_nights": 0,
+      "required_post_lock_nights": 30
+    },
+    {
+      "endpoint": "flow_strength_E2_partial_IC",
+      "layer": "flow_strength",
+      "eligible_nights": 0,
+      "mature_nights": 0,
+      "contributing_nights": 0,
+      "required_nights": 80,
+      "post_lock_contributing_nights": 0,
+      "required_post_lock_nights": 30
+    },
+    {
+      "endpoint": "flow_strength_E3_leave_one_out",
+      "layer": "flow_strength",
+      "eligible_nights": 0,
+      "mature_nights": 0,
+      "contributing_nights": 0,
+      "required_nights": 80,
+      "post_lock_contributing_nights": 0,
+      "required_post_lock_nights": 30,
+      "arm": "REMOVAL"
+    },
+    {
+      "endpoint": "technical_structure_E1_marginal_IC",
+      "layer": "technical_structure",
+      "eligible_nights": 0,
+      "mature_nights": 0,
+      "contributing_nights": 0,
+      "required_nights": 80,
+      "post_lock_contributing_nights": 0,
+      "required_post_lock_nights": 30
+    },
+    {
+      "endpoint": "technical_structure_E2_partial_IC",
+      "layer": "technical_structure",
+      "eligible_nights": 0,
+      "mature_nights": 0,
+      "contributing_nights": 0,
+      "required_nights": 80,
+      "post_lock_contributing_nights": 0,
+      "required_post_lock_nights": 30
+    },
+    {
+      "endpoint": "technical_structure_E3_leave_one_out",
+      "layer": "technical_structure",
+      "eligible_nights": 0,
+      "mature_nights": 0,
+      "contributing_nights": 0,
+      "required_nights": 80,
+      "post_lock_contributing_nights": 0,
+      "required_post_lock_nights": 30,
+      "arm": "REMOVAL"
+    },
+    {
+      "endpoint": "gex_alignment_E1_marginal_IC",
+      "layer": "gex_alignment",
+      "eligible_nights": 0,
+      "mature_nights": 0,
+      "contributing_nights": 0,
+      "required_nights": 80,
+      "post_lock_contributing_nights": 0,
+      "required_post_lock_nights": 30
+    },
+    {
+      "endpoint": "gex_alignment_E2_partial_IC",
+      "layer": "gex_alignment",
+      "eligible_nights": 0,
+      "mature_nights": 0,
+      "contributing_nights": 0,
+      "required_nights": 80,
+      "post_lock_contributing_nights": 0,
+      "required_post_lock_nights": 30
+    },
+    {
+      "endpoint": "gex_alignment_E3_leave_one_out",
+      "layer": "gex_alignment",
+      "eligible_nights": 0,
+      "mature_nights": 0,
+      "contributing_nights": 0,
+      "required_nights": 80,
+      "post_lock_contributing_nights": 0,
+      "required_post_lock_nights": 30,
+      "arm": "ADDITION",
+      "addition_weight": 12.0
+    },
+    {
+      "endpoint": "fundamental_quality_E1_marginal_IC",
+      "layer": "fundamental_quality",
+      "eligible_nights": 0,
+      "mature_nights": 0,
+      "contributing_nights": 0,
+      "required_nights": 80,
+      "post_lock_contributing_nights": 0,
+      "required_post_lock_nights": 30
+    },
+    {
+      "endpoint": "fundamental_quality_E2_partial_IC",
+      "layer": "fundamental_quality",
+      "eligible_nights": 0,
+      "mature_nights": 0,
+      "contributing_nights": 0,
+      "required_nights": 80,
+      "post_lock_contributing_nights": 0,
+      "required_post_lock_nights": 30
+    },
+    {
+      "endpoint": "fundamental_quality_E3_leave_one_out",
+      "layer": "fundamental_quality",
+      "eligible_nights": 0,
+      "mature_nights": 0,
+      "contributing_nights": 0,
+      "required_nights": 80,
+      "post_lock_contributing_nights": 0,
+      "required_post_lock_nights": 30,
+      "arm": "REMOVAL"
+    },
+    {
+      "endpoint": "catalyst_event_E1_marginal_IC",
+      "layer": "catalyst_event",
+      "eligible_nights": 0,
+      "mature_nights": 0,
+      "contributing_nights": 0,
+      "required_nights": 80,
+      "post_lock_contributing_nights": 0,
+      "required_post_lock_nights": 30
+    },
+    {
+      "endpoint": "catalyst_event_E2_partial_IC",
+      "layer": "catalyst_event",
+      "eligible_nights": 0,
+      "mature_nights": 0,
+      "contributing_nights": 0,
+      "required_nights": 80,
+      "post_lock_contributing_nights": 0,
+      "required_post_lock_nights": 30
+    },
+    {
+      "endpoint": "catalyst_event_E3_leave_one_out",
+      "layer": "catalyst_event",
+      "eligible_nights": 0,
+      "mature_nights": 0,
+      "contributing_nights": 0,
+      "required_nights": 80,
+      "post_lock_contributing_nights": 0,
+      "required_post_lock_nights": 30,
+      "arm": "REMOVAL"
+    },
+    {
+      "endpoint": "projection_E3_leave_one_out",
+      "layer": "projection",
+      "eligible_nights": 0,
+      "mature_nights": 0,
+      "contributing_nights": 0,
+      "required_nights": 80,
+      "post_lock_contributing_nights": 0,
+      "required_post_lock_nights": 30,
+      "arm": "REMOVAL"
+    }
+  ],
+  "data_dependency": {
+    "status": "No successor freeze exists yet. manifest_v001.json / manifest_prices_v001.json (as_of 2026-09-10) cover only the sealed R1b feasibility counts and the Gate-0 rehearsal -- 'not one night that carries a verdict here exists in it' (PREREG header, Sec 5.2).",
+    "required_manifests_per_PREREG_sec_5_4_R2": [
+      {
+        "manifest": "manifest_v00N (selections)",
+        "content": "sas_candidates -- every candidate row, published and unpublished, including score_details_json (weighted_dimensions, missing_data_json) and per-night sas_runs.config_json; market_regime_daily; add-only successor exclusions file (manual_runs, non_session_runs, uncorroborated_publication_runs, payload_disabled_runs -- 4 criteria, may only add nights)",
+        "coverage": "pick nights 2026-09-15..2027-03-05, >=60 prior sessions before 2026-09-15",
+        "built_when": "pinned at the decision date (pin_at_decision: true), delivered before Monday 2027-04-12 (PREREG Sec 5.4)"
+      },
+      {
+        "manifest": "manifest_prices_v00N (prices)",
+        "content": "daily bars for every candidate symbol on every in-window night, published or not, plus hourly bars for published symbols per DP-23",
+        "coverage": "forward through 2027-04-05 (t+20 of the last included pick night)",
+        "built_when": "same delivery date as the selections manifest, before Monday 2027-04-12 (PREREG Sec 5.4)"
+      },
+      {
+        "manifest": "second manifest_v00N / manifest_prices_v00N pair",
+        "content": "identical scope, extended",
+        "coverage": "pick nights through 2027-04-19, forward bars through 2027-05-17",
+        "built_when": "only if the single DP-13 extension fires, delivered before Monday 2027-05-24 (PREREG Sec 5.4)"
+      }
+    ],
+    "shared_with": "Q027_score_ranking_validity (one pair built and pinned for both questions, PREREG Sec 5.4)"
+  },
+  "sealed_reference": {
+    "label": "NOT IN THE DECIDING WINDOW -- provenance, Gate-0 rehearsal and feasibility counts only; no night here carries a verdict for Q029",
+    "report": "research/reports/STEWARD_Q029_feasibility.md",
+    "report_date": "2026-09-14",
+    "manifest": "research/data/manifest_v001.json (as_of 2026-09-10)",
+    "segment_measured": "2026-06-01..2026-09-10 (68 nights; decisive per Correction 3's engine-vintage scoping)",
+    "counts": {
+      "m_evaluable_layer_endpoint_pairs": 16,
+      "gate0_reconstruction_segment": "68/68 nights, every night >=99%",
+      "gate0_reconstruction_whole_freeze_2026_04_01_to_09_10": "84.77% (102 nights; not the decisive reading, printed for provenance only)",
+      "slate_replay_disagreement_segment": "0 of 68 nights above the 1% gate",
+      "borrowed_exposure_rate_from_Q027_R1a": "0.6761 contributing nights per elapsed session (48/71)",
+      "B4_control_pool_segment": "mean 51.8, median 54, min 39 (vs floor 10)",
+      "near_miss_pool_segment": "min 0 (3 of 68 nights), median 8, max 26"
+    }
+  },
+  "readiness_label": "unmeasured",
+  "notes": [
+    "In-window counts are 0 for every endpoint today: the window opens 2026-09-15 (tomorrow) and no successor freeze has been built or pinned. This is an absent snapshot, not a measured shortfall (research/LEARNING_POLICY.md: 'the board labels absent snapshots unmeasured').",
+    "m=16 and the EVALUABLE/DEAD/UNEVALUABLE register are fixed and closed at record (PREREG Sec 4.3, DECISIONS item 22) from STEWARD_Q029_feasibility.md's counts; they will not be revised when the successor freeze lands. smart_money_confirmation is DEAD on all three endpoints (0% coverage) and is not a registered primary. projection is UNEVALUABLE on E1/E2 (subscore <70% non-null every month measured) and carries only E3 (REMOVAL); its E1/E2 rows are intentionally absent from the 16 endpoints above.",
+    "Required floor per endpoint is 80 contributing nights (PREREG Sec 5.1, DP-21, rule 6); required post-lock is 30 (DP-24) -- non-binding by construction since every contributing night in this prospective-only window is post-lock.",
+    "Q029 adopts Q027's window, exposure rate and decision date whole (PREREG Sec 2.0, Sec 5.2, Sec 5.5); SCHEDULE_AUDIT.md's caution that Q029 inherits Q027's funnel and that layer-specific gates must still be checked separately is reflected here by listing all 16 layer/endpoint arms individually rather than pointing to Q027's funnel count alone.",
+    "No live query was run for any count in this file (rule 4 / DP-50(c)); no hit rate, touch rate, return, effect, p-value or comparison is recorded anywhere in this file; results/ was not opened.",
+    "This snapshot does not authorize an early run; the registered evaluation at the 2027-04-12 decision date (or the single DP-13 extension to 2027-05-24) independently checks all gates on eval.py's own measured counts."
+  ]
+}
