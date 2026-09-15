@@ -119,7 +119,12 @@ and a consensus. The decision layer is `day_trading_agent.py:668-917`.
 - **Unit of inference:** the analysis day, with the same symbol re-analysed on nearby days treated as
   one episode (DP-51). Horizons per timeframe are a trading-style choice (R-2) and are fixed at lock.
 
-- [ ] H-086 (F9) — **Do the setups work, per timeframe?** For each BUY (and, on synthetic levels, SELL)
+- [x] H-086 — **DEFERRED 2026-09-14** (no frozen dataset of the reports; no sub-hourly or crypto price
+  freeze, so 15m/30m/1h cannot be ordered on 1-hour bars; the corpus averages 2.07 distinct symbols per
+  active day so the same-day distance-matched control does not exist — `research/questions/DEFERRED.md`).
+  Re-entry needs EN-019's forward collection on a fixed universe with the trigger recorded, a pinned blob
+  + 15-minute price freeze, and a counts-only exposure probe. No question number consumed.
+  (F9) — **Do the setups work, per timeframe?** For each BUY (and, on synthetic levels, SELL)
   call: is the target touched before the stop, and how many bars or sessions after the analysis
   timestamp, at a registered horizon per timeframe (e.g. 15m/30m → same session, 1h → 2 sessions,
   4h → 5, 1d → 20, 1wk → 60, 1mo → descriptive only) — baseline: same-day HOLD reports on other symbols

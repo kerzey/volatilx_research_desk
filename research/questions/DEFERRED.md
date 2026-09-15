@@ -2523,3 +2523,194 @@ is code, manifests and FREEZE_v001 only. **F3's correction set is unchanged at Q
 source and `whale_watch_ledger` are all **options-flow** objects, and any successor question or
 brief must say so wherever the word "insider" appears. Under this file's preamble **nothing here
 may be reported, briefed or quoted** until both triggers are met.
+
+---
+
+## H-086 (F9) — "Do the multi-agent technical setups work, per timeframe?" — **no frozen dataset of the reports exists, no sub-hourly or crypto price freeze exists, and the historical corpus cannot supply the same-day distance-matched control the hypothesis names**
+
+**Deferred 2026-09-14 by the registrar, autonomous run (DP-40..48, DP-52..58), on this file's
+first admission ground: the objective cannot be measured with the artefacts the desk holds.** The
+blocker is **four separate missing artefacts plus one structural property of the corpus** — not
+accrual, not a grant, and only partly procurement. Not drafted: **no `QNNN` directory and no
+question number consumed; Q037 stays free.** Not merged (DP-29): no PREREG under
+`research/questions/` reads a multi-agent technical report — the only occurrence of
+`technical_snapshot` in a locked PREREG is Q004 §4's SAS excursion basis
+(volatilx `services/sas_excursion.py:336-354`), a different engine and a different object.
+
+Evidence: `research/reports/STEWARD_F9_blob_inventory.md` (counts and metadata only, 2026-09-14),
+`research/BACKLOG.md` F9 preamble, `research/PLATFORM_ISSUES.md` PI-018 / PI-019,
+`research/ENHANCEMENTS.md` EN-019, `research/data/manifest_prices_v001.json`,
+`research/data/manifest_prices_universe_v001.json`, `research/data/DATA_NOTES.md:315`.
+
+### What the question is, and why it is worth keeping
+
+Haci's INBOX line of 2026-09-14. The multi-agent technical engine
+(`day_trading_agent.py:668-917`) writes a per-symbol report with seven timeframes, each carrying a
+BUY / SELL / HOLD call, a strength, a confidence, a **stop** and a **target**. Entry is always the
+spot price at analysis time (`:718`, `:737`), so "did it reach entry" is vacuous — the testable
+thing is whether the **target is touched before the stop**, and how fast, at a horizon registered
+per timeframe. That is the single most direct question anyone can ask of this engine, it is graded
+exactly the way a subscriber would trade it (rule 5), and both signs are useful: if the short
+timeframes do not work, the platform should stop printing them as setups. It is kept, not killed.
+
+### Why it cannot be registered — five things, each named
+
+**(1) There is no frozen dataset of the reports, and rule 4 requires one.** The reports live in
+Azure blob containers (`ai-reports-YYYY-MM-DD`, volatilx `azure_storage.py:132-163`, `:523-639`)
+read through `PROD_SAS_TOKEN`. `freeze_config` covers no blob store; no manifest in
+`research/data/` lists a blob artefact of any kind. The Steward's inventory was taken **live** and
+its scan artefacts stayed in session scratch — by design, nothing but aggregate counts entered the
+desk. So there is nothing for a PREREG to pin, and any number it cited would be a live read, which
+DP-50(c) forbids for exactly the reason the reports are append-only-but-unpinned: a container
+lifecycle policy is a management-plane setting the desk's data-plane token cannot see (inventory
+§9), so future expiry can be neither confirmed nor ruled out.
+
+**(2) The desk's finest frozen bar is one hour, and the short-timeframe endpoints need finer.**
+H-086's horizons are per timeframe (15m/30m → same session, 1h → 2 sessions, 4h → 5, 1d → 20,
+1wk → 60). Grading "target before stop" requires bars fine enough to **order** the two touches.
+The desk holds `prices_hourly_raw` (`manifest_prices_v001`,
+`timeframe=1Hour adjustment=raw feed=sip`, 227 symbols, 2026-01-31..2026-09-10) and daily bars;
+`manifest_prices_universe_v001` is **daily only** (DATA_NOTES:315, "No hourly bars"). For a 15m or
+30m setup both levels ordinarily sit **inside a single hourly bar** — the F9 preamble's own sample
+has a 15m target 0.38% away with risk/reward 0.82 — so DP-27's tie rule (a same-session stop and
+target the bars cannot order counts **stop-first**, the outcome less favourable to the hypothesis)
+would decide most of the short-timeframe population **by convention rather than by measurement**.
+That is not a thin sample that waiting fixes; it is an endpoint the available data cannot express.
+
+**(3) The symbol universe is the wrong one, and part of it has no bars at all.** Every frozen price
+artefact the desk holds is `https://data.alpaca.markets/v2/**stocks**/bars` over SAS candidate and
+pick symbols (227 hourly / 436 daily / 2,405 universe daily). F9's corpus is **72 distinct symbols**
+chosen by an operator's watchlist and by subscriber requests; the overlap with the frozen sets is
+unmeasured, and **5 of the 72 are crypto** (ADA/USD, BTC/USD, BTC/USDC, BTC/USDT, ETH/USD — 14 of
+697 reports). The F9 preamble registers crypto as its own split with its own horizons because it
+trades 24/7 and has no session close; **that split currently has no data source in any manifest.**
+
+**(4) The historical corpus cannot supply H-086's own baseline.** The hypothesis names it
+explicitly: "same-day HOLD reports on **other symbols** with synthetic stop and target at the
+identical ATR distances". Counts only, from the inventory: **697 reports over 120 active days and
+248 distinct symbol-days** — a mean of **2.07 distinct symbols per active day** (and 2.81 reports
+per symbol-day, i.e. the same name re-run inside a day). A distance-matched control set of ≥ 3 other
+symbols needs ≥ 4 distinct symbols on the day; on the average day that pool does not exist. The days
+that *do* carry many symbols are the internal batch days (≤ 25 symbols per call,
+`app.py:3696-3700`), which are precisely the days where the selection problem is worst:
+**`user_id = 1` is 513 of 697 reports (73.6%)**, **seven symbols are 419 of 697 (60%)**, TSLA alone
+134. A control drawn from an operator-curated watchlist does not represent what the engine is asked
+about, so even where the count exists the contrast is not the one rule 5 requires. The hypothesis's
+second baseline — the same symbol's opposite-side level at the same distance — survives, but it is
+not a substitute: it measures **path symmetry**, not whether the *call* carried information.
+
+**(5) The floors and DP-51 cannot be reached on this corpus, and the population cannot be filtered.**
+Ceiling arithmetic, counts only: **120 active days is the entire history**, 2026-01-22..2026-09-14,
+and PI-019's silent zone switch on **2026-04-06** splits it into two different features on the
+DP-06 / DP-50(a) pattern (201 reports read as UTC to 04-05; 494 read as US Eastern from 04-07).
+DP-21 asks **80 contributing days per primary endpoint**, and H-086 registers one endpoint per
+timeframe bucket. Even the all-days ceiling of 120 clears 80 for at most **one pooled** endpoint —
+before the split, before the control requirement in (4), before target availability (a `take_profit`
+is present on **78.0–87.5% of BUY** and **73.1–100% of SELL** decisions, varying by timeframe) and
+before the long-horizon gaps (**1d/1wk/1mo present on only 597–654 of 697 reports**, 6–14% missing,
+which is exactly the swing and long buckets). Under **DP-51** the position is worse: another report
+on the same symbol lands within 5 trading days on **56.5%** of symbol-days and within 10 on
+**63.7%**, so **independent episodes number in the low dozens across fewer than ten names**, and an
+episode-clustered CI on that structure cannot exclude an MPE — DP-51 makes such a result
+INCONCLUSIVE by construction, never CONFIRMED. Separately, the registrar cannot write the population
+with exact filters at all: **no report records its trigger** (PI-019), so "which reports enter"
+could only be approximated by `user_id = 1`, which *is* the selection variable under suspicion.
+
+### What was considered and rejected before deferring
+
+- **Registering on the historical corpus with the within-report opposite-side level as the only
+  baseline.** Rejected. It silently changes the hypothesis from "do the setups work" to "are the two
+  sides of a report symmetric" — DP-25: the test stays the one that was proposed; a re-spec is a new
+  hypothesis, not a rescue.
+- **Keeping only the 1d and 1wk buckets, where hourly and daily bars suffice.** Rejected. It fixes
+  none of (1), (3), (4) or (5), and it drops precisely the timeframes the hypothesis says are most
+  suspect ("short-timeframe targets sit inside ordinary intraday noise"). A question reduced to the
+  buckets it happens to be able to grade is a different question, chosen after seeing the constraint.
+- **Treating the 184 `user_id != 1` reports as a clean "subscriber demand" sub-population.**
+  Rejected. They span 36 users and are themselves top-heavy (one user 21, another 15); PI-019 records
+  that provenance is inferable **only** through `user_id`, which is an inference, not a recorded
+  trigger. It is also ~184 reports, nowhere near any floor.
+- **Drawing controls from same-day SAS candidates instead of same-day HOLD reports.** Rejected.
+  A SAS candidate has no F9 report, therefore no F9 stop, target or ATR structure; synthesising
+  levels at a matched ATR distance on a symbol this engine never analysed measures the ATR distance,
+  not the engine, and quietly swaps the engine under test.
+- **Grading the short timeframes on hourly bars with DP-27 breaking the ties.** Rejected under
+  DP-45. DP-27 exists to resolve the residual ambiguous case conservatively, not to decide the
+  majority of a population; using it that way returns a number that looks like a hit rate and is an
+  artefact of bar resolution.
+- **DP-13's single automatic extension, or waiting.** Rejected. DP-13 rescues a floor that is
+  *marginal* at the decision date. Here (1)–(3) are missing artefacts that no elapsed time supplies,
+  and (4) is a structural property of how the corpus is generated — the Q025 precedent: nights
+  arriving do not add contributing nights when the constraint is per-day structure.
+- **Locking a PREREG now against EN-019's future collection.** Rejected. The population's exact
+  filters depend on the universe EN-019 declares and on the `trigger` field PI-019 asks for, neither
+  of which exists yet; a PREREG cannot state its population at SQL level against a schema that has
+  not been written. Rule 3 wants the lock to precede the **data**, not the **schema**.
+
+### What would move it back into the backlog
+
+**All three are required**, and each count is **measured by the Steward on a pinned freeze**, never
+from a live query or a projection.
+
+1. **EN-019 ships (or an equivalent).** The internal batch analysis runs on a **fixed,
+   pre-declared universe** every session at a fixed time — the same symbols whether or not anyone
+   asked — and every report carries an **explicit time-zone offset** and a **`trigger` field**
+   (`subscriber` / `internal_batch` / other), per PI-019. The question's window then **starts at that
+   ship date and is prospective only** (the DP-06 pattern); nothing written before it enters the
+   population, and the historical 697 stay exploratory (`research/BACKLOG.md` F9 preamble).
+2. **Two pinned freezes exist.** **(a) A report freeze:** the Steward adds the
+   `ai-reports-YYYY-MM-DD` **history** blobs (never the `_latest` pointers, which are current state)
+   to `freeze_config` and pins them in a manifest with a sha256, carrying per report at least
+   `symbol`, `user_id`, `trigger`, `strategy_scope`, `job_id`, the zone-explicit `timestamp`,
+   `stored_at`, and per timeframe `decision`, `strength`, `confidence`, `overall_bias`,
+   `entry_price`, `stop_loss`, `take_profit`, `risk_reward_ratio` and `price_timestamp`, with
+   `freeze_config.availability` declared on the report timestamp (rule 14). **(b) A price freeze at
+   the resolution the endpoint needs:** **15-minute bars or finer**, including pre/post-market, for
+   every symbol in the declared universe over the window; and, if the crypto split is retained,
+   crypto bars from Alpaca's crypto endpoint — both sha256-pinned. **Without (b) the 15m, 30m and 1h
+   buckets are struck from the question at re-entry, not graded by convention.**
+3. **A counts-only exposure probe clears the DP-43 gate.** On those freezes, over a trailing quarter,
+   with **no outcome, touch, hit rate or return read**, the Steward reports: per analysis day, the
+   number of symbols carrying a directional call with **both** a stop and a target at each registered
+   timeframe; the number of same-day symbols available as distance-matched controls (HOLD or
+   no directional call at that timeframe); **the count of days carrying ≥ 1 gradeable directional
+   call and ≥ 3 same-day matched controls, per elapsed session**; and the count of **independent
+   episodes** under DP-51's ≤ 10-session rule together with **the number of distinct symbols
+   contributing them**. Three conditions, all of which must hold:
+   - the day rate reaches the **DP-43 gate re-solved from the re-entry lock date** (orientation only,
+     and offered to be falsified: 0.36/session at a 2026-09-14 lock for a 20-session endpoint);
+   - **≥ 30 distinct symbols** contribute the days counted, and **no single symbol exceeds 10%** of
+     contributing days — today seven symbols are 60% of the corpus and TSLA alone is 19%;
+   - **≥ 80 independent episodes** exist for the primary endpoint, so DP-51's episode-clustered CI is
+     computable rather than degenerate.
+
+   The 30-symbol / 10%-per-symbol / 80-episode conditions are the **registrar's reading** of what
+   makes this corpus decidable, chosen before any outcome was seen (DP-26); they are open decisions
+   at re-entry, not registered values. If the probe clears (1) and (2) but misses (3), H-086 returns
+   here on the **second** admission ground with the measured rate named.
+
+### Bookkeeping while deferred
+
+No verdict, no `eval.py`, no `results/`, no `schedule.json`, no `PREREG.md`, and **no outcome of any
+kind read** — not a touch, not a first-touch date, not a return, not an arm difference. Every count
+above comes from the Steward's counts-and-metadata inventory, from committed manifests, or from the
+platform source read-only. **No question number is consumed: Q037 remains the next free number.**
+**F9's correction set is empty and stays empty** — no F9 hypothesis is registered, and H-086 does
+not join a family correction while deferred (the H-062 precedent). No locked file was edited.
+**DP-41 is not engaged**: nothing here asks for a later clock; the rule-14 requirement is the
+ordinary one, that the report timestamp be the decision time, which is why trigger (2a) puts
+`freeze_config.availability` on it.
+
+**Inherited by the rest of the family, so no successor re-derives it.** Blockers (1), (3), (4) and
+(5) apply verbatim to **H-087** (timeframe alignment), **H-088** (divergence and order of hits),
+**H-090** (strength/confidence calibration) and **H-094** (the GPT `principal_plan` setups, whose own
+backlog line already records "decidable only on EN-019's forward collection"); blocker (2) applies to
+any of them graded below the 1h timeframe. **H-089 is Explorer-only and is not a PREREG**, so it is
+unaffected by this entry — but an Explorer pass on the historical corpus is bound by the same
+selection facts and its output is exploratory, never a registrable finding on its own.
+**PI-018 is a separate matter and is not blocked by this entry:** 495 of 3,933 directional decisions
+(12.6%) oppose their own timeframe's `overall_bias`, "Near Fibonacci" appears in 2,992 of 3,933
+(76.1%), and the consensus tally disagrees with the timeframe count on 349 of 697 reports (50.1%) —
+those are counts of the engine's own output, they need no price path, and they are already filed.
+Under this file's preamble **nothing here may be reported, briefed or quoted** until all three
+triggers are met.
