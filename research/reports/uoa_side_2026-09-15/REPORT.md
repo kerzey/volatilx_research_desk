@@ -441,6 +441,32 @@ OI (no OI in snapshots; the volume-vs-OI "opening position" test stays a nightly
 confirm run). It also inherits the snapshot page bound; a > $2B name with more than 12,000 in-range contracts
 does not exist, so truncation is a Tier-1 (SPY/QQQ) matter only.
 
+### 5.15 Build order (Haci asked 2026-09-15: "enhancement then PI-023 fix, or the reverse?")
+**There is no separate PI-023 fix.** Alpaca keeps no historical option quotes (§3), so the only way to label a
+print correctly is to have captured the quote while the day ran. EN-020 *is* the fix; PI-023 closes when
+EN-020's Phase A is verified. The order is inside EN-020, not between the two.
+
+| # | Ship | What it is | PI-023 |
+|---|---|---|---|
+| 0 | `/desk-run verify PI-020 3f1d3e6` | already deployed; the sampler's trade fetch depends on it | — |
+| **A** | sampler (Tier 1) + nightly merge + `classify_print` + freeze_config entries | **the PI-023 fix.** Nothing subscriber-visible; `dir_ratio`, the SAS flow vote, Whale Watch and the UOA conviction column start telling the truth | closes on W1–W3 |
+| B | Tier-2 wide net + promotion + the admin "UOA live" tab | new capability, not a fix. Detection needs no labels, so it can ship any time after A | — |
+| C | PI-014 (Conviction Monitor polarity arm) | **must follow A** — see below | — |
+
+**Why A before B.** Phase A is what unblocks the desk (H-092, and the Q014/Q029/Q030 split date), and it is
+the half with a research consequence; every extra week is a week of nights scored on drift labels. Phase B is
+worth more once the tab can show labelled sides, and its flag thresholds (§5.14) want re-reading against live
+wide-universe counts anyway. Shipping them as one PR also makes a rollback all-or-nothing.
+
+**Why PI-014 must follow A.** The monitor's polarity arm computes polarity from
+`uoa_contract_daily.buy_premium / sell_premium` (`conviction_monitor_service.py:892-899`, feeding SAS's
+`_compute_flow_polarity`) — the exact field PI-023 indicts. PI-014's fix *wakes that arm*: it has read zeros
+since 2026-05-19 and printed `polarity_unavailable_coverage_low` on every row. Shipped before EN-020, the arm
+starts firing HOLD and EXIT from a label that tracks the day's drift, and Q019's re-measured rate and Q038's
+re-entry (both named in the PI-014 brief) are set on those nights. Shipped after, EN-020's "uncovered →
+unknown" makes the arm's own 0.5 coverage gate (`:184`) abstain honestly on low-coverage symbols, which is the
+behaviour the gate was written for.
+
 ## 6. Seen in passing
 - `uoa_runs` has a `nightly` row dated **2026-12-09** in state `running` (started 10:03 ET) and one for the
   Labor Day holiday 2026-09-07 (22:30, never finished — the `_is_weekday` guard). Harmless to the data; noted
