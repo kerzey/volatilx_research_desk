@@ -22,6 +22,12 @@ this brief was written; where the design report `research/reports/uoa_side_2026-
 that has moved or a fact that does not hold in the code, this brief carries the corrected version and says so
 (§0.3).
 **Research repo SHA:** `dd54241`.
+**Haci, 2026-09-15, after the first draft of this brief — two decisions that override the design report §5.13:**
+(1) **no admin gate.** Haci is the platform's only user, so the "UOA live" tab is rendered on the AI Picks page
+for every signed-in user, with the same sign-in check the other AI Picks routes use and nothing more: no
+`ADMIN_TOKEN`, no `X-Admin-Token`, no `ADMIN_EMAIL`, no `is_admin` context flag. (2) **The feed is OPRA in
+production. Take it as given; do not verify it.** Cadence 5 minutes, trade-fetch lag one tick, are the fixed
+defaults. The feed value is still written on every tick row, as a record, not a check.
 **Runtime settings — sizing and thresholds only, never gates** (read from the environment at call time, clamped;
 every one of them leaves a runnable job): §3.11 lists them with defaults and clamps. There is **no**
 `UOA_INTRADAY_ENABLED`, no `UOA_WIDENET_ENABLED`, and no `..._ENABLED` name anywhere in this build; §4.1(d)
@@ -42,8 +48,8 @@ artefact through a half-labelled symbol. Omega's `get_option_trades` gains side 
 populated only where the buckets cover ≥ 80% of the contract's own fetched premium. Phase B adds the Tier-2 wide
 net — a 15-minute, snapshot-only sweep over every US name ≥ $2B that flags big and unusual orders from
 `dailyBar v × vw` without fetching a single print, promotes a flagged name into Tier 1 and into that night's UOA
-universe, and feeds an **admin-only "UOA live" tab** under AI Picks. No historical row is rewritten by either
-phase.
+universe, and feeds a **"UOA live" tab** under AI Picks (no admin gate: Haci is the platform's only user). No
+historical row is rewritten by either phase.
 
 ---
 
@@ -659,13 +665,14 @@ Read at call time, clamped, each leaving a runnable job. **Phase A:**
 | `UOA_INTRADAY_BUCKET_RETENTION_SESSIONS` | 400 | 60..1000 | Bucket retention. |
 | `UOA_INTRADAY_RETENTION_MAX_ROWS` | 2000000 | 10000..50000000 | Retention sanity cap. |
 
-`ALPACA_OPTION_FEED` already exists (`ai_agents/options_client.py:30`, default `indicative`); production sets it
-to `opra`. Whatever it is, the value is recorded on every `uoa_quote_tick` row and in the tick status row.
-There is no setting that turns any of this off.
+`ALPACA_OPTION_FEED` already exists (`ai_agents/options_client.py:30`, default `indicative`); production runs
+`opra` (Haci, 2026-09-15 — given, not to be verified by this build). Do not change the default in code; the
+production setting stays where it is. The value in use is recorded on every `uoa_quote_tick` row and in the tick
+status row so the ship log can quote it. There is no setting that turns any of this off.
 
 ---
 
-# PR 2 — PHASE B: the Tier-2 wide net, promotion, and the admin "UOA live" tab
+# PR 2 — PHASE B: the Tier-2 wide net, promotion, and the "UOA live" tab
 
 Cut from `main` after PR 1 is merged and deployed. Detection needs no labels, so B can ship any time after A;
 shipping them as one PR would make a rollback all-or-nothing, which is why they are two.
@@ -737,12 +744,14 @@ explicit list (`services/uoa_screener.py:1043-1046`), and the nightly step passe
 SAS sees it the same night. The nightly's own `force_scope` behaviour is untouched
 (`services/uoa_screener.py:966-995`, PI-017).
 
-### 3B.4 The admin "UOA live" tab
+### 3B.4 The "UOA live" tab — no admin gate (Haci, 2026-09-15)
 
-- **Route:** `GET /api/admin/uoa/intraday?date=&window_min=30|60|day&symbol=` in a new
-  `routers/admin_uoa_intraday.py`, using the house admin guard — `ADMIN_TOKEN` env plus a matching
-  `X-Admin-Token` header, the `_require_admin` of `routers/admin_sas_speed.py:50-53` — and registered in
-  `app.py` beside `admin_sas_speed_router` (`app.py:7179`, `app.py:7195`).
+- **Route:** `GET /ai-picks/uoa-live?date=&window_min=30|60|day&symbol=` in a new
+  `routers/uoa_live.py`, authenticated exactly the way the other AI Picks routes are — `current_user:
+  Optional[User] = Depends(get_optional_user)` and a 401 with the `signin_required` payload when it is `None`,
+  copied from `routers/conviction_monitor.py:259-275` — and registered in `app.py` beside
+  `conviction_monitor_router` (`app.py:7184`, `app.py:7200`). **No** `ADMIN_TOKEN`, **no** `X-Admin-Token`,
+  **no** plan check: a signed-in user sees it. Haci is the platform's only user.
 - **Payload per underlying:** symbol, **unusual ratio** = `today's classified premium so far ÷ (trailing
   20-session mean daily premium × fraction of the session elapsed)`, using `uoa_symbol_daily.total_premium` for
   the trailing mean; net buy-side premium `(call_buy − call_sell) − (put_buy − put_sell)`; call buy / sell; put
@@ -751,10 +760,10 @@ SAS sees it the same night. The nightly's own `force_scope` behaviour is untouch
 - **Tab:** a new panel in `templates/ai_picks.html` — a `<button class="vx-tab-btn" data-target="uoa-live">UOA
   live</button>` in the tab bar (`templates/ai_picks.html:1939-1954`) and a matching
   `<div class="vx-tab-panel" data-tab="uoa-live">`; the existing delegated tab switcher at `:4106-4118` needs no
-  change. **Render the button and the panel only when the page context says the viewer is the admin** — add
-  `"is_admin": bool(os.getenv("ADMIN_TOKEN")) and user.email == os.getenv("ADMIN_EMAIL", "")` to the context
-  built at `app.py:2706-2718` and wrap the markup in `{% if is_admin %}`. Haci is the platform's only user;
-  making this subscriber-visible later is a role change gated on a research question (DP-48), not a tweak.
+  change. **Render the button and the panel unconditionally** — no `is_admin` flag, no new key in the context
+  built at `app.py:2706-2718`, no template conditional. Haci is the platform's only user (2026-09-15); if
+  subscribers are ever added, whether they see this tab is a research-gated decision (DP-48) taken then, not a
+  gate written now.
 - **Default view:** today's unusual names — the Tier-1 ratio rule above, plus the Tier-2 flags with their rule
   names, so a wide-net name appears within 15 minutes of the order whether or not anyone had it on a list.
   Ticker search opens that symbol's contract buckets and top prints with sides; a searched ticker outside the
@@ -863,7 +872,7 @@ the merge and aggregation tests operate on plain dicts, not ORM rows).
 one cent below; T20 trailing-20 baselines are used when available and the `yesterday` fallback is labelled;
 T21 the between-sweep single-print rule uses `Δ(v × vw) × 100` and never a level; T22 promotion adds the symbol
 to the day's Tier-1 set and to the nightly universe list without disturbing `force_scope`; T23 pre-promotion
-prints are written `side_source = "widenet_bracket"` and counted as **unknown** by the merge; T24 the admin
+prints are written `side_source = "widenet_bracket"` and counted as **unknown** by the merge; T24 the live
 route's serializer greys and sorts last any row with classified share < 0.50; T25 the unusual-ratio formula
 matches the stated rule on a fixture with a half-elapsed session.
 
@@ -875,7 +884,7 @@ anything persisted — the summarizer is pure and the tool's persistence path is
 
 - **New:** `docs/UOA_INTRADAY_SAMPLER.md` — the tick loop, the bracket rule table of §3.4, the reason
   vocabulary, the coverage columns, the `dir_ratio` NULL rule, retention, the settings table, and one line
-  naming PI-023 and EN-020 as its origin. Phase B appends the wide-net section and the admin tab.
+  naming PI-023 and EN-020 as its origin. Phase B appends the wide-net section and the "UOA live" tab.
 - **Edit:** `docs/AZURE_WEBJOBS_AUTOMATION.md` — one row in the WebJobs table (`:17-24`) for
   `uoa_intraday_sampler` (`0 */5 9-16 * * 1-5`, `scripts/run_uoa_intraday_tick.py`, "EN-020 intraday quote
   sampler: buy/sell side from the quote at trade time; window-gated 09:30 → close + 10 on XNYS sessions"), and
@@ -909,10 +918,11 @@ anything persisted — the summarizer is pure and the tool's persistence path is
 
 12. `python tests/test_uoa_widenet.py` prints `EN-020 Phase B: 7/7 checks passed`.
 13. The six flag thresholds equal §3B.2 exactly, as settings with those defaults.
-14. The admin route requires `X-Admin-Token`; an unauthenticated request returns 401 (asserted in T24's
-    serializer test plus a route-level guard test that constructs no app — assert `_require_admin` raises).
-15. The "UOA live" tab markup is inside `{% if is_admin %}` and no subscriber-facing string is added to
-    `templates/ai_picks.html` outside that block (`git diff` shows it).
+14. The live route uses the AI Picks sign-in check (`get_optional_user` → 401 `signin_required`) and nothing
+    else: `grep -n "ADMIN_TOKEN\|X-Admin-Token\|ADMIN_EMAIL\|is_admin" routers/uoa_live.py templates/ai_picks.html
+    app.py` finds nothing new (`git diff` shows it).
+15. The "UOA live" tab markup is rendered unconditionally; the `git diff` of `templates/ai_picks.html` contains
+    only the tab button, the panel and its script — no template conditional around them.
 16. Promotion appends to the nightly universe through the existing `_resolve_universe(explicit=…)` path, with
     no change to `force_scope` behaviour.
 
@@ -957,7 +967,7 @@ by construction (23–35% unknown premium; classified buy-share 47–59%; the ea
   > buckets labelled against the quote bracketing each print; uncovered premium is `unknown`, with no
   > closing-quote fallback. `uoa_symbol_daily.dir_ratio` is NULL when `aggressor_qat_share < 0.50`, and
   > `bull_dir`/`bear_dir` fall to 0.50, which moves `score_day/swing/long` on those symbols; the SAS legacy flow
-  > vote abstains there. Feed in use: `<opra|indicative>`. Per-session `aggressor_qat_share`: `<table>`. **No
+  > vote abstains there. Feed in use: `opra` (as recorded on the tick rows). Per-session `aggressor_qat_share`: `<table>`. **No
   > historical row was rewritten.** Under DP-50(a) the aggressor columns are two different features either side
   > of this date: **Q014, Q019, Q029 and Q030 split here.**
 
@@ -987,7 +997,8 @@ and the affected questions split again there.
 - No change to Whale Watch's two gate copies, to `premium_total` / `trade_count` / `top_trades_json` / the
   selection filters of `_pick_contracts`, to `_MAX_SNAPSHOT_PAGES`, `_MAX_TRADE_PAGES` or `get_option_trades`.
 - Multi-leg prints are flagged and measured, not excluded — that would be a later, evidence-based change.
-- No subscriber-facing surface, copy or number. The live tab is admin-only; a subscriber-facing live UOA page is
+- No new subscriber-facing number in the nightly artefacts. The live tab is ungated because Haci is the
+  platform's only user (2026-09-15); a live UOA page for subscribers, if they are ever added, is
   a separate enhancement gated on a research question (does intraday buy-side flow predict the close or the next
   session? — to `research/BACKLOG.md` once 20 sessions of buckets exist).
 - No websocket/streaming option quotes (`market_data/live_options.py` is untouched); no OI in the wide net.
