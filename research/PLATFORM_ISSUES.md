@@ -44,6 +44,7 @@ Statuses: `OPEN` · `HACI_DECIDED:<fix|research|accept>` · `BRIEF_WRITTEN` · `
 | PI-019 | med | OPEN | Multi-agent technical reports: the zone-less `timestamp` switched from **UTC** (to 2026-04-05) to **US Eastern** (from 2026-04-07; both on 04-06) with no marker; and no report records whether it came from a subscriber (`/analyze`) or the internal batch (`user_id=1`, 73.6% of reports). Anything reading report times or treating reports as subscriber demand is silently wrong for part of the history |
 | PI-020 | high | BRIEF_WRITTEN | **UOA scanner truncates option trades: the flow layer is blind to puts on the most liquid names.** `AlpacaOptionsClient.get_option_trades` (`ai_agents/options_client.py:985-1018`) requests up to 50 contracts with `limit=1000` (`services/uoa_screener.py:1505-1510`, `trades_limit` at `:806`) and never follows `next_page_token`. Alpaca sorts by contract symbol, so calls fill the page and puts get nothing. SNDK 2026-09-08: stored 2,000 trades, all calls, `dir_ratio` 1.00; paginated, the same contracts traded 14,441 calls ($200.7M) and 11,154 puts ($82.5M). **~15–16% of symbol-days hit the cap every month since 2026-01; 317 of 604 published SAS picks since 2026-06-01 were scored on capped flow** (GOOG, MSFT, AMZN, SNDK, ORCL… capped every day). Biases `call/put_premium_total`, `dir_ratio`, flow scores and the flow direction votes bullish. Evidence: `research/reports/case_SNDK_2026-09-15/` — brief: `research/briefs/PI-020_uoa_trades_pagination.md` (2026-09-15, rewritten 2026-09-15 under DP-59: ships directly, no flag, no shadow — from the ship date `put_premium_total`, `dir_ratio`, flow scores and SAS flow votes change for liquid names; no historical row rewritten; the desk logs the ship SHA/date in DATA_NOTES so Q014/Q019/Q029/Q030 split there under DP-50) |
 | PI-021 | high | OPEN | **Running the platform test suite deletes every user.** `conftest.py:37-55` (platform `c311e81`) has an autouse fixture that deletes all rows of `UserActivityEvent` and `User` before and after *every* test, and `conftest.py:31-35` runs `create_tables()`, against whatever database the test environment's connection URL names (`conftest.py:9-21` refuses only SQLite). Pointed at production, `pytest` empties `users` and `user_activity_events`. The PI-017 fix brief (§4(c)) told the coding agent to run `python -m pytest tests/ -q` on the base commit and after; PI-017 merged as `575df11`. **Not verified whether that run touched production** — first check: row count and newest signup in `users` against what you expect. Found 2026-09-15 by the Brief Writer while writing EN-019. |
+| PI-023 | high | OPEN | **Option buy/sell side is judged against the closing quote, so the label follows the day's price drift.** `services/uoa_screener.py:1114-1116` keeps the closing snapshot's bid/ask and `:1246-1256` classifies every print of the session against it. Over 170 sessions the daily call buy-share runs *against* the tape (Spearman −0.57 with SPY open-to-close) and the put buy-share *with* it (+0.53): up days show 43% of call premium "bought" and 60% of put premium "bought", down days 62% / 41% — the mirror image of a real aggressor label. Feeds `dir_ratio`, `call/put_buy_premium`, the SAS flow vote (`super_agent_select_scoring.py:555-560`), Whale Watch qualification (ask-share ≥ 0.65, `whale_watch_tracking.py:114-116`) and the UOA "conviction" column. Alpaca keeps no historical option quotes, so this cannot be repaired after the fact: the quote must be captured during the session → **EN-020** (intraday sampler). Evidence: `research/reports/uoa_side_2026-09-15/REPORT.md` §2, `drift_test.py`. Blocks H-092 alongside PI-020. |
 | PI-022 | med | OPEN | **Conviction Monitor wrote nothing on 2026-07-06** — `conviction_monitor_daily` has 0 rows for that session while every other in-window session carries 31–56 (frozen `manifest_v001`; `research/reports/STEWARD_Q038_exposure.md` item 3). A complete one-day outage of the monitor job, not a holiday (07-06 was a normal session; 07-03 was the holiday, and holidays still get off-calendar rows). No watchdog fired; the 24 picks of 06-29/06-30/07-01 lost their day-3/day-4 row and are excluded as `monitor_coverage_outage` in `exclusions_v004.json` (Q019 and Q038 read this table). Same watchdog gap as PI-002 — the PI-002 fix brief should add this table to the coverage check |
 
 ## Detail
@@ -650,3 +651,48 @@ required dedicated test URL, or a hard stop when the host or database name match
 deletes only rows the tests created. Plain bug fix. **Desk rule until PI-021 is fixed:** no brief tells a
 coding agent to run `pytest` in the platform repo (the EN-019 brief already forbids it and uses a standalone
 runner).
+
+### PI-023 — the option buy/sell label is judged against the closing quote and follows the day's drift
+
+**Found 2026-09-15** from Haci's question about Omega's option-trades tool (it cannot tell a buy from a sell;
+platform `d112d37`). Read-only queries and Alpaca market data only. Full report and the enhancement that fixes
+it: `research/reports/uoa_side_2026-09-15/REPORT.md` (EN-020).
+
+**Mechanism, read from code.**
+- `services/uoa_screener.py:1114-1116`: the bid/ask kept for a selected contract is the `latestQuote` of the
+  snapshot taken when the nightly runs (16:43–17:04 ET in September, `uoa_runs.started_at`), i.e. the closing
+  quote.
+- `:1246-1256` (`_aggregate_trades_for_contract`): every print of the 09:30–16:00 session is compared with
+  that one quote: `≥ ask − 0.1·spread` → `buy_premium`, `≤ bid + 0.1·spread` → `sell_premium`, else
+  `unknown_premium`. The MVP spec called this a proxy and asked that counts be stored "so you can replace it
+  later" (`docs/UOA_SCREENER_MVP.md` §4.3).
+- `:1663-1668`: `dir_ratio` is built from the two buy totals. `symbol_context_builder.py:136-205` hands the
+  four-way split to SAS; `super_agent_select_scoring.py:555-560` votes direction from `dir_ratio` when
+  polarity is off (it is, PI-014). `whale_watch_tracking.py:114-116` and `routers/whale_watch.py:153-159`
+  qualify contracts on the same split. `routers/uoa_screener.py:465-474` shows `buy/total` as conviction.
+
+**Evidence (`drift_test.py`, 170 sessions 2026-01-07..2026-09-14).** Buy-share = buy / (buy + sell) over all
+of a day's classified premium, by side, against SPY's open-to-close move (Alpaca daily bars):
+
+| SPY tercile | call buy-share | put buy-share |
+|---|---:|---:|
+| down day | 0.624 | 0.412 |
+| flat | 0.542 | 0.498 |
+| up day | 0.429 | 0.598 |
+
+Spearman −0.566 (calls) / +0.533 (puts). On an up day the call's closing quote sits above most of the day's
+prints, so they read as sold; the put's sits below, so they read as bought. A true aggressor label would not
+lean this way. 23–35% of premium is already `unknown` under the rule.
+
+**Why it matters.** The flow direction vote in SAS carries tape-correlated noise on the very variable rule 7
+calls dominant; Whale Watch admits contracts by afternoon drift; the UI's conviction number is not what it
+says. For the desk: `manifest_v001`'s `uoa_symbol` / `uoa_contract` carry the artefact throughout; Q014, Q029
+and Q030 measure the platform as it behaved (still legitimate); **H-092 must not be registered** until a
+forward window with quote-at-trade labels exists.
+
+**Expected behaviour.** Each print is labelled against the quote prevailing when it traded. Alpaca offers no
+historical option quotes, so the quote must be sampled during the session: EN-020 (every 10 minutes: chain
+snapshot → contracts that traded → bracketing quotes stored → prints fetched with a lag and classified against
+the brackets → 10-minute buckets; the nightly sums the buckets and labels each row's `aggressor_source`).
+Historical rows are not rewritten; the ship date is logged in `DATA_NOTES.md` and locked questions split there
+(DP-50). A delta-adjusted backfill of history is Phase 2, only after the sampler provides a truth set.
