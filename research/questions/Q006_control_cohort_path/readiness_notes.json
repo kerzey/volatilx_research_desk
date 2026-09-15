@@ -1,0 +1,36 @@
+{
+  "question": "Q006_control_cohort_path",
+  "elapsed_sessions": 107,
+  "window": "2026-04-01..2026-09-10 (PREREG \u00a76 states 108 non-excluded nights; recomputed here as 107 after exclusions_v001.json's manual_runs (5) and non_session_runs (1) applied to sas_runs, per exclusions_v001.json's own instruction to derive this in eval.py rather than hard-code it)",
+  "decision_date": "2026-10-05",
+  "readiness_label": "maturation-short",
+  "data_dependency": [
+    "manifest_prices_v002 (PREREG \u00a75 / schedule.json: same Alpaca queries and symbol list as manifest_prices_v001, end moved to the 2026-10-05 decision date) is not yet built. It is required to mature E1's remaining ~40 eligible nights (and E2's remaining 5) between now and the decision date; current counts above reflect manifest_prices_v001's horizon (2026-09-10) only, not a projection to 2026-10-05.",
+    "No freeze exists yet for pick nights after this question's lock commit (state.json: PREREG_LOCKED 2026-09-11T04:35:41Z). \u00a78's PROSPECTIVELY_CONFIRMED stage needs >=30 such pick nights, 'frozen separately' \u2014 a distinct manifest from manifest_prices_v002 (which only extends price bars for the pre-lock 2026-04-01..2026-09-10 population per \u00a75's 'freeze discipline'). post_lock_contributing_nights is left null for both endpoints pending that freeze; \u00a75 states pick nights after 2026-09-10 explicitly 'do not enter Q006'."
+  ],
+  "notes": "Counts computed directly from pinned research/data/v001_sas_candidates.parquet, v001_sas_runs.parquet and p001_daily_split.parquet (manifest_v001 / manifest_prices_v001); no live query. E1 is the binding constraint: PREREG \u00a75's own floor-date estimate places the 80th eligible night's 40-session maturation around 2026-09-28, before the 2026-10-05 decision date, so this reads as on-schedule maturation shortfall rather than a sample or coverage problem \u2014 label is 'maturation-short', not 'sample-short' (elapsed_sessions already covers the full registered window; the pick-night population is not growing) and not 'coverage-short' (no missing-bar or backfill defect found in this slice; 0 nights dropped for missing bars). E2 alone would be 'counts-ready-date-pending'; the question-level label follows E1 per PREREG \u00a78 ('the stronger endpoint does not carry the question'). This is a counts-only snapshot per DP-56 / LEARNING_POLICY.md \u00a7'Counts-only readiness and scheduling': no hit rate, touch rate, return, effect, p-value or comparison was computed or opened (results/ was not accessed).",
+  "sources_as_written": [
+    "research/data/manifest_v001.json",
+    "research/data/manifest_prices_v001.json",
+    "research/data/exclusions_v001.json"
+  ],
+  "endpoint_details": [
+    {
+      "mature_nights": 63,
+      "notes": "Immature tail: 40 of 103 eligible nights not yet matured inside manifest_prices_v001 (last session 2026-09-10); last matured night 2026-07-15, close to PREREG's own stated cutoff 2026-07-14 (\u00b11 session, calendar-boundary convention). Of the 63 mature nights, only 28 fall in the sealed half (>=2026-06-01) vs the >=40 sealed-half sub-floor in \u00a78 clause 1 \u2014 a second, independent reason this endpoint is not yet decidable. 0 nights dropped for the >25% missing-bar rule. 4 published picks excluded as 'hit at publication' (wrong-side L3 at actual pick-night close) out of 833 with a valid L3 target.",
+      "_endpoint": "E1_reach_L3_within_40_sessions",
+      "_null_counts_recorded_as_zero": [
+        "post_lock_contributing_nights"
+      ]
+    },
+    {
+      "mature_nights": 98,
+      "notes": "Floor already cleared on counts alone (98 >= 80 mature/contributing nights; 63 of those in the sealed half). PREREG \u00a76 flags E2's 5-session threshold as contamination-adjacent to EXPLORE_001 and \u00a78 additionally requires the sealed-half-only estimate to be positive \u2014 a decision-rule condition on the effect, not a count, and out of scope here. 0 nights dropped for the >25% missing-bar rule; 5 eligible nights (most recent, through 2026-09-10) not yet matured.",
+      "_endpoint": "E2_speed_L3_within_5_sessions",
+      "_null_counts_recorded_as_zero": [
+        "post_lock_contributing_nights"
+      ]
+    }
+  ],
+  "_note": "Companion to readiness.json (strict counts schema, research/lib/learning.py). Counts only; no outcomes. Null counts were recorded as 0 in readiness.json where no post-lock freeze exists yet."
+}

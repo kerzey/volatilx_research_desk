@@ -1,35 +1,19 @@
 {
   "as_of": "2026-09-14",
   "sources": [
-    "research/questions/Q034_economic_objective/PREREG.md (sec 2, 4.1, 2.5, 5.1, 5.2, 5.3)",
     "research/questions/Q034_economic_objective/schedule.json",
     "research/questions/Q034_economic_objective/state.json",
-    "research/questions/Q034_economic_objective/DECISIONS.md (## Schedule; items 7, 8, 9, 14, 18)",
-    "research/reports/STEWARD_Q034_exposure.md (R1, 2026-09-14, counts only -- cited, not recomputed)",
-    "research/reports/STEWARD_Q031_exposure.md (sec (a), the 0.6620 = 47/71 published-pick contributing rate that caps Q034's scheduling rate -- cited, not recomputed)",
-    "research/reports/SCHEDULE_AUDIT.md (flags Q033/Q034 cap planning on Q031's 0.6620 and carry 40/60-session endpoints with their own maturity clocks)"
+    "research/questions/Q034_economic_objective/PREREG.md",
+    "research/reports/STEWARD_Q034_exposure.md",
+    "research/questions/Q034_economic_objective/DECISIONS.md",
+    "research/reports/STEWARD_Q031_exposure.md",
+    "research/reports/SCHEDULE_AUDIT.md"
   ],
   "count_definition": "PREREG sec 2.5, in the PREREG's own words. Contributing night (the floor unit, DP-21): 'a non-excluded in-window night carrying a legal sec 2.2 window label and >= 3 valid published picks, each with >= 5 valid matched controls, matured to t+60' (Q031 sec 2.5's series-B rule verbatim, maturity extended from t+20 to t+60). Ranking set (DECISIONS item 7, Correction 4): 'the set of nights that are sec 2.5 contributing nights and on which each of the nine objectives independently carries >= 3 valid published picks, each with >= 5 valid matched controls, after that objective's own exclusions are applied' -- O4 after the wrong-side-swing-stop screen, O5 and O8 after the complete six-level-ladder requirement, every objective after the shared sec 2.4 screens; 'the ranking set is a subset of the contributing nights by construction.' Sec 5.1 floors (none waived): 'An objective row may be reported affirmatively only with >= 80 contributing nights on the ranking set' (per-row, DP-21); 'A window enters the stability test only with >= 20 contributing nights' (cell floor, per each of the four sec 2.2 windows: two calendar halves and two arms -- platform-label always, bar-only tape if the SPY history is delivered); '>= 3 valid picks per night, each with >= 5 valid matched controls' is intrinsic to the contributing-night rule itself; '>= 30 contributing nights after the lock commit' (DP-24) is satisfied by construction (every contributing night is post-lock) but not invoked, because PROSPECTIVELY_CONFIRMED is declined in every branch (sec 1, sec 8).",
-  "elapsed_sessions": 0,
-  "window": {
-    "start": "2026-09-15",
-    "end": "2027-04-30",
-    "elapsed_sessions_at_end": 158,
-    "extension_end": "2027-06-14",
-    "extension_elapsed_sessions": 188,
-    "extended": false
-  },
-  "decision_date": "2027-08-09",
-  "extension_decision_date": "2027-09-20",
-  "hard_stop": "2027-09-20",
   "endpoints": [
     {
       "endpoint": "O1_5_session_return",
-      "description": "5-session return, dir x (close_t+5/X - 1), fraction of price (PREREG sec 4.1)",
-      "own_clock_sessions": 5,
-      "binding_maturity_sessions": 60,
       "eligible_nights": 0,
-      "mature_nights": 0,
       "contributing_nights": 0,
       "required_nights": 80,
       "post_lock_contributing_nights": 0,
@@ -37,11 +21,7 @@
     },
     {
       "endpoint": "O2_20_session_return",
-      "description": "20-session return, dir x (close_t+20/X - 1), fraction of price (PREREG sec 4.1)",
-      "own_clock_sessions": 20,
-      "binding_maturity_sessions": 60,
       "eligible_nights": 0,
-      "mature_nights": 0,
       "contributing_nights": 0,
       "required_nights": 80,
       "post_lock_contributing_nights": 0,
@@ -49,11 +29,7 @@
     },
     {
       "endpoint": "O3_direction_path_form",
-      "description": "1 if X + dir*0.5*ATR touched strictly before X - dir*0.5*ATR, else 0; rate (PREREG sec 4.1, sec 2.2, definition fixed per Q033 DECISIONS #1/#2)",
-      "own_clock_sessions": 20,
-      "binding_maturity_sessions": 60,
       "eligible_nights": 0,
-      "mature_nights": 0,
       "contributing_nights": 0,
       "required_nights": 80,
       "post_lock_contributing_nights": 0,
@@ -61,11 +37,7 @@
     },
     {
       "endpoint": "O4_target_before_stop",
-      "description": "1 if L3 touched strictly before the printed swing stop, else 0; rate (PREREG sec 4.1, DP-30's stop, Q009's race)",
-      "own_clock_sessions": 20,
-      "binding_maturity_sessions": 60,
       "eligible_nights": 0,
-      "mature_nights": 0,
       "contributing_nights": 0,
       "required_nights": 80,
       "post_lock_contributing_nights": 0,
@@ -73,11 +45,7 @@
     },
     {
       "endpoint": "O5_atr_per_trade_plan_h",
-      "description": "realized result of committed Plan H (sec 4.1.1) from X, divided by ATR (PREREG sec 4.1)",
-      "own_clock_sessions": 60,
-      "binding_maturity_sessions": 60,
       "eligible_nights": 0,
-      "mature_nights": 0,
       "contributing_nights": 0,
       "required_nights": 80,
       "post_lock_contributing_nights": 0,
@@ -85,11 +53,7 @@
     },
     {
       "endpoint": "O6_adverse_excursion",
-      "description": "-(max adverse excursion from X in ATR); night excess signed ctrl - pick (PREREG sec 4.1)",
-      "own_clock_sessions": 20,
-      "binding_maturity_sessions": 60,
       "eligible_nights": 0,
-      "mature_nights": 0,
       "contributing_nights": 0,
       "required_nights": 80,
       "post_lock_contributing_nights": 0,
@@ -97,11 +61,7 @@
     },
     {
       "endpoint": "O7_favourable_excursion",
-      "description": "max favourable excursion from X in ATR (PREREG sec 4.1)",
-      "own_clock_sessions": 20,
-      "binding_maturity_sessions": 60,
       "eligible_nights": 0,
-      "mature_nights": 0,
       "contributing_nights": 0,
       "required_nights": 80,
       "post_lock_contributing_nights": 0,
@@ -109,11 +69,7 @@
     },
     {
       "endpoint": "O8_ladder_reach",
-      "description": "count of L1..L6 first-touched within each level's own lane window (L1/L2<=20, L3/L4<=40, L5/L6<=60); count 0-6 (PREREG sec 4.1)",
-      "own_clock_sessions": 60,
-      "binding_maturity_sessions": 60,
       "eligible_nights": 0,
-      "mature_nights": 0,
       "contributing_nights": 0,
       "required_nights": 80,
       "post_lock_contributing_nights": 0,
@@ -121,71 +77,11 @@
     },
     {
       "endpoint": "O9_speed",
-      "description": "1 if L3 touched within 5 sessions of X, else 0; rate (PREREG sec 4.1, Q002's S3)",
-      "own_clock_sessions": 5,
-      "binding_maturity_sessions": 60,
       "eligible_nights": 0,
-      "mature_nights": 0,
       "contributing_nights": 0,
       "required_nights": 80,
       "post_lock_contributing_nights": 0,
       "required_post_lock_nights": 30
     }
-  ],
-  "window_stability_floor": {
-    "description": "Per-window cell floor (sec 5.1, DP-21), distinct from the per-endpoint ranking-set floor above: each of the four registered sec 2.2 windows (Half A, Half B, and the two arms of whichever partition the branch registers -- platform-label STRONG/NOTSTRONG in every branch, plus bar-only tape BENIGN/HOSTILE if the SPY-from-2025-01-02 history is delivered) needs >= 20 contributing nights to enter the stability test; below 20 a window prints its count, leaves the stability test, and is named -- and after the single DP-13 extension, no objective may be named strongest unless all four windows in the branch clear 20 (DECISIONS item 14, Correction 5).",
-    "required_nights_per_window": 20,
-    "contributing_nights_per_window": {
-      "half_A": 0,
-      "half_B": 0,
-      "platform_label_STRONG": 0,
-      "platform_label_NOTSTRONG": 0,
-      "bar_only_BENIGN": 0,
-      "bar_only_HOSTILE": 0
-    }
-  },
-  "scheduling_rate_cap": {
-    "description": "Scheduling rate = min(r_rank,60, 0.6620) (DECISIONS items 7, 8). 0.6620 = 47/71, the desk's measured published-pick contributing rate, cited from STEWARD_Q031_exposure.md sec (a) (reconfirmed by STEWARD_Q032_exposure.md sec (a)(ii)) -- not recomputed here. r_rank,60 = 10/11 = 0.9091, the ranking-set rate on the t+60-evaluable sub-period, cited from STEWARD_Q034_exposure.md sec (b). The cap (0.6620) is the binding half: no date is ever computed from a rate faster than the desk's own measured published-pick number. SCHEDULE_AUDIT.md flags that Q033/Q034 cap planning on Q031's 0.6620 and carry their own 40/60-session endpoints with their own maturity clocks, and cautions that the 20-session illustrative scenarios in that audit's table do not apply to Q034.",
-    "value_used": 0.662,
-    "component_rates_cited": {
-      "r_rank_60": 0.9091,
-      "published_pick_contributing_rate": 0.662
-    }
-  },
-  "readiness_label": "unmeasured",
-  "data_dependency": {
-    "status": "no manifest pinned -- in-window counts are structurally 0 today",
-    "manifests_needed": [
-      {
-        "type": "selection freeze",
-        "scope": "sas_candidates (every row, published and unpublished), sas_runs, market_regime_daily (with created_at and regime_version preserved)",
-        "coverage": "pick nights 2026-09-15 .. 2027-04-30, plus a second pair .. 2027-06-14 only if the single DP-13 extension fires",
-        "routed_as": "PREREG sec 5.3 R2 -- ROUTED to data-steward, due before the 2027-08-09 decision date, not a blocker for lock (DP-23); still ROUTED and OPEN per DECISIONS item 20",
-        "built_when": "not yet built as of 2026-09-14; this is Q033's R2 build shared across Q027/Q029/Q031/Q033/Q034 with the daily tail extended to t+60"
-      },
-      {
-        "type": "price freeze",
-        "scope": "prices_daily_split, prices_daily_raw, prices_hourly_raw for every candidate symbol on every in-window night (published and unpublished), hourly bars for published symbols, SPY split-adjusted daily bars from 2025-01-02 (if the Alpaca credential blocker clears)",
-        "coverage": "daily bars >=60 prior sessions before 2026-09-15, through t+60 of the last in-window pick night = 2027-07-28 (DECISIONS Correction 1); through 2027-09-09 on the extension path",
-        "routed_as": "PREREG sec 5.3 R2 -- ROUTED to data-steward, due before the decision date, not a blocker for lock (DP-23); still ROUTED and OPEN per DECISIONS item 20",
-        "built_when": "not yet built as of 2026-09-14; SPY-from-2025-01-02 leg blocked on absent ALPACA_API_KEY/ALPACA_SECRET_KEY per STEWARD_Q032_exposure.md sec (g) -- the STABILITY_WITHOUT_TAPE_ARMS branch (sec 2.2) is the branch most likely to run on today's evidence"
-      },
-      {
-        "type": "add-only successor exclusions file",
-        "scope": "the identical four criteria (manual_runs, non_session_runs, uncorroborated_publication_runs, payload_disabled_runs) applied to nights after 2026-09-10; may only add nights, never remove one from exclusions_v003.json",
-        "routed_as": "PREREG sec 5.3 R2(v)",
-        "built_when": "not yet built as of 2026-09-14"
-      }
-    ]
-  },
-  "notes": [
-    "elapsed_sessions = 0 because the registered window (pick nights 2026-09-15..2027-04-30) starts tomorrow relative to as_of 2026-09-14; every eligible/mature/contributing count is 0 by construction, not by shortfall.",
-    "This is a DIAGNOSTIC/objective-comparison question (PREREG sec 1): it registers no primary endpoint in the effect-size/MPE sense, no BH correction and computes no q-value. The nine objectives O1-O9 are listed here because the register's own >= 80-contributing-night reporting floor applies per-row (sec 5.1, DP-21); PROSPECTIVELY_CONFIRMED is declined in every branch.",
-    "eligible_nights/mature_nights/contributing_nights are identical across all nine endpoint rows because the >= 80-night floor is projected on the shared ranking set (sec 2.5, DECISIONS item 7) -- a night only enters the ranking set once every one of the nine objectives independently clears >= 3 valid picks with >= 5 valid controls. Each objective also has its own, generally larger, full-night-set count (not tracked here as a separate readiness field; see PREREG sec 4.3).",
-    "The binding maturity is 60 sessions uniformly for every objective's contributing-night gating (sec 2.3, sec 2.5: 'matured to t+60'), even though O1/O9 have a 5-session own clock and O3/O4/O6/O7 a 20-session own clock -- this is what SCHEDULE_AUDIT.md means by '40/60-session endpoints with their own maturity clocks': O5 and O8 carry the deepest (60-session) own clock, and it is the reason Q034's registered window is longer than its 20-session-clock siblings (Q009/Q010, Q002, Q033).",
-    "Per DECISIONS item 18 / Schedule section (final, recorded 2026-09-14 on STEWARD_Q034_exposure.md R1, counts only, cited not recomputed): binding floor is A (>=80 ranking-set nights, projected reached at session 121 = 2027-03-09); floor B (>=20 rarer-registered-window nights) projected reached at session 102 = 2027-02-09; floor C (DP-24, >=30 post-lock nights) at session 46 -- all inside the registered 158 sessions.",
-    "No manifest is pinned (pin_at_decision: true, schedule.json); the successor selection and price freezes (sec 5.3 R2) are ROUTED and OPEN, due before the decision date but not a blocker for lock (DP-23). Never queried live for these counts (rule 4).",
-    "SCHEDULE_AUDIT.md's caution is heeded here: the illustrative 20-session Q024/Q027/Q029 scenarios in that audit's table are explicitly NOT applied to Q034; Q034's own scheduling rate (min(0.9091, 0.6620) = 0.6620, cited from STEWARD_Q034_exposure.md and STEWARD_Q031_exposure.md, not recomputed) and its own 60-session-maturity endpoints (O5, O8) govern its schedule instead.",
-    "No hit rate, touch rate, return, effect, p-value or comparison is recorded anywhere in this file; results/ was not opened."
   ]
 }
