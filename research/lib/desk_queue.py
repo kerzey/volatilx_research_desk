@@ -60,8 +60,8 @@ RUN_STEPS = {           # state -> what the desk does next
     "LEDGERED": "board; HISTORICALLY_CONFIRMED waits for Haci (HUMAN_APPROVED)",
     "HUMAN_APPROVED": "brief-writer QNNN",
     "BRIEF_WRITTEN": "Haci runs the brief in the platform repo",
-    "IMPLEMENTED_FLAG_OFF": "steward shadow grading (≥ 30 nights)",
-    "SHADOW_VALIDATED": "Haci: RELEASE_APPROVED",
+    "IMPLEMENTED": "steward live grading (≥ 30 nights)",
+    "LIVE_VALIDATED": "Haci: RELEASE_APPROVED",
 }
 TERMINAL = {"NULL", "INCONCLUSIVE", "REJECTED", "DEFERRED"}
 STATUS_RE = re.compile(r"^(OPEN|PROPOSED|READY|IDEA|UNDER_TEST\S*|HISTORICAL\S*|PROSPECTIVE\S*|KILLED|HACI_DECIDED:\S+|"
@@ -152,9 +152,12 @@ def lifted_deferrals() -> dict:
     """
     out, cur = {}, None
     for line in _read(QDIR / "DEFERRED.md").splitlines():
-        m = re.match(r"^## (Q\d{3})\b", line)
-        if m:
-            cur = m.group(1)
+        if line.startswith("## "):
+            # Any heading ends the previous entry (matches the controller's parser). Before
+            # 2026-09-15 only a "## QNNN" heading did, so a "TRIGGER MET" phrase inside a later
+            # "## H-NNN" entry was credited to the question above it.
+            m = re.match(r"^## (Q\d{3})\b", line)
+            cur = m.group(1) if m else None
             continue
         if cur and "TRIGGER MET" in line:
             out[cur] = line.lstrip("> ").strip()[:160]
@@ -224,12 +227,12 @@ def build_queue(today: date = None, max_register: int = 2) -> dict:
         elif s == "HUMAN_APPROVED":
             desk_todo.append({"id": q["id"], "what": "brief-writer: IMPLEMENTATION_BRIEF.md"})
         elif s == "BRIEF_WRITTEN":
-            for_haci.append({"id": q["id"], "what": f"run research/questions/{q['dir']}/IMPLEMENTATION_BRIEF.md in the platform repo, flag OFF",
-                             "type": f"python research/lib/controller.py advance {q['id']} IMPLEMENTED_FLAG_OFF --by haci --note \"PR <link> sha <before> <after>\""})
-        elif s == "IMPLEMENTED_FLAG_OFF":
-            desk_todo.append({"id": q["id"], "what": "steward: shadow grading nightly; SHADOW.json after ≥ 30 nights"})
-        elif s == "SHADOW_VALIDATED":
-            for_haci.append({"id": q["id"], "what": "flip the flag on",
+            for_haci.append({"id": q["id"], "what": f"run research/questions/{q['dir']}/IMPLEMENTATION_BRIEF.md in the platform repo and deploy (no flag, DP-59)",
+                             "type": f"python research/lib/controller.py advance {q['id']} IMPLEMENTED --by haci --note \"PR <link> sha <deployed>\""})
+        elif s == "IMPLEMENTED":
+            desk_todo.append({"id": q["id"], "what": "steward: live grading nightly; LIVE.json after ≥ 30 nights"})
+        elif s == "LIVE_VALIDATED":
+            for_haci.append({"id": q["id"], "what": "approve quoting it to subscribers (PROSPECTIVELY_CONFIRMED)",
                              "type": f"python research/lib/controller.py advance {q['id']} RELEASE_APPROVED --by haci"})
     in_flight.sort(key=lambda q: q["due_on"])
 

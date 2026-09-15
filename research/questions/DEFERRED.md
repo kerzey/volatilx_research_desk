@@ -2526,7 +2526,7 @@ may be reported, briefed or quoted** until both triggers are met.
 
 ---
 
-> **2026-09-15 — blocker may be lifting, not lifted.** Haci granted the desk his Financial Modeling Prep key (`FMP_API_KEY`; rule 1 listing pending Haci's edit; `research/data/DATA_NOTES.md` "External source: FMP"). FMP's insider-trading search endpoints are named above as a candidate source. Before any TRIGGER MET line: the Steward verifies, read-only, that the history endpoint returns Form 4 rows with an acceptance / filing timestamp for the study window and the candidate universe, freezes them with a manifest, and records the availability rule; only then does the registrar reassess. Not resumed by this note.
+> **2026-09-15 — blocker may be lifting, not lifted.** Haci granted the desk his Financial Modeling Prep key (`FMP_API_KEY`; rule 1 listing pending Haci's edit; `research/data/DATA_NOTES.md` "External source: FMP"). FMP's insider-trading search endpoints are named above as a candidate source. Before the trigger can be marked met, the Steward verifies, read-only, that the history endpoint returns Form 4 rows with an acceptance / filing timestamp for the study window and the candidate universe, freezes them with a manifest, and records the availability rule; only then does the registrar reassess. Not resumed by this note.
 > **Steward result, same day** (`research/reports/STEWARD_FMP_insider_feasibility.md`): **partly.** FMP's
 > `insider-trading/search` returns the full Form 3/4/5 history per symbol (reporting-owner CIK, SEC transaction
 > codes including P-Purchase, date, shares, price; paginated at 1,000 rows, no server-side date filter) but
