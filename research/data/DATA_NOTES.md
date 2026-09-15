@@ -409,3 +409,22 @@ unrelated defect -- platform pytest fixtures deleting all users -- so this is **
 issue and should not be cited under that id). The coordinator is filing this as a new
 `PLATFORM_ISSUES.md` entry (expected next free id **PI-022**); reference the entry the
 coordinator actually files, not PI-021, when this note is next revised.
+
+## EN-020 Phase A (PI-023) ship log (steward, 2026-09-15)
+
+**EN-020 Phase A (PI-023) shipped `c5740cc` (merged `eb2de2c`, redeployed `2036454`), first covered
+session pending — expected 2026-09-16, to be filled at the next verify.** From that session
+`uoa_contract_daily.buy_premium / sell_premium / unknown_premium` are summed from
+`uoa_contract_intraday` buckets labelled against the quote bracketing each print; uncovered premium
+is `unknown`, with no closing-quote fallback. `uoa_symbol_daily.dir_ratio` is NULL when
+`aggressor_qat_share < 0.50`, and `bull_dir`/`bear_dir` fall to 0.50, which moves
+`score_day/swing/long` on those symbols; the SAS legacy flow vote abstains there. Feed in use:
+`opra` (as recorded on the tick rows). Per-session `aggressor_qat_share`: pending — no trading
+session has run with the sampler deployed as of 2026-09-15 (ship date); to be filled once a session
+completes. **No historical row was rewritten.** Under DP-50(a) the aggressor columns are two
+different features either side of this date: **Q014, Q019, Q029 and Q030 split here** (split date
+= first covered session, TBD, expected 2026-09-16).
+
+Ship date: **2026-09-15**. Repository checks (§4.1 a-f of the brief) and the schema-landed check
+passed the same day; W1-W3 (sampler ran, merge reconciles, early-vs-late placebo) are pending on
+the schedule in `research/reports/VERIFY_EN-020.md`.
