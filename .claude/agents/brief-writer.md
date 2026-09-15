@@ -27,21 +27,25 @@ Read the codebase first. Cite every touch point as `path:line` from the *current
 
 The brief must contain, in this order (Haci's house format):
 1. **Finding** — one paragraph from REPORT.md Level 1, with n, CI, MPE, verdict, ledger row.
-2. **Change** — precisely what behaviour is added, and the config flag that gates it
-   (follow the repo's existing flag conventions; default OFF). Name the runtime setting keys.
-3. **Shadow column / sidecar** — what to persist so the Data Steward can grade the feature dark
-   for ≥30 nights (column name, table, write point, `path:line` of the write).
-4. **Inertness proof** — the exact dry-run command on a fixed trading date, before and after,
-   with SHA-256 of both outputs required to match; where to paste the hashes.
-5. **Tests** — flag-off path unchanged (unit), flag-on behaviour against a fixture built from
-   the study's frozen data (include the fixture rows), any DB-contract test.
+2. **Change** — precisely what behaviour is added. **No feature flag, no shadow mode, no inertness
+   proof (DP-59)** — it ships live. Name any runtime setting keys that size the job; settings are
+   not gates.
+3. **Live grading column** — what the platform persists so the Data Steward can grade the feature
+   live for ≥30 nights (column name, table, write point, `path:line` of the write). Usually the
+   feature's own output; add nothing extra if it already exists.
+4. **After-deploy check** — the read-only query or listing the Data Steward runs on the first
+   nightly after deploy, with expected values; and **what changes for the desk** — which published
+   numbers or stored rows change from the ship date, so the SHA is logged in DATA_NOTES.md and
+   locked questions split there (DP-50).
+5. **Tests** — unit tests against a fixture built from the study's frozen data (include the fixture
+   rows), any DB-contract test. No live calls.
 6. **Docs** — which doc under `docs/` gets updated and the one-line entry.
 7. **Acceptance criteria** — numbered, verifiable.
-8. **Rollback** — one command / one flag.
+8. **Rollback** — `git revert` of the PR.
 9. **Out of scope** — what the coding agent must not touch.
 
 Then `python research/lib/controller.py advance QNNN BRIEF_WRITTEN`. Haci runs the brief in the
-platform repo and advances IMPLEMENTED_FLAG_OFF himself with the PR link and hashes.
+platform repo, deploys it, and advances IMPLEMENTED himself with the PR link and the deployed SHA.
 
 ## Fix briefs (platform issues, not findings)
 
@@ -54,12 +58,14 @@ without asking questions. Cite every touch point as path:line at the current pla
 record the SHA in the header. Sections, in order:
 1. Symptom — the evidence from the register, with a reproducing read-only SQL query.
 2. Cause — the code path, path:line.
-3. Change — the minimal fix. No feature flag when the fix restores intended behaviour;
-   say explicitly why no flag is needed. If the fix changes any published number, STOP and
-   return the issue to Haci as `research`.
-4. Before/after check — one command on a fixed trading date; what differs, what must not.
+3. Change — the minimal fix. **Never a feature flag, shadow mode or inertness proof (DP-59).**
+   If the fix changes a published number, say which and from when; it still ships. Return the
+   issue as `research` only if the "fix" would change what is scored or selected on a
+   hypothesis rather than restore intended behaviour.
+4. Before/after check — the coding agent's repository-only check (tests, diff), plus the read-only
+   check the Data Steward runs after deploy; what changes, what must not.
 5. Test — the unit or contract test that would have caught it.
-6. Rollback — one command.
+6. Rollback — `git revert` of the PR.
 7. Out of scope.
 
 Then set the register row to BRIEF_WRITTEN with the brief's path. Haci runs it, records the PR
@@ -74,10 +80,10 @@ Precondition: the Build column of the row in `research/ENHANCEMENTS.md` (or the 
 - **behaviour, gate met** (the gating question is HUMAN_APPROVED) → write that question's finding
   brief instead and say so.
 - **behaviour, gate not met** → an **INTERNAL_TOOL** brief: first line
-  `INTERNAL_TOOL — flag-off, visible to Haci only, no subscriber-facing copy or number; gate: QNNN
-  (<decision date>)`, then the same sections, plus an acceptance criterion that the subscriber
-  payload is byte-identical before and after (the inertness proof, rule 11). A trade idea (TI) is
-  always built this way until its evidence reads PROSPECTIVE.
+  `INTERNAL_TOOL — visible to Haci only (admin route or admin-only page), no subscriber-facing copy
+  or number; gate: QNNN (<decision date>)`, then the same sections. It ships live with no flag
+  (DP-59); being Haci-only is what keeps it off subscriber surfaces. A trade idea (TI) is always
+  built this way until its evidence reads PROSPECTIVE.
 Every brief ends with the exact before/after check the Data Steward will run at
 `/desk-run verify <id> <sha>`. Then set the row to `BRIEF_WRITTEN` with the brief's path.
 
@@ -124,6 +130,6 @@ like "the hole" and differed by a factor of two for exactly that reason.
 **Check ship timing against every in-flight question (DP-50).** Before you write a repair brief,
 read `research/lib/desk_queue.py` output or `research/BOARD.md` for the locked questions. If the
 repair changes a column a locked PREREG reads, or changes which picks get published, the brief
-names the constraint in its own header — flag-off until that question's decision date, the
-PI-011 / Q010 pattern — and the repair log row in `research/data/DATA_NOTES.md` that will be
+names the constraint in its own header — the ship date it creates and the locked questions that
+split at it (DP-50; under DP-59 it still ships) — and the repair log row in `research/data/DATA_NOTES.md` that will be
 written when it ships. A repair is never briefed without that check.

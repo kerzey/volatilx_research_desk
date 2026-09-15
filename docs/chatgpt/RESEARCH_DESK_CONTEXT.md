@@ -127,7 +127,7 @@ cannot go backwards.
 ```
 IDEA -> PREREG_DRAFT -> PREREG_LOCKED -> DATASET_PINNED -> EVALUATED -> VALIDATED
      -> REDTEAM_SIGNED -> LEDGERED -> HUMAN_APPROVED* -> BRIEF_WRITTEN
-     -> IMPLEMENTED_FLAG_OFF* -> SHADOW_VALIDATED -> RELEASE_APPROVED*
+     -> IMPLEMENTED* -> LIVE_VALIDATED -> RELEASE_APPROVED*
 ```
 
 `*` — only Haci can advance these three. Everything else the desk does on its own.
@@ -150,7 +150,7 @@ IDEA -> PREREG_DRAFT -> PREREG_LOCKED -> DATASET_PINNED -> EVALUATED -> VALIDATE
    outputs, never the researcher's notes. Hunts look-ahead bias, denominator errors, regime
    confounds, multiple-testing inflation, baseline mismatches. **It can and does overturn verdicts.**
 8. **Ledger** — the verdict goes on the permanent record with its number, its sample and its q-value.
-9. **Ship, if it earns it** — prove inert, ship flag-off, validate in shadow, flip the flag last.
+9. **Ship, if it earns it** — ship directly with no flag (DP-59), verify after deploy, grade it live ≥ 30 nights before quoting it.
 
 **Autonomous mode.** Since 13 September 2026 the desk works its own queue without asking Haci:
 it registers and locks questions itself, settles the decisions it used to ask about, applies a

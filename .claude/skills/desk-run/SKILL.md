@@ -198,8 +198,8 @@ Commit the register change and the brief.
   protocol: run the brief's before/after check read-only, write `research/reports/VERIFY_<id>.md`
   with PASS/FAIL, set the row to `VERIFIED` or `FAILED:<one line>`). Reply with the PASS/FAIL line
   and the report path. Commit.
-- For a `QNNN` finding: the controller step is his (`IMPLEMENTED_FLAG_OFF --by haci --note "PR …
-  sha …"`); reply with that command, then the steward's shadow protocol takes over on later runs.
+- For a `QNNN` finding: the controller step is his (`IMPLEMENTED --by haci --note "PR …
+  sha …"`); reply with that command, then the steward's live grading protocol takes over on later runs.
 
 **`idea "<text>"`** — append `- [ ] <text>` to `research/INBOX.md`, run step A for it, then step F
 for that H-NNN with `--max-register 1`, then step G.

@@ -132,10 +132,10 @@ Then in Claude Code: `@data-steward advance Q001 DATASET_PINNED` → `@researche
 ## Step 9 — What happens with a finding
 
 - **Platform change:** you `advance QNNN HUMAN_APPROVED --by haci` → `@brief-writer` produces
-  `IMPLEMENTATION_BRIEF.md` (flag-off, shadow column, inertness hashes, tests, rollback) → you run
-  it in the platform repo with your coding agent → `advance QNNN IMPLEMENTED_FLAG_OFF --by haci
-  --note "PR #… sha before=… after=…"` → Steward grades the shadow column ≥30 nights →
-  `SHADOW_VALIDATED` → you `RELEASE_APPROVED` → flip the flag.
+  `IMPLEMENTATION_BRIEF.md` (change, live grading column, after-deploy check, tests, rollback; no
+  flag — DP-59) → you run it in the platform repo with your coding agent and deploy → `advance QNNN
+  IMPLEMENTED --by haci --note "PR #… sha …"` → Steward grades it live ≥30 nights →
+  `LIVE_VALIDATED` → you `RELEASE_APPROVED` → it may be quoted to subscribers.
 - **Trading rule for you:** the Reporter writes `playbook/PB-NNN_slug.md` with the rule, n, CI,
   regime caveats and `Status: HISTORICAL — trade small until PROSPECTIVELY_CONFIRMED`.
 - **Null:** ledgered. Tells you what not to build and not to market.
@@ -159,7 +159,7 @@ guarded command in `research/reports/hook_audit.log`; every change in `git log`.
 
 Saturday ritual (30 min): `/desk-status` → new REPORTs → weekly report → pick backlog items for
 the Registrar → review/commit PREREG drafts. Only you can advance HUMAN_APPROVED,
-IMPLEMENTED_FLAG_OFF and RELEASE_APPROVED.
+IMPLEMENTED and RELEASE_APPROVED.
 
 ## Order of questions
 

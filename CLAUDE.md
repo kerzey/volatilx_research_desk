@@ -66,8 +66,11 @@ platform repo.
 15. **Enforcement code is off-limits.** `.claude/`, `research/lib/{validators,controller,
     freeze_dataset,eval_utils}.py` are edited by humans outside the desk. Hooks are policy;
     the OS sandbox (`scripts/setup_sandbox.sh`) is containment.
-11. **Prove inert, ship dark, flip last.** New code ships flag-off with a byte-identical
-    checksum on the old path; validated in shadow; activated only after inertness is confirmed.
+11. **Ship, then verify here (DP-59).** Platform changes ship directly: no feature flag, no shadow
+    mode, no inertness proof. The desk verifies every fix, build and finding after deploy with a
+    read-only before/after check and logs the ship SHA and date in `research/data/DATA_NOTES.md`;
+    locked questions split at that date (DP-50). A finding still needs >= 30 live nights graded by
+    the Data Steward before it is PROSPECTIVELY_CONFIRMED and quotable to subscribers (rule 10).
 12. **Quotable vs research basis.** Subscriber-facing numbers are W60 only (exposure policy).
     W10/W20 windows are allowed for research and must be labelled `NON_QUOTABLE`.
 13. **Two-level reporting.** Anything for Haci: one decision paragraph first, detail after.
@@ -121,7 +124,7 @@ locks questions (`--by desk`, DP-46), settles the decisions once reserved for hi
 once on its decision date, and writes briefs on request. His moments are: read the board;
 `/desk-run prompt <id>` (asking is the decision); implement in the platform repo;
 `/desk-run verify <id> <sha>`; and the three controller steps that stay `--by haci`
-(HUMAN_APPROVED, IMPLEMENTED_FLAG_OFF, RELEASE_APPROVED). Ideas go in `research/INBOX.md`.
+(HUMAN_APPROVED, IMPLEMENTED, RELEASE_APPROVED). Ideas go in `research/INBOX.md`.
 Nothing above changes: rules 1–15 bind the autonomous desk exactly as before.
 
 ## One database (2026-09-13)

@@ -40,10 +40,11 @@ Writes: only `research/data/` and `research/reports/`.
 8. After freezing, `python research/lib/controller.py advance QNNN DATASET_PINNED` for the
    question(s) that named this manifest.
 
-## Shadow protocol
-When a question reaches IMPLEMENTED_FLAG_OFF, grade its shadow column nightly with the same
-T+10 rule. After ≥30 nights write `results/SHADOW.json` {n_nights, mean_alpha, ci} so the
-controller can evaluate SHADOW_VALIDATED. You do not decide; the controller does.
+## Live grading protocol (DP-59: findings ship live, no shadow)
+When a question reaches IMPLEMENTED, grade its live output nightly with the same T+10 rule,
+counting from the deployed SHA's ship date. After ≥30 nights write `results/LIVE.json`
+{n_nights, mean_alpha, ci, ship_sha, ship_date} so the controller can evaluate LIVE_VALIDATED.
+You do not decide; the controller does.
 
 ## Daily check protocol (skill: /daily-check)
 Compare today's nightly output to the trailing 20-trading-day median for each stage:

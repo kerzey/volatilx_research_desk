@@ -28,7 +28,7 @@ and type the three controller commands nobody else may type. To make it run over
 | Remember every decision date | `schedule.json` in each question folder; `research/lib/desk_queue.py` says what is due; the desk runs it on the date. |
 | Mark an issue fix / research / accept, then `@brief-writer fix-brief` | Ask for the prompt: `/desk-run prompt PI-NNN`. Asking *is* the decision (DP-48). |
 | Check a fix by hand after implementing | `/desk-run verify PI-NNN <sha>` — the steward runs the brief's before/after check and writes PASS or FAIL. |
-| HUMAN_APPROVED, IMPLEMENTED_FLAG_OFF, RELEASE_APPROVED | Still yours. The controller refuses them from anyone else, and that does not change. |
+| HUMAN_APPROVED, IMPLEMENTED, RELEASE_APPROVED | Still yours. The controller refuses them from anyone else, and that does not change. |
 | Ideas by conversation | `research/INBOX.md` (one line each) or `/desk-run idea "…"`. They jump the queue. |
 
 Nothing in CLAUDE.md rules 1–15 changed. Pre-registration before data, frozen data only, nights
@@ -46,7 +46,7 @@ and by the nightly daily-check, from these files:
 | 2. Results | `research/LEDGER.md` | Every verdict on record, one line each. |
 | 3. Edges | LEDGER + `playbook/` | Proven edges (none yet), and the candidate edges under test with their decision dates. |
 | 4. Platform issues | `research/PLATFORM_ISSUES.md` | Defects. Lifecycle: OPEN → HACI_DECIDED → BRIEF_WRITTEN → IMPLEMENTED:<sha> → VERIFIED. |
-| 5. Enhancements | `research/ENHANCEMENTS.md` | Things the platform could do. `plumbing` builds now; `behaviour` waits for its gate question, or ships as a flag-off internal tool. |
+| 5. Enhancements | `research/ENHANCEMENTS.md` | Things the platform could do. `plumbing` builds now; `behaviour` waits for its gate question, or ships as a Haci-only internal tool (no flag, DP-59). |
 | 6. Trade ideas | `research/TRADE_IDEAS.md` | Your list: IDEA → UNDER_TEST:QNNN → HISTORICAL → PROSPECTIVE, or KILLED. Each can become an internal tool. |
 | 7. Decisions the desk made | each `DECISIONS.md` | Every DEFAULTED item, with the option not taken. |
 | 8. Backlog and calendar | `research/BACKLOG.md`, `schedule.json` | What is next, and when each question decides. |

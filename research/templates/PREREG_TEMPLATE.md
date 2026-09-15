@@ -76,8 +76,8 @@
 
 ## 9. If CONFIRMED, what changes
 <a line in the Manual Trading Guide / a lane rule / a flag in SAS config / a marketing claim type>
-Owner: implementer. Flag off, prove inert, shadow validation ≥ 30 nights. HUMAN_APPROVED,
-IMPLEMENTED_FLAG_OFF and RELEASE_APPROVED retain their human-only gates. A hypothesis is not a
+Owner: implementer. Ships live, no flag (DP-59); live grading ≥ 30 nights. HUMAN_APPROVED,
+IMPLEMENTED and RELEASE_APPROVED retain their human-only gates. A hypothesis is not a
 defect repair. State DP-50 dependencies on every affected in-flight experiment.
 
 ## 10. Known threats to validity (registrar's own list)

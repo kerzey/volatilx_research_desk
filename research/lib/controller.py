@@ -19,10 +19,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 ORDER = ["IDEA", "PREREG_DRAFT", "PREREG_LOCKED", "DATASET_PINNED", "EVALUATED", "VALIDATED",
-         "REDTEAM_SIGNED", "LEDGERED", "HUMAN_APPROVED", "BRIEF_WRITTEN", "IMPLEMENTED_FLAG_OFF",
-         "SHADOW_VALIDATED", "RELEASE_APPROVED"]
+         "REDTEAM_SIGNED", "LEDGERED", "HUMAN_APPROVED", "BRIEF_WRITTEN", "IMPLEMENTED",
+         "LIVE_VALIDATED", "RELEASE_APPROVED"]  # patch9 (2026-09-15, DP-59): no flag-off / shadow states
 TERMINAL = {"NULL", "INCONCLUSIVE", "REJECTED", "DEFERRED"}
-HUMAN_ONLY = {"HUMAN_APPROVED", "IMPLEMENTED_FLAG_OFF", "RELEASE_APPROVED"}
+HUMAN_ONLY = {"HUMAN_APPROVED", "IMPLEMENTED", "RELEASE_APPROVED"}
 
 
 def qdir(q):
@@ -147,29 +147,29 @@ def pre_BRIEF_WRITTEN(d, st, args):
     f = d / "IMPLEMENTATION_BRIEF.md"
     if not f.exists():
         return "IMPLEMENTATION_BRIEF.md missing"
-    if "Inertness proof" not in f.read_text() or "Rollback" not in f.read_text():
+    if "After-deploy check" not in f.read_text() or "Rollback" not in f.read_text():
         return "brief lacks required sections"
     st["brief_sha256"] = sha(f)
     return None
 
 
-def pre_IMPLEMENTED_FLAG_OFF(d, st, args):
+def pre_IMPLEMENTED(d, st, args):
     if args.by != "haci":
         return "only Haci records that the brief was implemented in the platform repo"
     if not args.note or "PR" not in args.note or "sha" not in args.note.lower():
-        return "--note must carry the PR link and the before/after dry-run hashes"
+        return "--note must carry the PR link and the deployed sha"
     return None
 
 
-def pre_SHADOW_VALIDATED(d, st, args):
-    f = d / "results" / "SHADOW.json"
+def pre_LIVE_VALIDATED(d, st, args):
+    f = d / "results" / "LIVE.json"
     if not f.exists():
-        return "results/SHADOW.json missing (steward writes it after ≥30 shadow nights)"
+        return "results/LIVE.json missing (steward writes it after ≥30 live nights)"
     s = json.loads(f.read_text())
     if s.get("n_nights", 0) < 30:
-        return f"only {s.get('n_nights')} shadow nights; need ≥ 30"
+        return f"only {s.get('n_nights')} live nights; need ≥ 30"
     if s.get("mean_alpha", -1) <= 0:
-        return "shadow mean_alpha not > 0 — prospective confirmation failed"
+        return "live mean_alpha not > 0 — prospective confirmation failed"
     st["prospective_verdict"] = "PROSPECTIVELY_CONFIRMED"
     return None
 

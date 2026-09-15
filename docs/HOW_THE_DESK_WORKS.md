@@ -48,8 +48,8 @@ BACKLOG idea (or a line you wrote in research/INBOX.md)
   → verdict: NULL / INCONCLUSIVE / HISTORICALLY_CONFIRMED
   → YOU decide: build it?                              ← moment 1: HUMAN_APPROVED (controller)
   → /desk-run prompt QNNN → IMPLEMENTATION_BRIEF.md    (agent)
-  → YOU run the brief in the platform repo, flag OFF, record SHA  ← moment 2
-  → steward grades the dark column ≥ 30 nights → SHADOW_VALIDATED → YOU flip the flag ← moment 3
+  → YOU run the brief in the platform repo and deploy it, record SHA (IMPLEMENTED)  ← moment 2
+  → steward grades it live ≥ 30 nights → LIVE_VALIDATED → YOU approve quoting it (RELEASE_APPROVED) ← moment 3
 ```
 
 Only you can do the three ← moments; the controller refuses them from anyone else. Everything
@@ -71,7 +71,7 @@ before/after check. No pre-registration, no shadow period. Anything that turns o
 *behaviour change* to scoring gets promoted to a question. Enhancements
 (`research/ENHANCEMENTS.md`) and your trade ideas (`research/TRADE_IDEAS.md`) take the same
 prompt → implement → verify route; behaviour changes wait for their question's verdict, or ship as
-a flag-off internal tool for you only.
+an internal tool for you only (no flag, DP-59).
 
 ## The commands you'll actually type
 
@@ -84,8 +84,8 @@ a flag-off internal tool for you only.
 /desk-run idea "picks that gap up and close red on day 1 are dead money"   # jumps the queue
 /desk-status                             # one-screen status (or just read research/BOARD.md)
 python research/lib/controller.py advance Q00N HUMAN_APPROVED --by haci     # yours: build a finding
-python research/lib/controller.py advance Q00N IMPLEMENTED_FLAG_OFF --by haci --note "PR … sha …"
-python research/lib/controller.py advance Q00N RELEASE_APPROVED --by haci   # yours: flip the flag
+python research/lib/controller.py advance Q00N IMPLEMENTED --by haci --note "PR … sha …"
+python research/lib/controller.py advance Q00N RELEASE_APPROVED --by haci   # yours: quotable to subscribers
 # the old per-step commands (@registrar draft, @decision-maker decide --ask, @researcher run …)
 # still work when you want to drive one step by hand
 ```

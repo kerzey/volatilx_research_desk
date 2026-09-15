@@ -128,7 +128,7 @@ def main() -> None:
     # 5. Enhancements
     L.append("## 5. Enhancements to build in the platform\n")
     L.append("_Source: `research/ENHANCEMENTS.md`. `plumbing` items can be built now; `behaviour` items wait for their question's verdict "
-             "(rule 10/11) unless built as a flag-off internal tool._\n")
+             "(rule 10) unless built as a Haci-only internal tool (DP-59: no flags)._\n")
     L.append(table(q["lists"]["enhancements"], [("ID", lambda r: r["id"]), ("status", lambda r: r["status"] or "PROPOSED"), ("build", lambda r: r["flow"] or "—"), ("enhancement", lambda r: r["text"])]))
 
     # 6. Trade ideas
