@@ -326,6 +326,29 @@ W6. `DATA_NOTES.md` entry with ship SHA, first covered session, the feed in use 
    is recorded on every quote row either way.
 2. Whether the live view sits in the existing UOA tab (admin-only panel) or a new admin route.
 
+### 5.13 Haci's answers (2026-09-15) and the settings that follow — these override §5.1, §5.2, §5.6 and §5.12
+1. **Feed: OPRA in production** (Algo Trader Plus: 10,000 requests/min, no 15-minute hold-back, consolidated
+   NBBO). Therefore: **5-minute cadence**, quote-only seed tick at 09:30, last tick at close + 10 minutes;
+   **one-tick lag** (each tick fetches the interval that ended at the previous tick); the 80/min ceiling and
+   the 4-worker limit stay as a courtesy to the 16:02 and 16:05 jobs but are far from binding; `fast_market`,
+   `conflict` and quote-age numbers should all fall against the 10-minute estimates in §2.2. `feed` is still
+   recorded on every quote row.
+2. **Live view: a tab under AI Picks, "UOA live".** Visible to the **admin role only** in v1 (Haci is the
+   platform's only user; making it subscriber-visible later is a role change gated on a research question,
+   DP-48). Default table = today's unusual names; ticker search opens the symbol's contract buckets and top
+   prints with sides. **"Unusual" is a rule:** `today's classified premium so far ÷ (trailing 20-session mean
+   daily premium × fraction of the session elapsed) ≥ 3`, using `uoa_symbol_daily.total_premium` for the
+   trailing mean. Row columns: symbol, unusual ratio, net buy-side premium `(call_buy − call_sell) − (put_buy −
+   put_sell)`, call buy / sell, put buy / sell, classified share, largest print (contract, size, side, reason),
+   multi-leg share, last tick time. Rows with classified share < 0.50 are greyed and sorted last, so a quiet
+   sampler reads as *no data*, not *no activity*. Numbers only; no sentiment words.
+3. **Universe (desk recommendation, Haci to confirm in the brief request):** the nightly UOA universe
+   (`_resolve_universe`, S&P 500 list today, ~500 names — the floor, since every scored symbol needs coverage
+   or its `dir_ratio` is NULL) ∪ last night's SAS candidates ∪ the EN-019 20-name liquid list ∪ Haci's
+   favourites (`UserFavoriteSymbol`) ∪ SPY, QQQ, IWM; cap 800; ~1,000 requests a tick under Plus. A ticker
+   searched in the tab that is not in the universe is **added to the day's sticky set from that moment**; its
+   earlier prints stay `unknown (not_sampled)` and the tab says so on the row.
+
 ## 6. Seen in passing
 - `uoa_runs` has a `nightly` row dated **2026-12-09** in state `running` (started 10:03 ET) and one for the
   Labor Day holiday 2026-09-07 (22:30, never finished — the `_is_weekday` guard). Harmless to the data; noted
