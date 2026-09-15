@@ -13,8 +13,9 @@ scoring or selection still goes through a research question and a full IMPLEMENT
    bug), or **accept** (document and move on).
 3. Short route: `@brief-writer fix-brief PI-NNN` produces `research/briefs/PI-NNN_slug.md` — a
    self-contained prompt for the coding agent in the platform repo, with the reproducing query,
-   the expected behaviour, a test, and a rollback. No feature flag is needed for a fix that
-   restores intended behaviour, but the brief still names a before/after check.
+   the expected behaviour, a test, and a rollback. **No feature flag, shadow mode or inertness
+   proof — ever (DP-59, Haci 2026-09-15): fix is fix.** The brief names the before/after check the
+   steward runs after deploy, and says which numbers will change if any.
 4. Haci runs the brief in the platform repo, records the PR / SHA here, and the steward
    confirms on the next freeze that the data changed as expected. Then status → `VERIFIED`.
 
@@ -35,7 +36,7 @@ Statuses: `OPEN` · `HACI_DECIDED:<fix|research|accept>` · `BRIEF_WRITTEN` · `
 | PI-011 | high | HACI_DECIDED:fix | Printed swing stop on the wrong side of the pick-night close for 67 of 382 published picks (17.5%) |
 | PI-012 | med | HACI_DECIDED:research | 2026-06-26: three qualified, ranked picks the night's own run audit does not record; no run-history table |
 | PI-013 | med | OPEN | `uoa_symbol_daily.score_swing` / `score_long` overwritten in place by the next-morning OI-confirmation pass; no point-in-time copy |
-| PI-014 | high | OPEN | Conviction Monitor's polarity arm silent since 2026-06-01: `polarity_unavailable_coverage_low` on 100% of in-scope rows, 0 polarity HOLD/EXIT rows — the EXIT tier is the technical arm alone |
+| PI-014 | high | HACI_DECIDED:fix | Conviction Monitor's polarity arm silent since 2026-06-01: `polarity_unavailable_coverage_low` on 100% of in-scope rows, 0 polarity HOLD/EXIT rows — the EXIT tier is the technical arm alone |
 | PI-015 | high | OPEN | Projection layer (v1.6 weight 29, the largest) unscored — `available: false` — on 72.2% of published and 74.3% of capped main-lane rows; `overall_score` is a six-layer blend on ~3 of 4 picks |
 | PI-016 | med | OPEN | Conviction label degenerate on the published slate: `completeness_score` never below 65.37 (min 65.3686 of 4,195 scored rows), so `_confidence_label`'s completeness arm is inert — 401 high / 141 medium / **0 low** on 542 published rows, every `medium` the `[80,82)` score sliver; the subscriber sentence at `services/super_agent_select_public.py:212` re-prints "is the score ≥ 82" |
 | PI-017 | high | IMPLEMENTED:bccfa67 (code verified 2026-09-14; deploy unconfirmed -- V3 re-check after the next nightly that runs bccfa67; see reports/VERIFY_PI-017.md) | A forced UOA re-run deletes the **whole trading date** from `uoa_contract_daily`, `uoa_symbol_daily` and `uoa_bulletins`, then rebuilds only the symbols it was given — so the single-symbol range runner with `--force` wipes ~498 other symbols and the night's bulletins (a SAS candidate-universe source); the run still records `success`. Signature seen once, 2026-01-09 (23 of ~499 symbols), before every study window. Brief: `research/briefs/PI-017_forced_uoa_rerun_delete_scope.md` (2026-09-14) |

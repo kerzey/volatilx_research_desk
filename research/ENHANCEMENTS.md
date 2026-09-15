@@ -8,12 +8,13 @@ CLAUDE.md rules 10–12 and they do not bend.
 ## Two kinds
 
 - **plumbing** — no subscriber-visible number changes (an audit table, a data feed, a stamp, a
-  guard). Short route, like a fix: prompt → implement → verify. Buildable now.
+  guard). Short route, like a fix: prompt → implement → verify. Buildable now. **Ships directly —
+  no flag, no shadow, no inertness proof (DP-59, Haci 2026-09-15).**
 - **behaviour** — changes what is scored, selected, shown or recommended. Its **gate** is a research
   question's verdict: HISTORICALLY_CONFIRMED + `HUMAN_APPROVED` → full `IMPLEMENTATION_BRIEF.md`
-  with a shadow column (rule 11). Before the gate it may still be built as an **internal tool**:
-  flag-off, visible only to Haci, no subscriber copy — the brief says so in its header
-  (`INTERNAL_TOOL`).
+  (rule 11 still applies to finding briefs until Haci retires it). Before the gate it may still be
+  built as an **internal tool**: visible only to Haci, no subscriber copy — the brief says so in
+  its header (`INTERNAL_TOOL`); under DP-59 it ships directly, an admin-only route, no flag.
 
 ## How an enhancement gets built
 
