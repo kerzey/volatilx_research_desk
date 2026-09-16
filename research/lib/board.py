@@ -39,6 +39,16 @@ def playbook_rules() -> list:
     return out
 
 
+def cell(row, role: str) -> str:
+    """The register cell playing `role` ("status", "flow" or "text") in this row.
+
+    Looked up by the column *name* the register declares (desk_queue.REGISTER_ROLES), never by
+    position — the three registers name these columns differently (Status/Evidence, Build/Tool,
+    Issue/Enhancement/Idea) and a row shifted by one column would otherwise print silently.
+    """
+    return row["columns"][row["roles"][role]]
+
+
 def table(rows, cols):
     if not rows:
         return "_none yet_\n"
@@ -123,22 +133,21 @@ def main() -> None:
     # 4. Platform issues
     L.append("## 4. Platform issues\n")
     L.append("_Source: `research/PLATFORM_ISSUES.md`. Statuses: OPEN → HACI_DECIDED:fix/research/accept → BRIEF_WRITTEN → IMPLEMENTED:<sha> → VERIFIED._\n")
-    # status_raw is the cell as written (annotation and all); status is the normalised token the
-    # queue branches on. Both come from desk_queue.list_rows, so the board cannot disagree with the
-    # queue about a status — before 2026-09-15 an annotated cell parsed as "" and printed as OPEN,
-    # which is how PI-001's FAILED and PI-020's VERIFIED both showed here as OPEN.
-    L.append(table(q["lists"]["issues"], [("ID", lambda r: r["id"]), ("status", lambda r: r["status_raw"][:120] or "OPEN"), ("issue", lambda r: r["text"])]))
+    # Every column below is named through the row's own `roles`/`columns`, never by position, and
+    # the rows come from desk_queue.list_rows — so the board cannot disagree with the queue about
+    # a status, and a renamed register column fails in the parser instead of shifting this table.
+    L.append(table(q["lists"]["issues"], [("ID", lambda r: r["id"]), ("status", lambda r: cell(r, "status")[:120] or "OPEN"), ("issue", lambda r: cell(r, "text")[:140])]))
 
     # 5. Enhancements
     L.append("## 5. Enhancements to build in the platform\n")
     L.append("_Source: `research/ENHANCEMENTS.md`. `plumbing` items can be built now; `behaviour` items wait for their question's verdict "
              "(rule 10) unless built as a Haci-only internal tool (DP-59: no flags)._\n")
-    L.append(table(q["lists"]["enhancements"], [("ID", lambda r: r["id"]), ("status", lambda r: r["status_raw"][:120] or "PROPOSED"), ("build", lambda r: r["flow_raw"][:120] or "—"), ("enhancement", lambda r: r["text"])]))
+    L.append(table(q["lists"]["enhancements"], [("ID", lambda r: r["id"]), ("status", lambda r: cell(r, "status")[:120] or "PROPOSED"), ("build", lambda r: cell(r, "flow")[:120] or "—"), ("enhancement", lambda r: cell(r, "text")[:140])]))
 
     # 6. Trade ideas
     L.append("## 6. Trade ideas (yours; never subscriber-facing until prospective)\n")
     L.append("_Source: `research/TRADE_IDEAS.md`._\n")
-    L.append(table(q["lists"]["trade_ideas"], [("ID", lambda r: r["id"]), ("evidence", lambda r: r["status_raw"][:120] or "IDEA"), ("tool in platform", lambda r: r["flow_raw"][:120] or "—"), ("idea", lambda r: r["text"])]))
+    L.append(table(q["lists"]["trade_ideas"], [("ID", lambda r: r["id"]), ("evidence", lambda r: cell(r, "status")[:120] or "IDEA"), ("tool in platform", lambda r: cell(r, "flow")[:120] or "—"), ("idea", lambda r: cell(r, "text")[:140])]))
 
     # 7. Decisions the desk made
     L.append("## 7. Decisions the desk made for you (autonomous mode)\n")

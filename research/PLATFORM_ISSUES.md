@@ -21,6 +21,11 @@ scoring or selection still goes through a research question and a full IMPLEMENT
 
 Statuses: `OPEN` · `HACI_DECIDED:<fix|research|accept>` · `BRIEF_WRITTEN` · `IMPLEMENTED:<sha>` · `VERIFIED` · `ACCEPTED`
 
+
+_Editing this table: a literal `|` inside a cell must be written `\|`. Unescaped, it is read as a
+column separator and `research/lib/desk_queue.py` refuses the whole register with the row id and the
+cell count. Renaming a column does the same — the role names live in `REGISTER_ROLES`._
+
 | ID | Severity | Status | Issue |
 |---|---|---|---|
 | PI-001 | high | IMPLEMENTED:2d5776c (**the 2026-09-14 FAILED verdict is overturned, 2026-09-15**: fix is on `main` via PR #26 `4775e49`, deploy confirmed by PI-017 §7, and the repair is running — it refills degraded dates oldest-first at ~10 trading dates/night (06-10 on the 09-13 night, 06-11..06-25 on 09-14, 06-26..07-09 on 09-15), each back to ~99% on all three horizons. 42 dates left (2026-07-10..2026-09-08), clears ~2026-09-22; VERIFIED when that count is 0. The manual sweep is no longer needed — every month 2026-02..2026-06 has zero degraded dates. Rewrites historical rows → logged in DATA_NOTES under DP-50. See reports/VERIFY_PI-001.md §11) | `uoa_symbol_daily.fwd_return_*` was ~95% degraded; repair in progress — brief: `research/briefs/PI-001_fwd_return_backfill_window.md` |

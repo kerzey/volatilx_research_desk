@@ -13,6 +13,11 @@ Tool-in-platform statuses (an idea can be built as an **internal, flag-off, Haci
 stage; a subscriber-facing version needs the gate in `ENHANCEMENTS.md`): `—` · `HACI_DECIDED:build` ·
 `BRIEF_WRITTEN` · `IMPLEMENTED:<sha>` · `VERIFIED`. Ask with `/desk-run prompt TI-NNN`.
 
+
+_Editing this table: a literal `|` inside a cell must be written `\|`. Unescaped, it is read as a
+column separator and `research/lib/desk_queue.py` refuses the whole register with the row id and the
+cell count. Renaming a column does the same — the role names live in `REGISTER_ROLES`._
+
 | ID | Evidence | Tool | Idea |
 |---|---|---|---|
 | TI-001 | UNDER_TEST:Q004 | — | Partial fill after hours on elite (90+) picks at publication, rest at the open. Q004 (decides 2026-10-26) tests whether after-hours, open or 10:00 entry changes the path. Tool: an after-hours fill alert keyed to the run's `finished_at` for 90+ picks. |

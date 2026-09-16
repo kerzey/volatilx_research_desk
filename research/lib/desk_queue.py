@@ -183,38 +183,116 @@ def inbox() -> list:
     return [l[6:].strip() for l in _read(ROOT / "research/INBOX.md").splitlines() if l.startswith("- [ ] ")]
 
 
-def _status_cell(rx, cells: list) -> tuple:
-    """(normalised token, raw cell) for the first cell that *starts* with a status token.
+# --- register tables -------------------------------------------------------------------------
+#
+# The three registers are markdown tables that use different words for the same three roles. The
+# roles are declared once, here, so that no caller has to know a column's *position* — before
+# 2026-09-15 every consumer indexed into a positional list, and a header rename or a stray pipe
+# would have shifted every later column silently.
+REGISTER_ROLES = {
+    "PLATFORM_ISSUES.md": {"status": "Status",   "flow": "Status", "text": "Issue"},
+    "ENHANCEMENTS.md":    {"status": "Status",   "flow": "Build",  "text": "Enhancement"},
+    "TRADE_IDEAS.md":     {"status": "Evidence", "flow": "Tool",   "text": "Idea"},
+}
+ID_RE = re.compile(r"^(PI|EN|TI)-\d{3}$")
+_UNESCAPED_PIPE = re.compile(r"(?<!\\)\|")
 
-    The last cell of every register table is free prose (`| ID | … | Issue |`), so it is never
-    scanned — that, with the `^` anchor, is what stops a description being read as a status.
+
+class RegisterError(ValueError):
+    """A register table is malformed. The desk stops rather than parse around it."""
+
+
+def _split_row(line: str) -> list:
+    r"""Cells of one markdown table row.
+
+    **A literal pipe inside a cell must be written `\|`.** That is the markdown convention and
+    what board.py already emits when it renders these rows. An unescaped `|` is a column
+    separator, and nothing tries to guess otherwise: it raises the row's cell count above the
+    header's, and `list_rows` raises. That is the whole rule — escaped, never forbidden, and a
+    violation is caught by the cell-count check rather than by a separate scan.
     """
-    for c in (cells[1:-1] or cells[1:]):
-        m = rx.match(c)
-        if m:
-            return m.group(0), c
-    return "", ""
+    parts = _UNESCAPED_PIPE.split(line.strip())
+    if parts and not parts[0].strip():          # the leading "|" of the row
+        parts = parts[1:]
+    if parts and not parts[-1].strip():         # the trailing "|" of the row
+        parts = parts[:-1]
+    return [c.strip().replace("\\|", "|") for c in parts]
+
+
+def _table(name: str):
+    """(header names, [(line number, cells)]) for the FIRST contiguous table in the register.
+
+    Only the first table is read. The detail sections below each register carry tables of their
+    own, and those are not rows of the register.
+    """
+    header, rows, started = None, [], False
+    for n, line in enumerate(_read(ROOT / f"research/{name}").splitlines(), start=1):
+        if not line.lstrip().startswith("|"):
+            if started:
+                break
+            continue
+        cells = _split_row(line)
+        if header is None:
+            if cells and cells[0] == "ID":
+                header, started = cells, True
+            continue
+        if cells and all(c and set(c) <= set("-: ") for c in cells):
+            continue                            # the |---|---| separator
+        rows.append((n, cells))
+    return header, rows
+
+
+def _role_token(rx, cell: str) -> tuple:
+    """(normalised status token, the cell exactly as written) for one role column."""
+    m = rx.match(cell)
+    return (m.group(0) if m else ""), cell
 
 
 def list_rows(name: str) -> list:
-    """Rows of the first markdown table in research/<name>.md whose first cell is an ID.
+    r"""Rows of the first markdown table in research/<name>.md whose first cell is an ID.
 
-    `status` / `flow` are the normalised tokens (`IMPLEMENTED:bccfa67`) that the queue branches
-    on; `status_raw` / `flow_raw` are the cells as written, annotation and all, for anything that
-    displays them. board.py renders these same rows, so the board and the queue cannot disagree
-    about a status — there is one parser, here.
+    Each row carries:
+      `columns`    {header name: cell} — the structural form. No caller indexes by position.
+      `roles`      which header name plays each role in this register (see REGISTER_ROLES).
+      `cells`      the same values in order, kept for callers that want the raw row.
+      `status`/`flow`  the normalised tokens the queue branches on (`IMPLEMENTED:bccfa67`),
+                   read from the *declared role column* — never "whichever cell matched first".
+      `status_raw`/`flow_raw`  those cells as written, annotation and all, for display.
+      `text`       the register's description column, trimmed for listing.
+
+    Raises `RegisterError` if the header is missing, a declared role column is absent, or a row's
+    cell count differs from the header's. A malformed register stops the desk: it is never zipped
+    short, because a row silently shifted by one column is worse than a crash.
+
+    board.py renders these same dicts, so the board and the queue cannot disagree about a status.
     """
+    roles = REGISTER_ROLES.get(name)
+    if roles is None:
+        raise RegisterError(f"{name}: no column roles declared — add it to REGISTER_ROLES")
+    header, raw_rows = _table(name)
+    if header is None:
+        raise RegisterError(f"research/{name}: found no table with an 'ID' header column")
+    missing = sorted(set(roles.values()) - set(header))
+    if missing:
+        raise RegisterError(
+            f"research/{name}: header {header} has no column named {missing[0]!r} "
+            f"(REGISTER_ROLES wants {roles}). Rename it back, or update REGISTER_ROLES.")
     out = []
-    for line in _read(ROOT / f"research/{name}").splitlines():
-        if not line.startswith("| "):
+    for line_no, cells in raw_rows:
+        if not cells or not ID_RE.match(cells[0]):
             continue
-        cells = [c.strip() for c in line.strip().strip("|").split("|")]
-        if not re.match(r"^(PI|EN|TI)-\d{3}$", cells[0]):
-            continue
-        status, status_raw = _status_cell(STATUS_RE, cells)
-        flow, flow_raw = _status_cell(FLOW_RE, cells)
-        out.append({"id": cells[0], "status": status, "status_raw": status_raw,
-                    "flow": flow, "flow_raw": flow_raw, "cells": cells, "text": cells[-1][:140]})
+        if len(cells) != len(header):
+            raise RegisterError(
+                f"research/{name} line {line_no}: row {cells[0]} has {len(cells)} cells but the "
+                f"header has {len(header)} {header}. A literal '|' inside a cell must be written "
+                r"'\|'; unescaped it is read as a column separator.")
+        columns = dict(zip(header, cells))
+        status, status_raw = _role_token(STATUS_RE, columns[roles["status"]])
+        flow, flow_raw = _role_token(FLOW_RE, columns[roles["flow"]])
+        out.append({"id": cells[0], "columns": columns, "roles": roles, "cells": cells,
+                    "status": status, "status_raw": status_raw,
+                    "flow": flow, "flow_raw": flow_raw,
+                    "text": columns[roles["text"]][:140]})
     return out
 
 
@@ -326,7 +404,10 @@ def build_queue(today: date = None, max_register: int = 2) -> dict:
         "inbox": inbox(),
         "for_haci": for_haci, "desk_todo": desk_todo, "ready_for_prompt": ready_for_prompt,
         "defaulted_decisions": defaulted,
-        "lists": {k: [{"id": r["id"], "status": r["status"], "status_raw": r["status_raw"],
+        # `columns` + `roles` travel with every row so board.py can name its columns instead of
+        # counting them; `status`/`flow` are the normalised tokens for anything that branches.
+        "lists": {k: [{"id": r["id"], "columns": r["columns"], "roles": r["roles"],
+                       "status": r["status"], "status_raw": r["status_raw"],
                        "flow": r["flow"], "flow_raw": r["flow_raw"], "text": r["text"]} for r in v] for k, v in lists.items()},
         "questions": [{k: q[k] for k in ("id", "dir", "title", "state", "historical_verdict", "prospective_verdict", "schedule")} for q in qs],
     }

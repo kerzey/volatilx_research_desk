@@ -26,6 +26,11 @@ CLAUDE.md rules 10–12 and they do not bend.
 
 Build statuses: `—` · `HACI_DECIDED:build` · `BRIEF_WRITTEN` · `IMPLEMENTED:<sha>` · `VERIFIED` · `FAILED` · `DROPPED`
 
+
+_Editing this table: a literal `|` inside a cell must be written `\|`. Unescaped, it is read as a
+column separator and `research/lib/desk_queue.py` refuses the whole register with the row id and the
+cell count. Renaming a column does the same — the role names live in `REGISTER_ROLES`._
+
 | ID | Kind | Status | Gate | Build | Enhancement |
 |---|---|---|---|---|---|
 | EN-001 | plumbing | READY | — | — | Append-only run-history table for SAS runs. `super_agent_select_runs` is updated in place, so the 2026-06-26 unrecorded picks (PI-012) and the KT-audit re-run nights cannot be reconstructed, only detected. Source: STEWARD_Q009 §R3, KT_AUDIT. |
