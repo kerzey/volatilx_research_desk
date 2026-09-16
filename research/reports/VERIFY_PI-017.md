@@ -7,7 +7,13 @@ commit that carried it to `main` has an identical tree to `bccfa67` (empty diff)
 in the merge. Fix commit time: 2026-09-14 20:04:04 UTC (15:04:04 -0500).
 **Desk repo SHA:** `4a87d15` (research repo HEAD at verification time). **Date:** 2026-09-14.
 
-## IMPLEMENTED:bccfa67 -- code verified, deploy unconfirmed, not FAILED. Every repository-side item passes clean. Database checks V1, V2, V4, the success_partial count, and the no-unauthorized-forced-rerun check all confirm no regression and no historical rewrite. V3 shows the most recent nightly run (started 2026-09-14 21:04 UTC, after the fix commit) still carries no force_scope / bulletin_action -- the deployed process is not yet running this code. The row moves to VERIFIED when a nightly run-audit row dated after the deploy carries those fields (V3 re-check).
+## VERIFIED -- the V3 re-check passed on 2026-09-15 (see section 7). Every repository-side item passes clean. Database checks V1, V2, V4, the success_partial count, and the no-unauthorized-forced-rerun check all confirm no regression and no historical rewrite.
+
+**Original verdict, 2026-09-14 (superseded, kept as the receipt):** IMPLEMENTED:bccfa67 -- code
+verified, deploy unconfirmed, not FAILED. V3 showed the most recent nightly run (started 2026-09-14
+21:04 UTC, after the fix commit) still carrying no force_scope / bulletin_action -- the deployed
+process was not yet running this code. The row moves to VERIFIED when a nightly run-audit row dated
+after the deploy carries those fields (V3 re-check). **That re-check has now run and passed.**
 
 ---
 
@@ -164,3 +170,75 @@ assumed this time. What would confirm deployment going forward: a nightly run-au
 today, with `force_scope` and `bulletin_action` populated at all (their mere presence is the signal --
 the pre-fix code never wrote these keys). V2 has since completed and passed (section 4), so the only
 thing standing between this row and `VERIFIED` is that V3 re-check on a post-deploy nightly.
+
+---
+
+## 7. V3 re-check, 2026-09-15 -- PASS. Deploy confirmed; the row moves to VERIFIED.
+
+Run by the coordinator, read-only, counts and field-presence only. The signal the 2026-09-14 pass
+named is exact: the pre-fix code never wrote `force_scope` or `bulletin_action` at all, so their
+mere presence on a nightly run-audit row proves the deployed process is running this code.
+
+**V3 -- the 10 most recent nightly runs, asking whether the new keys EXIST:**
+
+| trading_date | status | config.force | config has force_scope | config has universe_size | stats has force_scope | stats has bulletin_action | bulletin_action |
+|---|---|---|---|---|---|---|---|
+| **2026-09-15** | success | **true** | **yes** | **yes** | **yes** | **yes** | **rebuilt_from_full_date** |
+| 2026-09-14 | success | — | no | no | no | no | — |
+| 2026-09-11 | success | — | no | no | no | no | — |
+| 2026-09-10 | success | — | no | no | no | no | — |
+| 2026-09-09 | success | — | no | no | no | no | — |
+| 2026-09-08 | success | — | no | no | no | no | — |
+| 2026-09-04 | success | — | no | no | no | no | — |
+| 2026-09-03 | success | — | no | no | no | no | — |
+| 2026-09-02 | success | — | no | no | no | no | — |
+
+A clean break at 2026-09-15: every nightly before it lacks all four keys, that one carries all four.
+**PASS.** (The `uoa_runs` column is `config_json`, not `run_config`; noted for the next check.)
+
+**The 2026-09-15 run's values, read in full:**
+
+    config.force              = True
+    config.force_scope        = date
+    config.universe_explicit  = False
+    config.universe_size      = 503
+    stats.force_scope         = date
+    stats.force_partial       = False
+    stats.force_deleted       = {'contract_rows': 0, 'symbol_rows': 0, 'bulletins': 0}
+    stats.bulletin_action     = rebuilt_from_full_date
+
+This is the fix behaving exactly as specified. `universe_explicit = False` (no symbol list was
+given) resolves to `force_scope = date` -- the whole-date branch, which is correct for a
+full-universe nightly and is the branch section 1 item 3 confirmed unchanged. `force_partial =
+False`, so the narrow delete path was not taken. `force_deleted` is all zeros: nothing was deleted,
+because the date had no prior rows. `universe_size = 503` is the full universe, not a subset.
+
+**Worth Haci's attention, not a defect:** this nightly ran with `force = True`, where
+`services/uoa_scheduler.py:103` passes `force=False`. Something other than the scheduler launched
+it, or the caller changed. It is safe -- full universe, whole-date scope, nothing deleted -- and it
+is exactly the configuration PI-017 was filed to make safe. But the count of forced nightly runs
+since 2026-09-14 is now **1**, where the brief's header constraint expected none until the fix
+deployed. The fix had deployed by then, so the constraint is satisfied; flagging the change in
+caller behaviour rather than the run itself.
+
+**V1, V4 and the supplementary counts, re-run the same pass:**
+
+- **V1** -- dates with fewer than 200 distinct symbols in `uoa_symbol_daily`: still exactly one,
+  `2026-01-09` with 23 symbols. Unchanged. **PASS** (this is the historical damage PI-017 was filed
+  for; the fix is forward-only and does not repair it).
+- **V4** -- dates since 2026-09-01 without exactly one bulletin row: none. **PASS.**
+- `uoa_runs` rows with `status = 'success_partial'`: **0**. No partial forced run has happened yet,
+  so the narrow delete path remains untested in production. It is covered by the unit test and by
+  section 1 item 1's reading of the shipped function.
+
+**Still true and still not chased:** the `run_type='nightly'` row with `trading_date = 2026-12-09`,
+`status = running`, `started_at = 2026-01-12`, `forced = true`. Now joined by a second never-finished
+row, `trading_date = 2026-09-07` started 2026-09-08 02:30 UTC. Neither is evidence about this fix.
+Both are noted in `research/reports/VERIFY_PI-020.md` as a run-log integrity gap worth its own row.
+
+## OVERALL
+
+**VERIFIED at bccfa67.** Code correct (sections 1-3), no historical rewrite (V1, V2, V4), deploy
+confirmed by the presence of `force_scope` / `bulletin_action` on the 2026-09-15 nightly and their
+absence on every nightly before it (section 7). The one thing this fix does not do is repair
+2026-01-09, which stays at 23 symbols by design -- it is forward-only.

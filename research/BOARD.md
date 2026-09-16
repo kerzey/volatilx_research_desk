@@ -65,12 +65,8 @@ A missing counts snapshot is shown as unmeasured, not assumed to be a maturation
 
 ## 1. Waiting on you
 
-- **PI-001** — verification failed — see research/reports/VERIFY_*.md  
-  `fix and re-run /desk-run verify`
 - **PI-014** — run the brief in the platform repo, then tell the desk the SHA  
   `/desk-run verify PI-014 <sha>`
-- **EN-002** — run the brief in the platform repo, then tell the desk the SHA  
-  `/desk-run verify EN-002 <sha>`
 - **EN-019** — run the brief in the platform repo, then tell the desk the SHA  
   `/desk-run verify EN-019 <sha>`
 
@@ -138,7 +134,7 @@ _Source: `research/PLATFORM_ISSUES.md`. Statuses: OPEN → HACI_DECIDED:fix/rese
 
 | ID | status | issue |
 |---|---|---|
-| PI-001 | FAILED:merged to main but no date recovered (still ~5%, 21–25/498 through 2026-09-02) — deployed nightly likely not runn | `uoa_symbol_daily.fwd_return_*` still ~95% degraded; 30d relapsed to 0% from 07-27 — brief: `research/briefs/PI-001_fwd_return_backfill_wind |
+| PI-001 | IMPLEMENTED:2d5776c (**the 2026-09-14 FAILED verdict is overturned, 2026-09-15**: fix is on `main` via PR #26 `4775e49`, | `uoa_symbol_daily.fwd_return_*` was ~95% degraded; repair in progress — brief: `research/briefs/PI-001_fwd_return_backfill_window.md` |
 | PI-002 | HACI_DECIDED:fix | No coverage watchdog fires on PI-001 (none found in the codebase by that name) |
 | PI-003 | HACI_DECIDED:fix | `atr_pct` corrupted around splits (ATR computed on raw bars) |
 | PI-004 | HACI_DECIDED:fix | Manual re-runs indistinguishable from nightly runs in `super_agent_select_runs` |
@@ -154,7 +150,7 @@ _Source: `research/PLATFORM_ISSUES.md`. Statuses: OPEN → HACI_DECIDED:fix/rese
 | PI-014 | BRIEF_WRITTEN | Conviction Monitor's polarity arm silent since 2026-06-01: `polarity_unavailable_coverage_low` on 100% of in-scope rows, 0 polarity HOLD/EXI |
 | PI-015 | OPEN | Projection layer (v1.6 weight 29, the largest) unscored — `available: false` — on 72.2% of published and 74.3% of capped main-lane rows; `ov |
 | PI-016 | OPEN | Conviction label degenerate on the published slate: `completeness_score` never below 65.37 (min 65.3686 of 4,195 scored rows), so `_confiden |
-| PI-017 | IMPLEMENTED:bccfa67 (code verified 2026-09-14; deploy unconfirmed -- V3 re-check after the next nightly that runs bccfa6 | A forced UOA re-run deletes the **whole trading date** from `uoa_contract_daily`, `uoa_symbol_daily` and `uoa_bulletins`, then rebuilds only |
+| PI-017 | VERIFIED:bccfa67 (code verified 2026-09-14; **deploy confirmed 2026-09-15** — the V3 re-check passed: the 2026-09-15 nig | A forced UOA re-run deletes the **whole trading date** from `uoa_contract_daily`, `uoa_symbol_daily` and `uoa_bulletins`, then rebuilds only |
 | PI-018 | OPEN | Multi-agent technical report: the per-timeframe BUY/SELL call is not a faithful read of the technicals. A ≥ 70-strength signal with "medium" |
 | PI-019 | OPEN | Multi-agent technical reports: the zone-less `timestamp` switched from **UTC** (to 2026-04-05) to **US Eastern** (from 2026-04-07; both on 0 |
 | PI-020 | VERIFIED:3f1d3e6 (PR #32 merged e513d44, 2026-09-15; **D0 = 2026-09-15**; repo PASS, W5 history unchanged to the row, W1 | **UOA scanner truncates option trades: the flow layer is blind to puts on the most liquid names.** `AlpacaOptionsClient.get_option_trades` ( |
@@ -169,7 +165,7 @@ _Source: `research/ENHANCEMENTS.md`. `plumbing` items can be built now; `behavio
 | ID | status | build | enhancement |
 |---|---|---|---|
 | EN-001 | READY | — | Append-only run-history table for SAS runs. `super_agent_select_runs` is updated in place, so the 2026-06-26 unrecorded picks (PI-012) and t |
-| EN-002 | BRIEF_WRITTEN | BRIEF_WRITTEN | Speed-to-target on the report card: sessions to first touch of L1/L2/L3 from the next open, shown next to the distance-matched control. Sour |
+| EN-002 | PROPOSED | VERIFIED (2026-09-14, VERIFY_EN-002_2026-09-14.md; original FAIL receipt preserved) — BRIEF_WRITTEN (`research/briefs/EN | Speed-to-target on the report card: sessions to first touch of L1/L2/L3 from the next open, shown next to the distance-matched control. Sour |
 | EN-003 | PROPOSED | — | Actionable-basis hit rates (next-open and 10:00 ET) alongside the close-basis rate on performance surfaces; entry-timing note "L1 may be gon |
 | EN-004 | PROPOSED | — | Distance-matched control rate next to every published hit rate; ATR-scaled ladder placement (L1 ≥ ~0.75 ATR) if the deep-level pattern holds |
 | EN-005 | PROPOSED | — | Streak flag on the pick card (first-time / 2 / 3+ consecutive selections); lower default size note for first-time picks. Source: EXPLORE_001 |

@@ -149,7 +149,19 @@ class QueueAndAuditTests(unittest.TestCase):
         self.assertTrue(all(c["quotability"] == "NON_QUOTABLE" for c in queue["learning"]["cards"]))
         self.assertFalse(any(q["id"] == "Q024" for q in queue["due"]))
         self.assertFalse(any(q["id"] == "EN-002" for q in queue["for_haci"]))
-        self.assertTrue(any(t["id"] == "READINESS-Q024" for t in queue["learning"]["work"]))
+        # A tracked question whose readiness metadata is unusable must raise a repair task, and one
+        # whose metadata is usable must not. Until 2026-09-14 this asserted the Q024 repair task
+        # directly; commit 80d09d9 normalised Q024/Q006/Q027/Q029/Q034 to the counts schema, so the
+        # task legitimately stopped firing and the snapshot assertion went stale. The invariant is
+        # asserted instead, which holds however the readiness files are repaired later.
+        broken = {"READINESS_UNMEASURED", "READINESS_STALE", "READINESS_INVALID"}
+        tracked = {"Q006", "Q024", "Q027", "Q029", "Q034"}
+        tasks = {t["id"] for t in queue["learning"]["work"]}
+        for row in queue["readiness"]:
+            if row["id"] in tracked:
+                self.assertEqual(row["reason"] in broken, f"READINESS-{row['id']}" in tasks,
+                                 f"{row['id']}: reason {row['reason']} disagrees with the repair-task list")
+        self.assertNotIn(next(r["reason"] for r in queue["readiness"] if r["id"] == "Q024"), broken)
         self.assertEqual(before, {p: hashlib.sha256(p.read_bytes()).hexdigest() for p in files})
 
     def test_cards_become_due_weekly(self):

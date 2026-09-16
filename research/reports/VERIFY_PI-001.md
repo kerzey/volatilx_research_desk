@@ -1,4 +1,14 @@
-FAIL: merged to `main` but coverage has NOT recovered on any trading date — every date from 2026-06-26 through 2026-09-02 still carries 21–25 non-null `fwd_return_5d_pct` of ~498 rows (~5%), identical to the pre-fix state; the pre-freeze baseline was ~99%. Counts-only live check, coordinator, 2026-09-14 (§10).
+**REPAIRING — the 2026-09-14 FAIL is overturned (§11, 2026-09-15).** The fix is deployed and working.
+It refills the degraded dates **oldest first, about 10 trading dates a night**: 2026-06-10 on the
+night of 09-13, 2026-06-11..06-25 on 09-14, 2026-06-26..07-09 on 09-15. Every repaired date is back
+to ~99% on all three horizons. **42 dates remain** (2026-07-10..2026-09-08); at the observed rate
+the backlog clears around **2026-09-22**. The FAIL was read off a single snapshot taken while the
+repair was on its first night — the leading edge had already moved and was mistaken for noise.
+
+*Superseded verdict, 2026-09-14, kept as the receipt:* FAIL: merged to `main` but coverage has NOT
+recovered on any trading date — every date from 2026-06-26 through 2026-09-02 still carries 21–25
+non-null `fwd_return_5d_pct` of ~498 rows (~5%), identical to the pre-fix state; the pre-freeze
+baseline was ~99%. Counts-only live check, coordinator, 2026-09-14 (§10).
 
 # VERIFY PI-001 -- floor the legacy outcome backfill window in-process
 
@@ -487,3 +497,59 @@ code and prints `backfill_window_trading_days=65`; then re-run this exact query 
 (`--start-date 2026-04-15 --end-date 2026-07-29`, never `--force`), which remains Haci's decision.
 
 No historical row was observed rewritten, so no DATA_NOTES entry is owed.
+
+---
+
+## 11. Coordinator re-check, 2026-09-15 — the FAIL is overturned. The fix works; it is draining a backlog.
+
+§10 called FAIL on 2026-09-14 and inferred that the production nightly was not running the merged
+code. That inference is now falsified, twice over.
+
+**The fix is on `main`.** `2d5776c` ("PI-001: floor the legacy outcome backfill window in-process",
+2026-09-13 17:37 -0500) reaches `main` through `4775e49`, the PR #26 merge.
+
+**The deploy is confirmed, independently of PI-001.** The 2026-09-15 nightly writes `force_scope`
+and `bulletin_action` into its run audit — keys the pre-fix code never wrote at all — and no nightly
+before it does (`research/reports/VERIFY_PI-017.md` §7). Whatever was stale in the WebJob wrapper is
+stale no longer.
+
+**And the repair is visibly running.** Counts-only, read-only, per trading date:
+
+| repaired on the night of | trading dates repaired | range | 5d coverage after |
+|---|---:|---|---|
+| 2026-09-13 | 1 | 2026-06-10 | ~99% |
+| 2026-09-14 | 10 | 2026-06-11 .. 2026-06-25 | ~99% |
+| 2026-09-15 | 9 | 2026-06-26 .. 2026-07-09 | ~99% |
+
+Coverage now reads ~99% on **all three horizons** for every date from 2026-06-10 through 2026-07-09,
+and ~5% from 2026-07-10 onward. The boundary is sharp and it moves one night at a time.
+
+**The row-level timestamps say it outright.** The repaired dates carry `updated_at` between
+**21:35 and 21:45 UTC on 2026-09-15** — after that night's UOA nightly finished (21:03:43 → 21:13:21),
+about one trading date per minute, in date order. The nightly's own `outcomes_backfill` stat updated
+22 rows for a single recent date; these are 494-row full-date fills from the pipeline's outcome
+backfill step, which is precisely what the 65-trading-day floor in `2d5776c` governs.
+
+**Why §10 read it as no recovery.** Its own table already showed 2026-06-15..06-25 at 491–496 of
+~497 on `fwd_return_5d_pct` — the repair's first night, visible in the data it printed — but the
+14d and 30d columns for those dates were still low, and the combination was read as "no date shows
+recovery." A progressive backfill that walks forward from the oldest degraded date, filling short
+horizons before long ones, produces exactly that pattern on its first night. The lesson is specific:
+**one snapshot cannot distinguish "not working" from "working, partway through"** — that needs two
+observations, or the row timestamps, which §10 did not take.
+
+**Remaining work, and what it is not.** 42 trading dates (2026-07-10 .. 2026-09-08) are still at ~5%.
+At ~10 dates/night this clears around **2026-09-22**. Nothing needs to be run by hand for those —
+they are inside the 65-trading-day floor and the nightly is reaching them on its own. Dates *before*
+2026-06-10 are already healthy: every month 2026-02 through 2026-06 has zero degraded dates, and
+2026-01 has exactly one, `2026-01-09`, which is PI-017's 23-symbol date and a different defect. **So
+the separate manual sweep §10 left open as Haci's decision is no longer needed.**
+
+**What moves this row to VERIFIED:** re-run §10's counts query after about 2026-09-22 and confirm
+zero degraded dates in 2026-06-10..2026-09-08. Nothing else is owed.
+
+**A repair that rewrites history — logged under DP-50.** Unlike PI-017 and PI-020, this fix *does*
+rewrite historical rows: `uoa_symbol_daily.fwd_return_5d_pct / _14d_pct / _30d_pct` for trading dates
+from 2026-06-10 forward. `manifest_v001` (as_of 2026-09-10) froze those columns in their degraded
+state, so the live table and the freeze now disagree about the past — the case DP-50 anticipates.
+Entered in `research/data/DATA_NOTES.md` on the day it was observed.

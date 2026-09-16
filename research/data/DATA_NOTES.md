@@ -34,7 +34,7 @@ SHA. A repair that is only forward-looking (a new column, a guard on future writ
 
 | shipped | SHA | table.column | date range rewritten | raised by |
 |---|---|---|---|---|
-| _pending_ | `2d5776c` (on branch `fix/pi-001-backfill-window-floor`, **not merged to main as of 2026-09-13**) | `uoa_symbol_daily.fwd_return_5/7/14/30d_pct` | nothing yet. The code fix only widens which NULLs the nightly revisits; it overwrites no value. If Haci runs the PI-001 catch-up sweep, that fills NULLs over 2026-04-15..2026-07-29 and gets its own row here. | PI-001 |
+| **2026-09-13** (first repaired night; merged `4775e49` PR #26, deploy confirmed 2026-09-15) | `2d5776c` | `uoa_symbol_daily.fwd_return_5/14/30d_pct` | **2026-06-10 forward, null → value, refilling oldest-first at ~10 trading dates/night.** Done: 06-10..07-09. Remaining: 2026-07-10..2026-09-08, clears ~2026-09-22. No non-null value observed changing. Full entry: §"Repair log: `fwd_return_*` refilled from 2026-06-10" at the end of this file. The manual catch-up sweep is **not** needed — 2026-02..2026-06 have zero degraded dates. | PI-001 |
 
 ## Manual / late SAS runs (Haci, 2026-09-10)
 
@@ -461,3 +461,33 @@ row, before and after D0. The brief's W3 query keys on `snapshot_volume > 0`, so
 reads like a pass while measuring nothing. The substitute used instead — zero-print contracts by side on
 symbol-days with >= 1,000 prints — is decisive: the put-side zero-print share falls 74.0% -> 17.5% while the
 call side falls 55.2% -> 14.3%, i.e. a 19-point side gap closing to 3 points.
+
+## Repair log: `fwd_return_*` refilled from 2026-06-10 (PI-001, shipped `2d5776c`, deploy confirmed 2026-09-15)
+
+**This repair rewrites historical rows.** Unlike PI-017 and PI-020, which are forward-only, the
+PI-001 fix refills columns on trading dates already in the frozen record.
+
+- **Columns:** `uoa_symbol_daily.fwd_return_5d_pct`, `fwd_return_14d_pct`, `fwd_return_30d_pct`
+  (null → value only; no non-null value observed changing).
+- **Range:** trading dates from **2026-06-10** forward. Repaired so far: 2026-06-10 (night of
+  2026-09-13), 2026-06-11..2026-06-25 (09-14), 2026-06-26..2026-07-09 (09-15). Each goes from ~5%
+  non-null to ~99%. **42 dates remain** (2026-07-10..2026-09-08), refilling at ~10 trading dates per
+  night, expected complete around **2026-09-22**.
+- **Ship SHA:** `2d5776c` ("PI-001: floor the legacy outcome backfill window in-process",
+  2026-09-13), on `main` via PR #26 (`4775e49`). Deploy confirmed 2026-09-15 by the presence of
+  PI-017's new run-audit keys on that night's nightly and their absence on every nightly before it.
+- **Observed:** 2026-09-15, counts-only read-only check. `research/reports/VERIFY_PI-001.md` §11.
+
+**What this means for pinned work (DP-50).** `manifest_v001` (as_of 2026-09-10, sha256
+`1b959ef8…ae34ac4`) froze these columns in their **degraded** state — ~5% non-null from 2026-06-26
+onward. The live table and that freeze now disagree about the past, and will disagree further each
+night until the backlog clears. Per DP-50 this is not a bug in either: rule 4 holds, and a locked
+question keeps its pinned manifest. Two consequences to carry forward:
+
+1. **A study that pinned v001 and reads `fwd_return_*` after 2026-06-10 is reading a denominator
+   that no longer exists live.** Anything descriptive built on those columns from v001 should say so.
+2. **A successor freeze taken after ~2026-09-22 will show ~99% where v001 shows ~5%.** That is the
+   repair, not a discrepancy to chase. The split date for any question whose window spans it is the
+   date the repair reached that trading date, not the ship date — the repair walks backwards through
+   the calendar, so a single split date does not describe it. Prefer a successor freeze taken after
+   the backlog clears.
