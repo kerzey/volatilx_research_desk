@@ -65,10 +65,14 @@ A missing counts snapshot is shown as unmeasured, not assumed to be a maturation
 
 ## 1. Waiting on you
 
+- **PI-001** — verification failed — see research/reports/VERIFY_*.md  
+  `fix and re-run /desk-run verify`
 - **PI-014** — run the brief in the platform repo, then tell the desk the SHA  
   `/desk-run verify PI-014 <sha>`
 - **EN-002** — run the brief in the platform repo, then tell the desk the SHA  
   `/desk-run verify EN-002 <sha>`
+- **EN-019** — run the brief in the platform repo, then tell the desk the SHA  
+  `/desk-run verify EN-019 <sha>`
 
 **Ready when you ask** (you already decided these; the desk writes the prompt on request):
 
@@ -134,7 +138,7 @@ _Source: `research/PLATFORM_ISSUES.md`. Statuses: OPEN → HACI_DECIDED:fix/rese
 
 | ID | status | issue |
 |---|---|---|
-| PI-001 | OPEN | `uoa_symbol_daily.fwd_return_*` still ~95% degraded; 30d relapsed to 0% from 07-27 — brief: `research/briefs/PI-001_fwd_return_backfill_wind |
+| PI-001 | FAILED:merged to main but no date recovered (still ~5%, 21–25/498 through 2026-09-02) — deployed nightly likely not runn | `uoa_symbol_daily.fwd_return_*` still ~95% degraded; 30d relapsed to 0% from 07-27 — brief: `research/briefs/PI-001_fwd_return_backfill_wind |
 | PI-002 | HACI_DECIDED:fix | No coverage watchdog fires on PI-001 (none found in the codebase by that name) |
 | PI-003 | HACI_DECIDED:fix | `atr_pct` corrupted around splits (ATR computed on raw bars) |
 | PI-004 | HACI_DECIDED:fix | Manual re-runs indistinguishable from nightly runs in `super_agent_select_runs` |
@@ -150,10 +154,10 @@ _Source: `research/PLATFORM_ISSUES.md`. Statuses: OPEN → HACI_DECIDED:fix/rese
 | PI-014 | BRIEF_WRITTEN | Conviction Monitor's polarity arm silent since 2026-06-01: `polarity_unavailable_coverage_low` on 100% of in-scope rows, 0 polarity HOLD/EXI |
 | PI-015 | OPEN | Projection layer (v1.6 weight 29, the largest) unscored — `available: false` — on 72.2% of published and 74.3% of capped main-lane rows; `ov |
 | PI-016 | OPEN | Conviction label degenerate on the published slate: `completeness_score` never below 65.37 (min 65.3686 of 4,195 scored rows), so `_confiden |
-| PI-017 | OPEN | A forced UOA re-run deletes the **whole trading date** from `uoa_contract_daily`, `uoa_symbol_daily` and `uoa_bulletins`, then rebuilds only |
+| PI-017 | IMPLEMENTED:bccfa67 (code verified 2026-09-14; deploy unconfirmed -- V3 re-check after the next nightly that runs bccfa6 | A forced UOA re-run deletes the **whole trading date** from `uoa_contract_daily`, `uoa_symbol_daily` and `uoa_bulletins`, then rebuilds only |
 | PI-018 | OPEN | Multi-agent technical report: the per-timeframe BUY/SELL call is not a faithful read of the technicals. A ≥ 70-strength signal with "medium" |
 | PI-019 | OPEN | Multi-agent technical reports: the zone-less `timestamp` switched from **UTC** (to 2026-04-05) to **US Eastern** (from 2026-04-07; both on 0 |
-| PI-020 | OPEN | **UOA scanner truncates option trades: the flow layer is blind to puts on the most liquid names.** `AlpacaOptionsClient.get_option_trades` ( |
+| PI-020 | VERIFIED:3f1d3e6 (PR #32 merged e513d44, 2026-09-15; **D0 = 2026-09-15**; repo PASS, W5 history unchanged to the row, W1 | **UOA scanner truncates option trades: the flow layer is blind to puts on the most liquid names.** `AlpacaOptionsClient.get_option_trades` ( |
 | PI-021 | OPEN | **Running the platform test suite deletes every user.** `conftest.py:37-55` (platform `c311e81`) has an autouse fixture that deletes all row |
 | PI-023 | OPEN | **Option buy/sell side is judged against the closing quote, so the label follows the day's price drift.** `services/uoa_screener.py:1114-111 |
 | PI-022 | OPEN | **Conviction Monitor wrote nothing on 2026-07-06** — `conviction_monitor_daily` has 0 rows for that session while every other in-window sess |
@@ -182,8 +186,8 @@ _Source: `research/ENHANCEMENTS.md`. `plumbing` items can be built now; `behavio
 | EN-016 | PROPOSED | — | A larger per-night candidate universe retained in `sas_candidates` — the full scanned universe rather than the scored shortlist, or a per-se |
 | EN-017 | PROPOSED | — | Edge-decay monitor: a nightly job that appends, per pick night, the Spearman IC between `overall_score` and the path outcome across all 16:0 |
 | EN-018 | PROPOSED | — | Setup labels on the pick card (A flow-led / B projection-led continuation / C catalyst-driven, assigned deterministically from the 16:05 dom |
-| EN-019 | PROPOSED | — | **Make the multi-agent technical reports researchable going forward.** Run the internal batch analysis on a fixed, pre-declared universe eve |
-| EN-020 | READY | — | **Intraday UOA sampler: option buy/sell side from the quote at trade time (fixes PI-023).** A 10-minute WebJob on NYSE sessions (XNYS calend |
+| EN-019 | PROPOSED | BRIEF_WRITTEN (2026-09-15, research/briefs/EN-019_fixed_universe_report_batch.md; HACI_DECIDED:build 2026-09-15; **rewri | **Make the multi-agent technical reports researchable going forward.** Run the internal batch analysis on a fixed, pre-declared universe eve |
+| EN-020 | READY | IMPLEMENTED:c5740cc (Phase A, PR #35 merged eb2de2c, redeployed 2036454 / PR #36, 2026-09-15; VERIFY_PENDING (repo+schem | **Intraday UOA sampler: option buy/sell side from the quote at trade time (fixes PI-023).** A 10-minute WebJob on NYSE sessions (XNYS calend |
 
 ## 6. Trade ideas (yours; never subscriber-facing until prospective)
 
@@ -262,6 +266,7 @@ _Each was a question the desk would once have asked you. It took the recommended
 ## 8. Backlog and calendar
 
 - Open hypotheses: **6** · registered: 61 · deferred (data missing): H-014, H-021, H-022, H-041, H-055, H-062, H-067, H-078, H-080, H-086, H-087, H-088, H-089, H-090, H-094
+- Inbox items waiting: 1
 - Next to register (DP-47 order): H-092, H-093, H-095, H-096, H-098
 
 | decides on | Q |

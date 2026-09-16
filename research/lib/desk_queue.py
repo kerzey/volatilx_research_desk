@@ -64,9 +64,23 @@ RUN_STEPS = {           # state -> what the desk does next
     "LIVE_VALIDATED": "Haci: RELEASE_APPROVED",
 }
 TERMINAL = {"NULL", "INCONCLUSIVE", "REJECTED", "DEFERRED"}
-STATUS_RE = re.compile(r"^(OPEN|PROPOSED|READY|IDEA|UNDER_TEST\S*|HISTORICAL\S*|PROSPECTIVE\S*|KILLED|HACI_DECIDED:\S+|"
-                       r"BRIEF_WRITTEN|IMPLEMENTED:\S+|VERIFIED|FAILED\S*|ACCEPTED|DROPPED)$")
-FLOW_RE = re.compile(r"^(HACI_DECIDED:\S+|BRIEF_WRITTEN|IMPLEMENTED:\S+|VERIFIED|FAILED\S*|ACCEPTED|DROPPED)$")
+# A register status cell is a token, optionally `:value`, optionally followed by an annotation:
+#   OPEN
+#   HACI_DECIDED:fix
+#   IMPLEMENTED:bccfa67 (code verified 2026-09-14; deploy unconfirmed -- ...)
+#   VERIFIED:3f1d3e6 (PR #32 merged e513d44, 2026-09-15; ...) -- BRIEF_WRITTEN
+# 2026-09-15: these were anchored `^...$` over `\S` classes, so *any* cell carrying an annotation
+# matched nothing — which is every cell a verify writes. list_rows then returned status="" and
+# flow="", and build_queue's branch chain skipped the row outright: PI-001's FAILED state was
+# invisible to the queue and PI-017 was never listed for the Steward's verification. Match only at
+# the START of the cell (a prose cell is never mistaken for a status) and terminate the `:value` at
+# whitespace or "(" so downstream `split(":", 1)[1]` gets the SHA alone, not the SHA plus prose.
+_STATUS_TOKEN = (r"HACI_DECIDED|BRIEF_WRITTEN|IMPLEMENTED|VERIFIED|FAILED|ACCEPTED|DROPPED|"
+                 r"UNDER_TEST|HISTORICAL|PROSPECTIVE|PROPOSED|KILLED|READY|IDEA|OPEN")
+_FLOW_TOKEN = r"HACI_DECIDED|BRIEF_WRITTEN|IMPLEMENTED|VERIFIED|FAILED|ACCEPTED|DROPPED"
+_CELL = r"^(?:{})[A-Z_]*(?::[^\s(]*)?(?=$|[\s(])"   # [A-Z_]* absorbs HISTORICAL -> HISTORICALLY_CONFIRMED
+STATUS_RE = re.compile(_CELL.format(_STATUS_TOKEN))
+FLOW_RE = re.compile(_CELL.format(_FLOW_TOKEN))
 DATE_RE = re.compile(r"(\d{4}-\d{2}-\d{2})")
 
 
@@ -169,8 +183,27 @@ def inbox() -> list:
     return [l[6:].strip() for l in _read(ROOT / "research/INBOX.md").splitlines() if l.startswith("- [ ] ")]
 
 
+def _status_cell(rx, cells: list) -> tuple:
+    """(normalised token, raw cell) for the first cell that *starts* with a status token.
+
+    The last cell of every register table is free prose (`| ID | … | Issue |`), so it is never
+    scanned — that, with the `^` anchor, is what stops a description being read as a status.
+    """
+    for c in (cells[1:-1] or cells[1:]):
+        m = rx.match(c)
+        if m:
+            return m.group(0), c
+    return "", ""
+
+
 def list_rows(name: str) -> list:
-    """Rows of the first markdown table in research/<name>.md whose first cell is an ID."""
+    """Rows of the first markdown table in research/<name>.md whose first cell is an ID.
+
+    `status` / `flow` are the normalised tokens (`IMPLEMENTED:bccfa67`) that the queue branches
+    on; `status_raw` / `flow_raw` are the cells as written, annotation and all, for anything that
+    displays them. board.py renders these same rows, so the board and the queue cannot disagree
+    about a status — there is one parser, here.
+    """
     out = []
     for line in _read(ROOT / f"research/{name}").splitlines():
         if not line.startswith("| "):
@@ -178,9 +211,10 @@ def list_rows(name: str) -> list:
         cells = [c.strip() for c in line.strip().strip("|").split("|")]
         if not re.match(r"^(PI|EN|TI)-\d{3}$", cells[0]):
             continue
-        status = next((c for c in cells[1:] if STATUS_RE.match(c)), "")
-        flow = next((c for c in cells[1:] if FLOW_RE.match(c)), "")
-        out.append({"id": cells[0], "status": status, "flow": flow, "cells": cells, "text": cells[-1][:140]})
+        status, status_raw = _status_cell(STATUS_RE, cells)
+        flow, flow_raw = _status_cell(FLOW_RE, cells)
+        out.append({"id": cells[0], "status": status, "status_raw": status_raw,
+                    "flow": flow, "flow_raw": flow_raw, "cells": cells, "text": cells[-1][:140]})
     return out
 
 
@@ -248,7 +282,7 @@ def build_queue(today: date = None, max_register: int = 2) -> dict:
                 for_haci.append({"id": r["id"], "what": "run the brief in the platform repo, then tell the desk the SHA",
                                  "type": f"/desk-run verify {r['id']} <sha>"})
             elif st.startswith("IMPLEMENTED:"):
-                desk_todo.append({"id": r["id"], "what": f"steward verify {r['id']} {st.split(':',1)[1]}"})
+                desk_todo.append({"id": r["id"], "what": f"steward verify {r['id']} {st.split(':', 1)[1] or '<sha missing from the register row>'}"})
             elif st.startswith("FAILED"):
                 for_haci.append({"id": r["id"], "what": "verification failed — see research/reports/VERIFY_*.md", "type": "fix and re-run /desk-run verify"})
 
@@ -292,7 +326,8 @@ def build_queue(today: date = None, max_register: int = 2) -> dict:
         "inbox": inbox(),
         "for_haci": for_haci, "desk_todo": desk_todo, "ready_for_prompt": ready_for_prompt,
         "defaulted_decisions": defaulted,
-        "lists": {k: [{"id": r["id"], "status": r["status"], "flow": r["flow"], "text": r["text"]} for r in v] for k, v in lists.items()},
+        "lists": {k: [{"id": r["id"], "status": r["status"], "status_raw": r["status_raw"],
+                       "flow": r["flow"], "flow_raw": r["flow_raw"], "text": r["text"]} for r in v] for k, v in lists.items()},
         "questions": [{k: q[k] for k in ("id", "dir", "title", "state", "historical_verdict", "prospective_verdict", "schedule")} for q in qs],
     }
 
