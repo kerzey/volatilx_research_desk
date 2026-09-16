@@ -189,8 +189,12 @@ def inbox() -> list:
 # roles are declared once, here, so that no caller has to know a column's *position* — before
 # 2026-09-15 every consumer indexed into a positional list, and a header rename or a stray pipe
 # would have shifted every later column silently.
+# A role a register does not have is simply absent from its mapping — "fault" exists only on
+# PLATFORM_ISSUES.md, and ENHANCEMENTS.md keeps its own unrelated "Kind" column (plumbing /
+# behaviour), which is why the issues column is named Fault rather than Kind.
 REGISTER_ROLES = {
-    "PLATFORM_ISSUES.md": {"status": "Status",   "flow": "Status", "text": "Issue"},
+    "PLATFORM_ISSUES.md": {"status": "Status",   "flow": "Status", "text": "Issue",
+                           "fault": "Fault"},
     "ENHANCEMENTS.md":    {"status": "Status",   "flow": "Build",  "text": "Enhancement"},
     "TRADE_IDEAS.md":     {"status": "Evidence", "flow": "Tool",   "text": "Idea"},
 }

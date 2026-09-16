@@ -13,7 +13,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from desk_queue import ROOT, QDIR, build_queue, _read  # noqa: E402
+from desk_queue import ROOT, QDIR, RegisterError, build_queue, _read  # noqa: E402
 
 OUT = ROOT / "research/BOARD.md"
 
@@ -136,7 +136,7 @@ def main() -> None:
     # Every column below is named through the row's own `roles`/`columns`, never by position, and
     # the rows come from desk_queue.list_rows — so the board cannot disagree with the queue about
     # a status, and a renamed register column fails in the parser instead of shifting this table.
-    L.append(table(q["lists"]["issues"], [("ID", lambda r: r["id"]), ("status", lambda r: cell(r, "status")[:120] or "OPEN"), ("issue", lambda r: cell(r, "text")[:140])]))
+    L.append(table(q["lists"]["issues"], [("ID", lambda r: r["id"]), ("fault", lambda r: cell(r, "fault")), ("status", lambda r: cell(r, "status")[:120] or "OPEN"), ("issue", lambda r: cell(r, "text")[:140])]))
 
     # 5. Enhancements
     L.append("## 5. Enhancements to build in the platform\n")
@@ -191,7 +191,43 @@ def main() -> None:
     print(f"wrote {OUT.relative_to(ROOT)}")
 
 
+def write_error_board(error: RegisterError) -> None:
+    """Replace the board with the reason it could not be built, and exit non-zero.
+
+    A malformed register must stop the desk — that part is correct and unchanged. But the
+    cockpit's runner snapshots by calling this script, so a traceback escaping to stderr shows
+    Haci an empty board with no explanation of why. The failure has to be legible where he is
+    actually looking, so it goes *into* BOARD.md. Everything else on the board is derived from
+    the registers and would be stale or wrong, so none of it is rendered.
+    """
+    OUT.write_text("\n".join([
+        "# Research desk board — BLOCKED",
+        "",
+        "**The board could not be built: a register table is malformed.**",
+        "",
+        "Nothing below is rendered, because every section is derived from the registers and would",
+        "be stale or wrong. The desk has stopped on purpose — a row silently shifted by one column",
+        "is worse than a crash. Fix the row named below and re-run `python research/lib/board.py`.",
+        "",
+        "```",
+        str(error),
+        "```",
+        "",
+        "The message names the file, the line, the row id and both cell counts. The usual cause is a",
+        r"literal `|` inside a cell: it must be written `\|`, or it is read as a column separator.",
+        "A renamed or removed column fails the same way — the role names live in `REGISTER_ROLES`",
+        "in `research/lib/desk_queue.py`.",
+        "",
+    ]) + "\n", encoding="utf-8")
+    print(f"BLOCKED: {error}", file=sys.stderr)
+    print(f"wrote {OUT.relative_to(ROOT)} (error board)")
+
+
 if __name__ == "__main__":
     if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
         sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
-    main()
+    try:
+        main()
+    except RegisterError as err:
+        write_error_board(err)
+        sys.exit(1)

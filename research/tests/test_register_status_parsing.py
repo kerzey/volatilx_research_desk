@@ -28,8 +28,8 @@ PI_017 = ("IMPLEMENTED:bccfa67 (code verified 2026-09-14; deploy unconfirmed -- 
 PI_020 = ("VERIFIED:3f1d3e6 (PR #32 merged e513d44, 2026-09-15; **D0 = 2026-09-15**; repo PASS, "
           "W5 history unchanged to the row) - BRIEF_WRITTEN")
 
-HEADER = "| ID | Severity | Status | Issue |"
-SEP = "|---|---|---|---|"
+HEADER = "| ID | Severity | Fault | Status | Issue |"
+SEP = "|---|---|---|---|---|"
 
 
 def write_register(*body, header=HEADER, name="PLATFORM_ISSUES.md"):
@@ -52,7 +52,7 @@ class StatusTokenTests(unittest.TestCase):
     """Defect 1 — the leading token must survive an annotation after it."""
 
     def parse(self, status_cell):
-        rows = write_register(f"| PI-999 | high | {status_cell} | prose |")
+        rows = write_register(f"| PI-999 | high | data | {status_cell} | prose |")
         self.assertEqual(len(rows), 1)
         return rows[0]
 
@@ -94,50 +94,50 @@ class StructuralTests(unittest.TestCase):
     """Defect 2 — columns by name, and a malformed table raises instead of shifting."""
 
     def test_well_formed_row_gives_columns_by_name(self):
-        rows = write_register(f"| PI-042 | high | {PI_017} | the issue text |")
+        rows = write_register(f"| PI-042 | high | logic | {PI_017} | the issue text |")
         row = rows[0]
-        self.assertEqual(row["columns"], {"ID": "PI-042", "Severity": "high",
+        self.assertEqual(row["columns"], {"ID": "PI-042", "Severity": "high", "Fault": "logic",
                                           "Status": PI_017, "Issue": "the issue text"})
-        self.assertEqual(row["cells"], ["PI-042", "high", PI_017, "the issue text"])
+        self.assertEqual(row["cells"], ["PI-042", "high", "logic", PI_017, "the issue text"])
         self.assertEqual(row["roles"], desk_queue.REGISTER_ROLES["PLATFORM_ISSUES.md"])
         self.assertEqual(row["text"], "the issue text")
         self.assertEqual(row["status"], "IMPLEMENTED:bccfa67")
 
     def test_one_extra_cell_raises_and_names_both_counts(self):
         with self.assertRaises(desk_queue.RegisterError) as e:
-            write_register("| PI-042 | high | OPEN | the issue | an extra cell |")
+            write_register("| PI-042 | high | data | OPEN | the issue | an extra cell |")
         msg = str(e.exception)
         self.assertIn("PI-042", msg)
-        self.assertIn("5 cells", msg)
-        self.assertIn("header has 4", msg)
+        self.assertIn("6 cells", msg)
+        self.assertIn("header has 5", msg)
 
     def test_missing_trailing_cell_raises(self):
         with self.assertRaises(desk_queue.RegisterError) as e:
-            write_register("| PI-042 | high | OPEN |")
+            write_register("| PI-042 | high | data | OPEN |")
         msg = str(e.exception)
         self.assertIn("PI-042", msg)
-        self.assertIn("3 cells", msg)
-        self.assertIn("header has 4", msg)
+        self.assertIn("4 cells", msg)
+        self.assertIn("header has 5", msg)
 
     def test_renamed_header_column_raises_rather_than_shifting(self):
         with self.assertRaises(desk_queue.RegisterError) as e:
-            write_register("| PI-042 | high | OPEN | the issue |",
-                           header="| ID | Severity | State | Issue |")
+            write_register("| PI-042 | high | data | OPEN | the issue |",
+                           header="| ID | Severity | Fault | State | Issue |")
         self.assertIn("'Status'", str(e.exception))
 
     def test_an_escaped_pipe_is_one_cell_and_comes_back_literal(self):
-        rows = write_register(r"| PI-042 | high | OPEN | a \| b, still one cell |")
+        rows = write_register(r"| PI-042 | high | data | OPEN | a \| b, still one cell |")
         self.assertEqual(rows[0]["columns"]["Issue"], "a | b, still one cell")
-        self.assertEqual(len(rows[0]["cells"]), 4)
+        self.assertEqual(len(rows[0]["cells"]), 5)
 
     def test_an_unescaped_pipe_is_caught_by_the_cell_count_check(self):
         # this is the silent-shift bug: without the check, "Issue" would read "a " and the
         # row would lose " b" off the end with no error at all
         with self.assertRaises(desk_queue.RegisterError):
-            write_register("| PI-042 | high | OPEN | a | b |")
+            write_register("| PI-042 | high | data | OPEN | a | b |")
 
     def test_only_the_first_table_is_read(self):
-        rows = write_register("| PI-042 | high | OPEN | the issue |")
+        rows = write_register("| PI-042 | high | data | OPEN | the issue |")
         self.assertEqual([r["id"] for r in rows], ["PI-042"])
 
     def test_the_live_registers_parse_and_leave_no_row_unparsed(self):
@@ -147,6 +147,39 @@ class StructuralTests(unittest.TestCase):
                 with self.subTest(register=name, row=row["id"]):
                     self.assertTrue(row["status"], f"{row['id']} parsed to an empty status")
                     self.assertEqual(len(row["cells"]), len(row["columns"]))
+
+
+class FaultColumnTests(unittest.TestCase):
+    """PLATFORM_ISSUES.md's Fault column: data | logic | feature, read by name."""
+
+    VALUES = ("data", "logic", "feature")
+
+    def test_each_of_the_three_values_parses(self):
+        for value in self.VALUES:
+            with self.subTest(fault=value):
+                rows = write_register(f"| PI-042 | high | {value} | OPEN | the issue |")
+                self.assertEqual(rows[0]["columns"]["Fault"], value)
+                self.assertEqual(rows[0]["columns"][rows[0]["roles"]["fault"]], value)
+
+    def test_a_row_missing_the_fault_cell_raises_with_the_id_and_both_counts(self):
+        with self.assertRaises(desk_queue.RegisterError) as e:
+            write_register("| PI-042 | high | OPEN | the issue |")
+        msg = str(e.exception)
+        self.assertIn("PI-042", msg)
+        self.assertIn("4 cells", msg)
+        self.assertIn("header has 5", msg)
+
+    def test_fault_is_declared_only_where_the_column_exists(self):
+        self.assertEqual(desk_queue.REGISTER_ROLES["PLATFORM_ISSUES.md"]["fault"], "Fault")
+        for other in ("ENHANCEMENTS.md", "TRADE_IDEAS.md"):
+            self.assertNotIn("fault", desk_queue.REGISTER_ROLES[other])
+
+    def test_every_live_issue_row_carries_a_legal_fault(self):
+        rows = desk_queue.list_rows("PLATFORM_ISSUES.md")
+        self.assertTrue(rows)
+        for row in rows:
+            with self.subTest(row=row["id"]):
+                self.assertIn(row["columns"]["Fault"], self.VALUES)
 
 
 if __name__ == "__main__":
