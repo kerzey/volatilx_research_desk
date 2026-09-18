@@ -1,6 +1,6 @@
 # Research desk — board
 
-_Generated 2026-09-15 by `research/lib/board.py`. Do not edit; edit the source files and re-run. Ask the desk for anything on this page in plain words, or use the commands shown._
+_Generated 2026-09-17 by `research/lib/board.py`. Do not edit; edit the source files and re-run. Ask the desk for anything on this page in plain words, or use the commands shown._
 
 ## Evidence available now
 
@@ -263,8 +263,8 @@ _Each was a question the desk would once have asked you. It took the recommended
 
 ## 8. Backlog and calendar
 
-- Open hypotheses: **7** · registered: 61 · deferred (data missing): H-014, H-021, H-022, H-041, H-055, H-062, H-067, H-078, H-080, H-086, H-087, H-088, H-089, H-090, H-094
-- Inbox items waiting: 1
+- Open hypotheses: **9** · registered: 61 · deferred (data missing): H-014, H-021, H-022, H-041, H-055, H-062, H-067, H-078, H-080, H-086, H-087, H-088, H-089, H-090, H-094
+- Inbox items waiting: 3
 - Next to register (DP-47 order): H-092, H-093, H-095, H-096, H-098
 
 | decides on | Q |
