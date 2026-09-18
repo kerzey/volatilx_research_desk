@@ -28,3 +28,10 @@ Narrowed / not adopted
 Consequence to keep in mind
 - Night-level inference means Q001 has ~90–100 observations. Detectable edge ≈ 1% per 10 sessions.
   Modest real edges will read INCONCLUSIVE; the forward shadow cohort is where they get proven.
+
+## 2026-09-15 — patch10: human gate and admin flag closed to sessions
+
+guard_bash.py now blocks any command containing `--by haci` or the token `DESK_ADMIN` unless the
+hook itself runs in an admin session (`scripts/start_desk.sh --admin`). Before this, controller.py
+compared a string and any agent could approve a question; and an inline `DESK_ADMIN=1` prefix
+reached the controller's child process unguarded. Cockpit Phase 0 entry gate.

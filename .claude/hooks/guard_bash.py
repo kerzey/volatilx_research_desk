@@ -9,6 +9,7 @@ Blocks:
   - rm -rf, sudo, curl|sh style installs
   - Alpaca trading endpoints (market data only) — absolute, no DESK_ADMIN escape
   - modification of enforcement code (unless DESK_ADMIN=1)
+  - any `--by haci` (human-only transitions) and any DESK_ADMIN token, unless launched as admin (patch10)
 Logs every decision to research/reports/hook_audit.log (stderr only on block).
 
 FAIL-SAFE SCOPE (changed 2026-09-10). Claude Code 2.1.267 does not populate `agent_type` in
@@ -52,6 +53,10 @@ CODEBASE = os.environ.get("CODEBASE_DIR", "").replace("\\", "/").rstrip("/")
 CODE_WRITE = re.compile(r"(>|>>|\bsed\s+-i|\btee\b|\bmv\b|\bcp\b|\brm\b|\bchmod\b|\btouch\b|\bpython3?\s+-c)")
 CODE_GIT_RO = re.compile(r"git\s+(-C\s+\S+\s+)?(log|show|diff|rev-parse|status|ls-files|blame|describe|branch\s+--show-current)\b")
 ENFORCEMENT = re.compile(r"(\.claude/|research/lib/validators\.py|research/lib/controller\.py|research/lib/freeze_dataset\.py|research/lib/eval_utils\.py)")
+
+# patch10 (cockpit, 2026-09-15): the human gate and the admin flag never come from inside a session.
+BY_HACI = re.compile(r"--by(?:=|\s+)[\"']?haci\b", re.I)
+ADMIN_TOKEN = re.compile(r"\bDESK_ADMIN\b")
 
 
 def resolve_agent(payload) -> str:
@@ -104,6 +109,13 @@ def main() -> None:
     cmd = (payload.get("tool_input") or {}).get("command", "") or ""
     agent = resolve_agent(payload)
 
+    # patch10: the three HUMAN_ONLY transitions are Haci's alone (controller.py:25). They are typed
+    # in a terminal, never issued by an agent or a cockpit job. DESK_ADMIN is a launch-time decision
+    # (scripts/start_desk.sh --admin), never an inline prefix on one command.
+    if not ADMIN and BY_HACI.search(cmd):
+        block(cmd, "--by haci is a human-only transition; Haci runs it himself in a terminal", agent)
+    if not ADMIN and ADMIN_TOKEN.search(cmd):
+        block(cmd, "DESK_ADMIN cannot be set from inside a session; relaunch with scripts/start_desk.sh --admin", agent)
     if DESTRUCTIVE.search(cmd):
         block(cmd, "destructive shell command", agent)
     if re.search(r"git\s+push.*(--force|-f\b|\+)", cmd, re.I):
